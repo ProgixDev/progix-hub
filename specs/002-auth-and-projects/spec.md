@@ -47,6 +47,4 @@ progixHub today is a painted-door portfolio with hard-coded projects and no sign
 
 ## Open questions
 
-Resolved before `/plan-feature` proceeds (it will interview you). Delete when empty.
-
-- [ ] e2e auth strategy: real GitHub OAuth is not testable in CI — `/plan-feature` picks a seeded/test-session approach so CUJ-01/02 can run signed-in.
+None — the e2e auth strategy (seeded test session, no real OAuth) is resolved in [plan.md](plan.md).
