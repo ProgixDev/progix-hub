@@ -4,7 +4,9 @@
  * token is only ever passed in server code (the OAuth callback).
  */
 
-export const PROGIX_ORG = "DigitariaWebs";
+// The org's canonical GitHub login is `ProgixDev` (it was renamed from `DigitariaWebs`,
+// which now 404s on the membership API). Overridable via env for other deployments.
+export const PROGIX_ORG = process.env.PROGIX_GITHUB_ORG ?? "ProgixDev";
 
 /** Shape of the GitHub `GET /user/memberships/orgs/{org}` response we care about. */
 export type OrgMembership = { state?: string } | null;

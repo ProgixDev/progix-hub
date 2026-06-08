@@ -41,7 +41,7 @@ export default async function SignInPage({
           </div>
         </div>
         <p className="text-text-3 mt-5 text-center text-[12px]">
-          Access is limited to DigitariaWebs organization members.
+          Access is limited to Progix organization members.
         </p>
       </div>
     </main>
