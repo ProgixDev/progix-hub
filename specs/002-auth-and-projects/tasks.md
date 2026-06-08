@@ -40,9 +40,9 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 4 — review & ship
 
-- [ ] T24 Run `/review` — **AppSec is mandatory** (RLS, authz on every action, secret handling, OAuth callback); fix P0/P1.
-- [ ] T25 `/feature-report` → `docs/reports/002-auth-and-projects.md`.
-- [ ] T26 Open PR (template filled; spec + plan + report linked).
+- [x] T24 `/review` board (arch ✓ · sec ✓ · qa · ux · product ✓). Fixed: membership-enforcing gate, callback fail-closed, modal a11y + required field, AC-4/empty-state tests, CUJ-02 registered, focus-visible ring. P2s → PR follow-ups.
+- [x] T25 `/feature-report` → `docs/reports/002-auth-and-projects.md` (AC→evidence table + curated screenshots).
+- [~] T26 Open PR (template filled; spec + plan + report linked).
 - [ ] T27 After merge: `/update-docs` — feature doc, CUJ table (extend CUJ-01, register CUJ-02), specs index → shipped.
 
 ## AC coverage (mirror of plan.md — keep ticked in sync)
