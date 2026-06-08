@@ -1,7 +1,8 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
-export async function middleware(request: NextRequest) {
+// Next 16 renamed the `middleware` convention to `proxy`. Auth gate lives in updateSession.
+export async function proxy(request: NextRequest) {
   return updateSession(request);
 }
 

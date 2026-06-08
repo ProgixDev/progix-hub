@@ -19,9 +19,20 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
+    // Seeds a verified-member session via the env-gated test-login route.
+    { name: "setup", testMatch: /auth\.setup\.ts/ },
+    // Signed-out journeys (no stored session).
     {
-      name: "chromium",
+      name: "signed-out",
+      testMatch: /auth\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
+    },
+    // Signed-in journeys reuse the seeded member session.
+    {
+      name: "member",
+      testMatch: /(home|projects)\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"], storageState: "e2e/.auth/member.json" },
+      dependencies: ["setup"],
     },
   ],
   webServer: {
@@ -29,5 +40,7 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Enables the test-only sign-in route for the e2e run only (never set in production).
+    env: { E2E_AUTH_BYPASS: "1" },
   },
 });

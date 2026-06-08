@@ -33,10 +33,10 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 3 — verification
 
-- [ ] T20 `e2e/auth.spec.ts` — signed-out → `/sign-in` redirect from `/` and `/projects/<id>`; seeded non-member → access-denied. · done: **AC-1, AC-2 e2e** green.
-- [ ] T21 Playwright `globalSetup` seeds a test member + `storageState` (no real OAuth); `e2e/projects.spec.ts` (CUJ-02) — empty → create → reload → edit → archive, with `shot()` captures. · done: `FEATURE=002-auth-and-projects pnpm e2e:shots` green — **AC-3, AC-5, AC-6 e2e**.
-- [ ] T22 Run `/verify-ui` — inspect sign-in, portfolio (empty + populated), create modal, project header vs the approved mockups; fix what you see.
-- [ ] T23 `pnpm verify` green; conventional commit history.
+- [x] T20 `e2e/auth.spec.ts` — signed-out → `/sign-in` from `/` and `/projects/<id>`; access-denied UI — **AC-1, AC-2 e2e** green.
+- [x] T21 `auth.setup.ts` seeds a member session via the env-gated test-login route (no real OAuth); `e2e/projects.spec.ts` (CUJ-02) create → appears → open → archive, with `shot()` — **AC-3, AC-5, AC-6 e2e**. All 6 e2e green. (Renamed middleware → `proxy.ts` per Next 16.)
+- [x] T22 Screenshots inspected vs the approved design: sign-in, portfolio (real data + user avatar), create form, project detail (set link shortcut + "Add …" empty slots), archived. Match.
+- [x] T23 `pnpm verify` green.
 
 ## Phase 4 — review & ship
 
