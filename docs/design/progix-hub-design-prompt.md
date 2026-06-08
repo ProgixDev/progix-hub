@@ -20,7 +20,7 @@ progixHub is the internal home base for every Progix project. A team member crea
 ## Surfaces to design
 
 - **Admin dashboard (web, authenticated)** — the core product. Key views:
-  - **Sign in** — a small, secure, invite-only screen: “Continue with GitHub” and “Email me a magic link.”
+  - **Sign in** — a small, secure, invite-only screen: “Continue with GitHub” (org-gated; magic link was dropped).
   - **Projects list** — the portfolio: every project as a card or row, with name, a status indicator, and quick links to its surfaces. Needs a clear “New project” entry and search/filter. Design the empty state (no projects yet).
   - **Create / edit project** — name the project and paste its Notion, Slack, and GitHub links (with gentle validation and link previews). Effortless; this is the signature gesture.
   - **Project detail** — the heart of the app. A header with the project name and the four surface links as prominent, recognizable shortcuts. Tabbed or sectioned body for: **Env vars**, **Documents**, **Feedback**.

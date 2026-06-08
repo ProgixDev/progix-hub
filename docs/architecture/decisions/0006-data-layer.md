@@ -10,7 +10,7 @@ progixHub owns its own canonical data — projects, surface links, environment v
 
 ## Decision
 
-Use **Supabase** for persistence (Postgres), authentication (GitHub OAuth + magic link, invite-only), and file storage (uploaded documents). Postgres Row-Level Security governs access. The app is hosted on Vercel; Supabase is the managed backend.
+Use **Supabase** for persistence (Postgres), authentication (GitHub OAuth, gated to DigitariaWebs org members), and file storage (uploaded documents). Postgres Row-Level Security governs access. The app is hosted on Vercel; Supabase is the managed backend.
 
 ## Alternatives considered
 

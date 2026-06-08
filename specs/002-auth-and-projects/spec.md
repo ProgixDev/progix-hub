@@ -12,7 +12,7 @@ progixHub today is a painted-door portfolio with hard-coded projects and no sign
 
 ## Desired behavior (the what)
 
-**Signing in.** A visitor who is not signed in only ever sees a sign-in screen, regardless of which URL they open. They can sign in two ways: “Continue with GitHub”, or “Email me a magic link” and click the link in their inbox. Only members of the **DigitariaWebs** GitHub organization may enter; anyone who authenticates but isn’t an org member is signed out and told they don’t have access. Once signed in, they land on the projects portfolio and stay signed in across visits until they sign out.
+**Signing in.** A visitor who is not signed in only ever sees a sign-in screen, regardless of which URL they open. They sign in with “Continue with GitHub”. Only members of the **DigitariaWebs** GitHub organization may enter; anyone who authenticates but isn’t an org member is signed out and told they don’t have access. Once signed in, they land on the projects portfolio and stay signed in across visits until they sign out.
 
 **Seeing projects.** A signed-in member sees the portfolio of real projects (replacing the placeholder data) — each as a card with its name, status, description, and the surface links that are set. When there are no projects yet, they see a designed empty state inviting them to create the first one. They can filter by status (All / Active / At risk / Archived).
 
@@ -25,7 +25,7 @@ progixHub today is a painted-door portfolio with hard-coded projects and no sign
 ## Acceptance criteria
 
 - **AC-1:** Given a signed-out visitor, when they open any app URL, then they see only the sign-in screen and cannot reach the portfolio or any project.
-- **AC-2:** Given a person who authenticates (GitHub or magic link) but is **not** a DigitariaWebs org member, when sign-in completes, then they are signed out and shown an “access denied / not a Progix member” message — no project data is exposed.
+- **AC-2:** Given a person who authenticates via GitHub but is **not** a DigitariaWebs org member, when sign-in completes, then they are signed out and shown an “access denied / not a Progix member” message — no project data is exposed.
 - **AC-3:** Given a signed-in member on an empty account, when they view the portfolio, then they see the empty state; when they create a project with a name, then it appears in the portfolio and is still there after a reload.
 - **AC-4:** Given the create form, when the name is blank, then save is blocked with a clear message; when any filled link is not a valid URL, then that field shows a validation error and the project is not saved.
 - **AC-5:** Given an existing project, when a member edits its fields and saves, then the changes persist; when status is set to Archived, then it leaves the Active list and appears under the Archived filter.
@@ -49,5 +49,4 @@ progixHub today is a painted-door portfolio with hard-coded projects and no sign
 
 Resolved before `/plan-feature` proceeds (it will interview you). Delete when empty.
 
-- [ ] Magic-link sign-ins also need the DigitariaWebs-membership check — confirm how a magic-link user’s GitHub org membership is established (link GitHub identity, or maintain an allowlist synced from the org). Plan-feature decides the mechanism.
-- [ ] e2e auth strategy: real OAuth is not testable in CI — confirm a seeded/test-session approach for CUJ-01/02.
+- [ ] e2e auth strategy: real GitHub OAuth is not testable in CI — `/plan-feature` picks a seeded/test-session approach so CUJ-01/02 can run signed-in.

@@ -49,7 +49,7 @@ The non-negotiables for launch, ranked. Each becomes one or more specs via `/cre
 - **Deadline:** none — build it right.
 - **Platforms:** web admin dashboard + one external feedback page. No mobile.
 - **Data layer:** Supabase (Postgres + Auth + Storage) — own DB is the source of truth.
-- **Auth:** GitHub OAuth + magic link; invite-only internal team.
+- **Auth:** GitHub OAuth, gated to DigitariaWebs org members (invite-only internal team).
 - **Hosting:** Vercel (app) + Supabase (DB/auth/storage).
 - **Languages / i18n:** bilingual EN + FR from day one.
 - **Security:** env vars are sensitive; secured-login + gated reveal **and encryption at rest** are the MVP bar (the design asserts “Encrypted at rest”). Reveal stays object-level-authorized and audit-logged. See ADR-0006.
@@ -77,7 +77,7 @@ Resolved before the relevant spec proceeds (carried into `/create-spec` intervie
 ## Decision log
 
 - 2026-06-08 — Data layer is **Supabase** (Postgres + Auth + Storage) — because it covers DB, auth, and document storage in one platform that fits this shape.
-- 2026-06-08 — Auth is **GitHub OAuth + magic link**, invite-only — because the org’s GitHub is already central and the team is internal.
+- 2026-06-08 — Auth is **GitHub OAuth only**, gated to **DigitariaWebs org membership** — magic link dropped (2026-06-08) to keep the org-membership check trivial; the team already lives in GitHub.
 - 2026-06-08 — Surfaces are **linked by pasted URL, not API-synced** — because the MVP is a registry, not a sync engine (anti-goal).
 - 2026-06-08 — Env vars are **secured-login + gated reveal** for MVP; not a hardened vault — to ship the hub without over-building the vault.
 - 2026-06-08 — Repo/package slug normalized to **`progix-hub`**; human-facing display name stays **progixHub**.
