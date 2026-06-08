@@ -6,9 +6,9 @@ Adding or changing a CUJ is a product decision — PR must be approved by the pr
 
 ## Registry
 
-| ID     | Journey         | Steps (user's words)                                                   | E2E spec           | Screenshots |
-| ------ | --------------- | ---------------------------------------------------------------------- | ------------------ | ----------- |
-| CUJ-01 | Land and orient | Open `/` → understand what progixHub is and what it holds, at a glance | `e2e/home.spec.ts` | `home-*`    |
+| ID     | Journey         | Steps (user's words)                                                                            | E2E spec           | Screenshots |
+| ------ | --------------- | ----------------------------------------------------------------------------------------------- | ------------------ | ----------- |
+| CUJ-01 | Land and orient | Open `/` → see the projects portfolio in the app shell → read each project’s status at a glance | `e2e/home.spec.ts` | `home-*`    |
 
 ## Rules
 

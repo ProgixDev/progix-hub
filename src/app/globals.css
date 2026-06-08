@@ -1,57 +1,110 @@
 @import "tailwindcss";
 
 /*
- * Design tokens — Tailwind v4 CSS-first config (docs/conventions/styling.md).
- * Semantic tokens below are the only colors features may use.
- * shadcn/ui-compatible naming so `pnpm dlx shadcn add <component>` drops in cleanly.
+ * progixHub design system — dark developer-tool aesthetic (Progix blue on deep navy).
+ * Ported from the approved Claude Design (docs/design/mockups/progixhub/styles.css).
+ * Tailwind v4 CSS-first config (docs/conventions/styling.md).
+ *
+ * Two token layers:
+ *  1. Raw progix tokens (--bg, --blue, …) — the source palette, also surfaced as
+ *     Tailwind colors via @theme (e.g. `bg-bg-2`, `text-text-1`, `border-line`).
+ *  2. shadcn-compatible semantic tokens (--background, --primary, …) mapped onto the
+ *     palette so `components/ui` adopts the theme and `shadcn add` keeps working.
+ * The app is dark-only; tokens live on :root.
  */
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0.625rem;
-}
+  /* Surfaces */
+  --bg: #0a0d16;
+  --bg-1: #0f1320;
+  --bg-2: #151b2b;
+  --bg-3: #1c2334;
+  --bg-inset: #07090f;
+  --bg-sidebar: #0b0e18;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  /* Borders */
+  --line: rgba(255, 255, 255, 0.07);
+  --line-1: rgba(255, 255, 255, 0.11);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --line-blue: rgba(76, 130, 251, 0.4);
+
+  /* Text */
+  --text: #e8ecf6;
+  --text-1: #b4bcce;
+  --text-2: #79839a;
+  --text-3: #515b73;
+
+  /* Progix blue */
+  --blue: #4c82fb;
+  --blue-hover: #6a98ff;
+  --blue-press: #3a6fe6;
+  --blue-deep: #15203e;
+  --blue-tint: rgba(76, 130, 251, 0.12);
+  --blue-tint-2: rgba(76, 130, 251, 0.2);
+  --blue-ring: rgba(76, 130, 251, 0.45);
+  --blue-text: #9db8ff;
+
+  /* Status */
+  --green: #3fb97f;
+  --green-tint: rgba(63, 185, 127, 0.14);
+  --amber: #e0a53b;
+  --amber-tint: rgba(224, 165, 59, 0.14);
+  --red: #f0613b;
+  --red-tint: rgba(240, 97, 59, 0.14);
+
+  /* shadcn semantic tokens → mapped onto the palette */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--bg-1);
+  --card-foreground: var(--text);
+  --popover: var(--bg-2);
+  --popover-foreground: var(--text);
+  --primary: var(--blue);
+  --primary-foreground: #ffffff;
+  --secondary: var(--bg-2);
+  --secondary-foreground: var(--text);
+  --muted: var(--bg-2);
+  --muted-foreground: var(--text-2);
+  --accent: var(--bg-3);
+  --accent-foreground: var(--text);
+  --destructive: var(--red);
+  --destructive-foreground: #ffffff;
+  --border: var(--line-1);
+  --input: var(--line-1);
+  --ring: var(--blue-ring);
+  --radius: 0.5625rem; /* 9px — the design's base radius */
 }
 
 @theme inline {
+  /* Raw palette as Tailwind colors */
+  --color-bg: var(--bg);
+  --color-bg-1: var(--bg-1);
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-bg-inset: var(--bg-inset);
+  --color-bg-sidebar: var(--bg-sidebar);
+  --color-line: var(--line);
+  --color-line-1: var(--line-1);
+  --color-line-strong: var(--line-strong);
+  --color-line-blue: var(--line-blue);
+  --color-text: var(--text);
+  --color-text-1: var(--text-1);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-blue: var(--blue);
+  --color-blue-hover: var(--blue-hover);
+  --color-blue-press: var(--blue-press);
+  --color-blue-deep: var(--blue-deep);
+  --color-blue-tint: var(--blue-tint);
+  --color-blue-text: var(--blue-text);
+  --color-green: var(--green);
+  --color-green-tint: var(--green-tint);
+  --color-amber: var(--amber);
+  --color-amber-tint: var(--amber-tint);
+  --color-red: var(--red);
+  --color-red-tint: var(--red-tint);
+
+  /* shadcn semantic colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -71,12 +124,14 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --radius-xl: calc(var(--radius) + 6px);
+
+  --font-sans: var(--font-ibm-sans);
+  --font-mono: var(--font-ibm-mono);
 }
 
 @layer base {
@@ -87,5 +142,19 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--blue-tint-2);
+  }
+  /* Eyebrow label — small mono uppercase, used above page titles */
+  .t-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    font-weight: 500;
   }
 }
