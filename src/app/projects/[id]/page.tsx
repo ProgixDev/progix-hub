@@ -1,6 +1,7 @@
+import { notFound } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
-import { ProjectsPortfolio, listProjects, type Project } from "@/features/projects";
+import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -12,16 +13,23 @@ function toRecent(projects: Project[]): RecentProject[] {
   }));
 }
 
-export default async function Home() {
-  const [user, projects] = await Promise.all([getCurrentUser(), listProjects()]);
+export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const [user, project, projects] = await Promise.all([
+    getCurrentUser(),
+    getProject(id),
+    listProjects(),
+  ]);
+
+  if (!project) notFound();
 
   return (
     <AppShell
-      title="Projects"
+      title={project.name}
       recent={toRecent(projects)}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
-      <ProjectsPortfolio projects={projects} />
+      <ProjectDetail project={project} />
     </AppShell>
   );
 }

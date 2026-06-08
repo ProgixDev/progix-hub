@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { Wordmark } from "@/components/brand/logo";
-import { getCurrentUser, SignInButton } from "@/features/auth";
+import { SignInButton } from "@/features/auth";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function SignInPage({
   searchParams,

@@ -8,17 +8,19 @@ import { TopBar } from "./top-bar";
 export function AppShell({
   title,
   recent,
+  userSlot,
   children,
 }: {
   title: string;
   recent: RecentProject[];
+  userSlot?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="bg-bg flex h-dvh overflow-hidden">
       <Sidebar recent={recent} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar title={title} />
+        <TopBar title={title} userSlot={userSlot} />
         <main className="min-h-0 flex-1 overflow-auto">{children}</main>
       </div>
     </div>

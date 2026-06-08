@@ -21,15 +21,15 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 2 — projects slice (AC-3 … AC-6)
 
-- [ ] T11 Scaffold slice: `/new-module projects` (store, provider, actions, types, index, tests). · done: stub renders.
-- [ ] T12 `types.ts` + zod schema (name required; status enum; links optional, valid URL if present). · done: schema unit covers blank-name + bad-URL reject — **AC-4 unit**.
-- [ ] T13 Store: filter state + create/edit modal + optimistic insert; archive removes from Active filter. · done: `store.test.ts` green — **AC-5 unit (filter)**.
-- [ ] T14 `actions.ts`: `createProjectAction` / `updateProjectAction` / `archiveProjectAction` — zod-validated, `requireMember()` authz, write via server client. · done: invalid input returns typed error (AC-4); unauthorized blocked.
-- [ ] T15 `data.ts` (server-only): list projects for the member, get one by id. · done: returns typed rows.
-- [ ] T16 [P] `components/project-card.tsx` — set links → `<a target="_blank" rel="noopener">`, unset → empty “add” slot; status badge. · done: `project-card.test.tsx` green — **AC-6 unit**.
-- [ ] T17 [P] `components/project-form.tsx` — create/edit modal (name, description, status, four links) with inline validation + designed states.
-- [ ] T18 [P] `components/project-header.tsx` — name, status, description, four link shortcuts (unset = empty slot).
-- [ ] T19 Wire `src/app/page.tsx` to fetch real projects (replace painted-door data) + empty state; `src/app/projects/[id]/page.tsx` renders the header. · done: portfolio shows DB data; empty account shows empty state — **AC-3**.
+- [x] T11 Projects slice scaffolded (store + provider, actions, data, types, lib, components, index, tests).
+- [x] T12 `types.ts` + zod schema; `types.test.ts` green — **AC-4 unit** (blank-name + bad-URL reject, empty links → undefined).
+- [x] T13 Store: filter + create/edit modal; `filterProjects` helper; `store.test.ts` green — **AC-5 unit (filter)**.
+- [x] T14 `actions.ts`: create/update/archive — zod-validated, `requireMember()` authz, server-client write, revalidatePath.
+- [x] T15 `data.ts` (server-only): `listProjects` / `getProject`.
+- [x] T16 `components/project-card.tsx` — set links → new-tab anchors, unset → non-link slot; `project-card.test.tsx` green — **AC-6 unit**. (Fixed RTL cleanup in `vitest.setup.ts`.)
+- [x] T17 `components/project-form.tsx` — create/edit modal with inline field errors.
+- [x] T18 `components/project-detail.tsx` — header: name, status, description, four surface shortcuts (set → anchor, unset → “Add …” slot), Edit + Archive.
+- [x] T19 `src/app/page.tsx` (real portfolio + empty state) + `src/app/projects/[id]/page.tsx` (detail); shell shows the signed-in user (UserMenu) — **AC-3**. Root `loading.tsx`/`error.tsx` added.
 
 ## Phase 3 — verification
 
