@@ -1,7 +1,7 @@
 # 0006 — Use Supabase as the data layer
 
-- **Status:** Proposed
-- **Date:** 2026-06-08
+- **Status:** Accepted
+- **Date:** 2026-06-08 (accepted 2026-06-08 with spec 002)
 - **Deciders:** Progix team (engineering accepts)
 
 ## Context

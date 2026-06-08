@@ -10,12 +10,14 @@ import { z } from "zod";
  */
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  // Supabase data layer (ADR-0006). Optional until the data-layer spec wires them,
-  // so the build stays green before secrets are provisioned. Mirror in .env.example.
-  SUPABASE_URL: z.string().url().optional(),
+  // Supabase service-role secret (ADR-0006) — bypasses RLS, used only in narrowly-scoped
+  // server code (e.g. the admin client that stamps org membership). Optional at parse time
+  // so the build stays green before CI secrets are provisioned; the admin client asserts it
+  // at call time. Mirror in .env.example. NEVER expose this client-side.
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-  // Public Supabase values (URL + anon key) are exposed as NEXT_PUBLIC_* and read at the
-  // client boundary, never here — server-only forbids importing this from a client component.
+  // Public Supabase values (NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY) are
+  // exposed as NEXT_PUBLIC_* and read at the client boundary by the @supabase/ssr factories,
+  // never through this server-only module.
 });
 
 export const env = serverEnvSchema.parse(process.env);

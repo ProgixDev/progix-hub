@@ -2,7 +2,7 @@
 
 import { ClockIcon, CommandIcon, GridIcon } from "@/components/ui/icons";
 
-export function TopBar({ title }: { title: string }) {
+export function TopBar({ title, userSlot }: { title: string; userSlot?: React.ReactNode }) {
   return (
     <header className="border-line flex h-14 flex-none items-center gap-3 border-b px-5">
       <GridIcon className="text-text-2 size-[18px]" />
@@ -23,9 +23,11 @@ export function TopBar({ title }: { title: string }) {
         >
           <ClockIcon className="size-[18px]" />
         </button>
-        <span className="bg-blue-deep border-line-blue text-blue-text flex size-9 items-center justify-center rounded-full border text-[12px] font-semibold">
-          AR
-        </span>
+        {userSlot ?? (
+          <span className="bg-blue-deep border-line-blue text-blue-text flex size-9 items-center justify-center rounded-full border text-[12px] font-semibold">
+            AR
+          </span>
+        )}
       </div>
     </header>
   );

@@ -148,6 +148,12 @@
   ::selection {
     background: var(--blue-tint-2);
   }
+  /* Visible keyboard focus on every interactive element (a11y baseline). */
+  :focus-visible {
+    outline: 2px solid var(--blue-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
   /* Eyebrow label — small mono uppercase, used above page titles */
   .t-eyebrow {
     font-family: var(--font-mono);
