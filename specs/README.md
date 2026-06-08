@@ -27,6 +27,7 @@ ship → /update-docs                           status: shipped; learnings disti
 
 ## Index
 
-| #                            | Spec                   | Status    |
-| ---------------------------- | ---------------------- | --------- |
-| [001](001-task-list/spec.md) | Task list demo feature | abandoned |
+| #                                    | Spec                       | Status    |
+| ------------------------------------ | -------------------------- | --------- |
+| [001](001-task-list/spec.md)         | Task list demo feature     | abandoned |
+| [002](002-auth-and-projects/spec.md) | Sign-in & project registry | draft     |
