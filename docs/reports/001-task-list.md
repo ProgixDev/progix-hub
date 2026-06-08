@@ -1,6 +1,8 @@
 # Feature report — 001 Task list demo
 
-- **Spec:** [specs/001-task-list](../../specs/001-task-list/spec.md) · **Status:** shipped with skeleton baseline
+> **Feature removed at progixHub init (2026-06-08).** This report is retained as historical skeleton evidence only — the slice, route, and tests no longer exist. See `docs/product/features/task-list.md`.
+
+- **Spec:** [specs/001-task-list](../../specs/001-task-list/spec.md) · **Status:** abandoned (was shipped with skeleton baseline)
 - **Date:** 2026-06-07 · **Author:** Engineering + Claude (agent-implemented, human-reviewed)
 
 ## What & why
@@ -9,19 +11,16 @@ The skeleton's reference feature: a minimal task manager proving every harness m
 
 ## Acceptance criteria → evidence
 
-| AC                                               | Proven by                                               | Evidence                                             | Verdict |
-| ------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------- | ------- |
-| AC-1 add task, input clears                      | `store.test.ts` + `e2e/task-list.spec.ts` step 2        | [tasks-added](001-task-list/img/tasks-added.png)     | PASS    |
-| AC-2 toggle updates remaining count              | `store.test.ts` + e2e step 3                            | [tasks-toggled](001-task-list/img/tasks-toggled.png) | PASS    |
-| AC-3 blank title is a no-op                      | `store.test.ts` + e2e step 4 (`required` + store guard) | count assertion in spec                              | PASS    |
-| AC-4 clear done removes only done, then disables | `store.test.ts` + e2e step 5                            | [tasks-cleared](001-task-list/img/tasks-cleared.png) | PASS    |
+| AC                                               | Proven by                                               | Verdict |
+| ------------------------------------------------ | ------------------------------------------------------- | ------- |
+| AC-1 add task, input clears                      | `store.test.ts` + `e2e/task-list.spec.ts` step 2        | PASS    |
+| AC-2 toggle updates remaining count              | `store.test.ts` + e2e step 3                            | PASS    |
+| AC-3 blank title is a no-op                      | `store.test.ts` + e2e step 4 (`required` + store guard) | PASS    |
+| AC-4 clear done removes only done, then disables | `store.test.ts` + e2e step 5                            | PASS    |
 
 ## Screenshots
 
-|                                                                                     |                                                                                     |
-| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| ![Landing](001-task-list/img/home-landing.png) Home — entry to the example (CUJ-01) | ![Initial](001-task-list/img/tasks-initial.png) Seeded list, one task already done  |
-| ![Added](001-task-list/img/tasks-added.png) After adding “Write the spec”           | ![Cleared](001-task-list/img/tasks-cleared.png) Done tasks cleared, button disabled |
+Removed at progixHub init along with the slice and its e2e specs — the original `tasks-*` evidence is no longer retained.
 
 ## Changes by layer
 

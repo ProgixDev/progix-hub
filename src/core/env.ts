@@ -5,7 +5,8 @@ import { z } from "zod";
  * Server-side environment access — the ONLY place process.env is read.
  * `server-only` makes importing this from a client component a build error,
  * which is exactly the failure mode we want (secrets can't drift client-side).
- * Client-exposed values must be NEXT_PUBLIC_* and added to the separate schema below.
+ * Client-exposed values must be NEXT_PUBLIC_* and validated in a separate client schema
+ * (added when the data-layer spec lands) — never read public values through this module.
  */
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),

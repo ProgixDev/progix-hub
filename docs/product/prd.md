@@ -66,9 +66,9 @@ The non-negotiables for launch, ranked. Each becomes one or more specs via `/cre
 Resolved before the relevant spec proceeds (carried into `/create-spec` interviews — never assumed).
 
 - [ ] **Visual personality** — deferred to Claude Design (designer’s call).
-- [ ] **Encrypt env vars at rest?** — recommended; decide before the env-vars spec is built.
+- [ ] **Encrypt env vars at rest?** — decision owed before the env-vars spec, with an owner; if undecided, the secure default (encrypt) wins, not plaintext. (See ADR-0006.)
 - [ ] **Brand assets** — logo, colors, store name not yet provided; needed for the design pass.
-- [ ] **Secrets access model** — can any internal role reveal any project’s envs, or is reveal gated by per-project membership? (drives Supabase RLS design)
+- [ ] **Secrets access model** — reveal is deny-by-default, object-level-authorized, and audit-logged regardless; the open variable is only whether reveal is gated by per-project membership or open to any internal role. Decide before the spec. (Drives Supabase RLS.)
 - [ ] **Feedback page auth** — fully public, or per-project secret link?
 
 ## Decision log

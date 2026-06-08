@@ -40,7 +40,7 @@ export function createTaskListStore(initial: Task[] = []) {
 }
 ```
 
-A `Provider` + `useTaskListStore(selector)` hook wrap it (see `src/features/task-list/` for the canonical implementation). RSC pages pass initial data into the provider.
+A `Provider` + `useTaskListStore(selector)` hook wrap it (illustrative — the demo `task-list` slice was removed at project init; `/new-module` scaffolds this same pattern for a real feature). RSC pages pass initial data into the provider.
 
 ## Rules
 

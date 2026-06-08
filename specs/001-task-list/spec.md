@@ -1,6 +1,6 @@
 # Spec 001 — Task list demo feature
 
-- **Status:** shipped (2026-06-07)
+- **Status:** abandoned — removed at progixHub init, 2026-06-08 (was shipped 2026-06-07 with the skeleton)
 - **Type:** feature
 - **Requested by / owner:** Engineering (skeleton reference feature)
 - **Date:** 2026-06-07

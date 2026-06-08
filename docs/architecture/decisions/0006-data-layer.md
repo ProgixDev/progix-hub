@@ -24,7 +24,8 @@ Use **Supabase** for persistence (Postgres), authentication (GitHub OAuth + magi
 
 - Positive: DB + auth + document storage in one platform; RLS gives a clean per-project access model; first-class Next.js SSR support via `@supabase/ssr`.
 - Negative / accepted trade-offs: a managed-vendor dependency; `@supabase/ssr` + RSC cookie/auth patterns move fast — needs a 2026 research pass (the `supabase` skill) before wiring.
-- Follow-ups required:
-  - Resolve the **secrets access model** (any role reveals any project’s envs vs. per-project membership) — it drives the RLS schema. _(PRD open question.)_
-  - Decide whether env vars are **encrypted at rest** beyond login-gating. _(PRD open question.)_
-  - Add the real env vars to `.env.example` and tighten the zod schema in `src/core/env.ts` (currently `.optional()`) when the data-layer spec lands.
+- Follow-ups required (the env-vars spec starts from these as **default-secure** posture, not open-ended questions):
+  - **Secrets access model — default deny.** RLS is deny-by-default; revealing an env is an authenticated, object-level-authorized (no IDOR on `project_id`), audit-logged action. Whether reveal is gated by per-project membership or allowed for any internal role is the only open variable — and it must be decided _before_ the spec, never defaulted to “everyone sees everything.” This is a non-negotiable acceptance criterion of the env-vars spec.
+  - **Service-role key is scoped, never a general client.** `SUPABASE_SERVICE_ROLE_KEY` bypasses RLS, so it is used only inside narrowly-scoped server actions, never as an app-wide query client. Captured as an acceptance criterion the reviewer checks.
+  - **Encrypt at rest — decision owed, default-secure fallback.** Because the product stores other projects’ secrets, a DB compromise exposes every plaintext env at once. Before the env-vars spec is approved, encrypt-at-rest (app-layer envelope encryption / `pgsodium`, key held outside the same Supabase project) is a **decision with an owner**; if undecided, the secure fallback (encrypt) wins — not plaintext.
+  - Add the real env vars to `.env.example` and tighten the zod schema in `src/core/env.ts` (currently `.optional()`) when the data-layer spec lands — in the same PR that wires Supabase, so the build doesn’t go red on an un-provisioned skeleton.
