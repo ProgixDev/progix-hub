@@ -1,0 +1,26 @@
+# Review routing — keep this current as the team grows.
+# Shared layers and gate-bearing files get mandatory owner review (docs/conventions/git.md).
+# Replace the placeholder teams with real GitHub teams/users when cloning the skeleton.
+
+*                           @DigitariaWebs/engineering
+
+# The harness itself — changes here steer every agent and every PR.
+/AGENTS.md                  @DigitariaWebs/engineering
+/CLAUDE.md                  @DigitariaWebs/engineering
+/.claude/                   @DigitariaWebs/engineering
+/docs/                      @DigitariaWebs/engineering
+/specs/constitution.md      @DigitariaWebs/engineering
+/scripts/                   @DigitariaWebs/engineering
+
+# Gates and CI.
+/.github/                   @DigitariaWebs/engineering
+/eslint.config.mjs          @DigitariaWebs/engineering
+/tsconfig.json              @DigitariaWebs/engineering
+
+# Shared design system.
+/src/components/            @DigitariaWebs/engineering
+/src/core/                  @DigitariaWebs/engineering
+
+# Product knowledge.
+/docs/product/              @DigitariaWebs/engineering
+/specs/                     @DigitariaWebs/engineering

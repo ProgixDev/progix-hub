@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, types, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (incl. module boundaries)
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Docs integrity
+        run: pnpm check:docs
+
+      - name: Typography (user-facing copy)
+        run: pnpm check:typography
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      # Auto-file an issue when a gate breaks on main, so the failure is tracked
+      # without anyone remembering to (AGENTS.md obligations · ADR-0005). PR failures
+      # are visible in the PR itself, so we only auto-file for pushes to main.
+      - name: Auto-file issue on gate failure (main only)
+        if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node scripts/auto-issue.mjs \
+            --kind gate \
+            --dedupe-key "ci-main-${{ github.workflow }}" \
+            --title "CI gate failed on main (${{ github.sha }})" \
+            --body "A required gate failed on the latest push to main. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

@@ -1,0 +1,46 @@
+# AI persona review on every PR (ADR-0004). Requires the ANTHROPIC_API_KEY repo secret —
+# easiest setup: run `claude` locally and use /install-github-app.
+name: Claude persona review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # Skip drafts and bot PRs; keep token spend bounded.
+    if: ${{ !github.event.pull_request.draft && github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run persona review board
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are the review board for this repository. Review this pull request the way
+            .claude/skills/review/SKILL.md prescribes, adapted to CI:
+
+            1. Read AGENTS.md, then select the relevant personas from docs/personas/
+               (frontend-architect always; appsec for actions/deps/env/CI changes; qa for
+               behavior changes; ux + product when user-visible surface changed — check
+               whether docs/reports/ contains a report for this branch and use it).
+            2. Review the full diff against those persona files and the docs they cite.
+            3. Post ONE consolidated PR review comment: verdict per persona, then P0/P1/P2
+               findings with file:line and concrete fixes. "None" is a valid section.
+               Do not pad findings. Do not approve/block formally — humans decide; you inform.
+          claude_args: |
+            --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*),Bash(gh pr comment:*),Bash(gh pr view:*)"

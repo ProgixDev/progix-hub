@@ -1,0 +1,38 @@
+# Daily report — compiles GitHub activity into a human report each weekday morning.
+# Needs the ANTHROPIC_API_KEY secret (same one as the persona review).
+name: Daily report
+
+on:
+  schedule:
+    - cron: "0 6 * * 1-5" # 06:00 UTC, Mon–Fri
+  workflow_dispatch: {}
+
+concurrency:
+  group: daily-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Run the daily-report skill (.claude/skills/daily-report/SKILL.md) for this
+            repository. Gather the last 24h of merged PRs, open PRs, and issues (flagging
+            any with the `auto-filed` label) using the gh CLI, translate them into a
+            human-readable report per docs/templates/daily-report.md, and commit it to
+            docs/reports/daily/<YYYY-MM-DD>.md. Keep it under a minute to read and be
+            honest about milestone risk. If there was no activity, write a one-line "quiet day".
+          claude_args: |
+            --allowedTools "Read,Write,Bash(gh *),Bash(git *),Glob,Grep"
