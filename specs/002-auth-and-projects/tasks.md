@@ -8,8 +8,8 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 - [x] T1 **Research pass** — `@supabase/ssr` confirmed: `getAll/setAll` cookies (+ `headers` arg), `getClaims()` for server auth checks, legacy anon/service keys valid through 2026, `middleware.ts` still supported in Next 16. Org membership via GitHub at callback → stamp `app_metadata.is_member`.
 - [x] T2 Installed `@supabase/supabase-js` + `@supabase/ssr`; ADR-0006 → Accepted.
 - [x] T3 `src/core/env.ts`: service-role secret (optional at parse, asserted at call); `.env.example` documents the shape; `.env.local` set by human; Supabase project provisioned + MCP connected.
-- [ ] T4 Supabase client factories `src/lib/supabase/{client,server,admin}.ts`. · done: typecheck; server client reads cookies, admin uses service role (server-only).
-- [ ] T5 Migration `supabase/migrations/0001_projects.sql`: `projects` table + **deny-by-default RLS** (member-only select/insert/update, no delete). · done: applies cleanly to a local/test Supabase.
+- [x] T4 Supabase client factories `src/lib/supabase/{client,server,admin}.ts` (browser, server-cookies, service-role admin).
+- [x] T5 `projects` table + deny-by-default RLS applied to the live DB (member-only select/insert/update, no delete); security advisors clean; saved as `supabase/migrations/0001_projects.sql`.
 
 ## Phase 1 — auth slice (AC-1, AC-2)
 
