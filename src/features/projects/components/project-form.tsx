@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { createProjectAction, updateProjectAction, type ActionResult } from "../actions";
 import { useProjectsStore } from "../provider";
 import { PROJECT_STATUSES, type Project, type ProjectStatus } from "../types";
@@ -29,15 +29,20 @@ export function ProjectForm() {
 function Field({
   label,
   error,
+  required,
   children,
 }: {
   label: string;
   error?: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-text-1 text-[12.5px] font-medium">{label}</span>
+      <span className="text-text-1 text-[12.5px] font-medium">
+        {label}
+        {required && <span className="text-[#FFB6A2]"> *</span>}
+      </span>
       {children}
       {error && <span className="text-[12px] text-[#FFB6A2]">{error}</span>}
     </label>
@@ -47,10 +52,29 @@ function Field({
 const inputCls =
   "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
 
-function ProjectFormModal({ editing, onClose }: { editing: Project | null; onClose: () => void }) {
+export function ProjectFormModal({
+  editing,
+  onClose,
+}: {
+  editing: Project | null;
+  onClose: () => void;
+}) {
   const [pending, start] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+
+  // Close on Escape and restore focus to the element that opened the dialog.
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      previouslyFocused?.focus?.();
+    };
+  }, [onClose]);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -96,8 +120,15 @@ function ProjectFormModal({ editing, onClose }: { editing: Project | null; onClo
             </p>
           )}
 
-          <Field label="Name" error={errors.name}>
-            <input name="name" defaultValue={editing?.name ?? ""} className={inputCls} autoFocus />
+          <Field label="Name" error={errors.name} required>
+            <input
+              name="name"
+              defaultValue={editing?.name ?? ""}
+              className={inputCls}
+              required
+              aria-required="true"
+              autoFocus
+            />
           </Field>
 
           <Field label="Description" error={errors.description}>

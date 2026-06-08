@@ -31,14 +31,19 @@ export async function updateSession(request: NextRequest) {
   );
 
   const { data } = await supabase.auth.getClaims();
-  const signedIn = Boolean(data?.claims);
+  const claims = data?.claims;
+  const appMeta = (claims?.app_metadata ?? {}) as { is_member?: boolean };
+  const isMember = appMeta.is_member === true;
 
   const path = request.nextUrl.pathname;
   const isPublic = path.startsWith("/sign-in") || path.startsWith("/auth");
 
-  if (!signedIn && !isPublic) {
+  // The gate enforces membership, not just "signed in": a signed-in non-member is bounced
+  // to the access-denied screen, so the database RLS isn't the only thing standing guard.
+  if (!isPublic && !isMember) {
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";
+    if (claims) url.searchParams.set("error", "access_denied");
     return NextResponse.redirect(url);
   }
 

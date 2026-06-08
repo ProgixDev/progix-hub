@@ -13,6 +13,7 @@ export default async function SignInPage({
 
   const { error } = await searchParams;
   const denied = error === "access_denied";
+  const failed = Boolean(error) && !denied;
 
   return (
     <main className="bg-bg flex min-h-dvh items-center justify-center px-6">
@@ -27,6 +28,11 @@ export default async function SignInPage({
           {denied && (
             <div className="border-red/30 bg-red-tint mt-4 rounded-md border px-3 py-2.5 text-[13px] text-[#FFB6A2]">
               That account isn’t a member of the Progix organization, so it can’t access progixHub.
+            </div>
+          )}
+          {failed && (
+            <div className="border-red/30 bg-red-tint mt-4 rounded-md border px-3 py-2.5 text-[13px] text-[#FFB6A2]">
+              Something went wrong signing in. Please try again.
             </div>
           )}
 

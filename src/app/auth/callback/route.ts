@@ -31,7 +31,14 @@ export async function GET(request: Request) {
 
   // Verified member → stamp non-user-editable membership, then refresh so the JWT carries it.
   const admin = createAdminClient();
-  await admin.auth.admin.updateUserById(user.id, { app_metadata: { is_member: true } });
+  const stamp = await admin.auth.admin.updateUserById(user.id, {
+    app_metadata: { is_member: true },
+  });
+  if (stamp.error) {
+    // Don't drop the user into a silently RLS-denied session — fail closed.
+    await supabase.auth.signOut();
+    return NextResponse.redirect(`${origin}/sign-in?error=auth`);
+  }
   await supabase.auth.refreshSession();
 
   return NextResponse.redirect(`${origin}/`);

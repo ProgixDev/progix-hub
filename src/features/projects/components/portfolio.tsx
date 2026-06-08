@@ -81,7 +81,7 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
           ))}
           {visible.length === 0 && (
             <p className="text-text-2 col-span-full py-12 text-center text-[13.5px]">
-              No {filter === "all" ? "" : filter.replace("_", " ")} projects.
+              {filter === "all" ? "No projects." : `No ${filter.replace("_", " ")} projects.`}
             </p>
           )}
         </div>
