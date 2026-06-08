@@ -4,10 +4,10 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 0 — setup & infra
 
-- [ ] T0 Branch `feat/002-auth-and-projects`.
-- [ ] T1 **Research pass** — run the `supabase` skill for current `@supabase/ssr` + Next 16 RSC auth patterns; note decisions in plan.md. · done: patterns confirmed before any client code.
-- [ ] T2 Install `@supabase/supabase-js` + `@supabase/ssr`; flip **ADR-0006** Proposed → Accepted. · done: deps in `package.json`, ADR status updated.
-- [ ] T3 Tighten Supabase env in `src/core/env.ts` (required) + document vars; **human:** provision Supabase project, GitHub OAuth app, and `.env` / CI secret. · done: `env.ts` parses; provisioning checklist noted in PR.
+- [x] T0 Branch `feat/002-auth-and-projects`.
+- [x] T1 **Research pass** — `@supabase/ssr` confirmed: `getAll/setAll` cookies (+ `headers` arg), `getClaims()` for server auth checks, legacy anon/service keys valid through 2026, `middleware.ts` still supported in Next 16. Org membership via GitHub at callback → stamp `app_metadata.is_member`.
+- [x] T2 Installed `@supabase/supabase-js` + `@supabase/ssr`; ADR-0006 → Accepted.
+- [x] T3 `src/core/env.ts`: service-role secret (optional at parse, asserted at call); `.env.example` documents the shape; `.env.local` set by human; Supabase project provisioned + MCP connected.
 - [ ] T4 Supabase client factories `src/lib/supabase/{client,server,admin}.ts`. · done: typecheck; server client reads cookies, admin uses service role (server-only).
 - [ ] T5 Migration `supabase/migrations/0001_projects.sql`: `projects` table + **deny-by-default RLS** (member-only select/insert/update, no delete). · done: applies cleanly to a local/test Supabase.
 
