@@ -25,7 +25,7 @@ The bet: the cost of finding "where is everything for this project" — scattere
 ## MVP scope (ranked)
 
 1. Project creation + the four links — create/edit/list projects; paste-and-validate Notion, Slack, GitHub URLs. _(Signature.)_
-2. Secure env-vars management — per-project key/value, masked by default, gated reveal, behind secured login. _(Signature.)_
+2. Secure env-vars management — per-project key/value, masked by default, gated reveal, behind secured login; each variable shows a recognizable **service logo** (Stripe, Twilio, Next.js, Redis, …) auto-detected from the key with a manual override. _(Signature.)_
 3. Documents — file uploads (Supabase Storage) + external links + rich-text notes.
 4. Client feedback page — per-project link-gated feedback; team reads it in-app.
 

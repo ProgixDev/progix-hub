@@ -21,6 +21,8 @@ const eslintConfig = defineConfig([
     "playwright-report/**",
     "test-results/**",
     "artifacts/**",
+    // Design mockups exported from Claude Design — visual reference, not project source.
+    "docs/design/mockups/**",
   ]),
   {
     files: ["src/**/*.{ts,tsx}"],

@@ -39,7 +39,7 @@ Every Progix project lives across four surfaces — Notion explains it, GitHub t
 The non-negotiables for launch, ranked. Each becomes one or more specs via `/create-spec`.
 
 1. **Project creation + the four links** — create/edit/list projects; paste-and-validate Notion, Slack, GitHub URLs. _(Signature — must be impeccable.)_
-2. **Secure env-vars management** — per-project key/value envs, masked by default, gated reveal, behind secured login. _(Signature — must be impeccable.)_
+2. **Secure env-vars management** — per-project key/value envs, masked by default, gated reveal, behind secured login. Each variable carries a **service logo** (Stripe, Twilio, Next.js, Redis, SendGrid, Algolia, Postgres, …) so it’s recognizable at a glance — auto-detected from the key (e.g. `STRIPE_*` → Stripe, `REDIS_*` → Redis) with a manual override and a generic key fallback. _(Signature — must be impeccable.)_
 3. **Documents** — file uploads (Supabase Storage) + external links + rich-text notes per project.
 4. **Client feedback page** — per-project link-gated page for client feedback; team reads it in-app.
 
