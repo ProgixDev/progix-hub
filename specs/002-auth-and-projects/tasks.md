@@ -13,11 +13,11 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 1 — auth slice (AC-1, AC-2)
 
-- [ ] T6 `src/features/auth/membership.ts` — pure `isAllowedMember(githubLogin, orgMembership)` decision + `requireMember()` server helper (fetch + cache GitHub org membership). · done: `membership.test.ts` green (member allowed, non-member denied) — **AC-2 unit**.
-- [ ] T7 `src/app/auth/callback/route.ts` — OAuth callback: exchange code, run org check, sign out + redirect to access-denied if not a member. · done: non-member is rejected.
-- [ ] T8 `src/middleware.ts` — refresh session; redirect signed-out requests to `/sign-in`. · done: protects all app routes.
-- [ ] T9 [P] `src/app/sign-in/page.tsx` + `features/auth` sign-in island ("Continue with GitHub") and the access-denied state. · done: renders; button starts OAuth.
-- [ ] T10 [P] `signOutAction` + session provider/`useSession` in `features/auth`; export public API via `index.ts`. · done: sign-out clears session.
+- [x] T6 `features/auth/membership.ts` — pure `isAllowedMember` + `fetchOrgMembership`; `session.ts` `requireMember`/`getCurrentUser` (getClaims + app_metadata). `membership.test.ts` green — **AC-2 unit**.
+- [x] T7 `src/app/auth/callback/route.ts` — exchange code, GitHub org check, stamp `app_metadata.is_member` + refresh, or sign out → `?error=access_denied`.
+- [x] T8 `src/middleware.ts` + `lib/supabase/middleware.ts` — session refresh; signed-out → `/sign-in` (public: /sign-in, /auth).
+- [x] T9 `src/app/sign-in/page.tsx` + `SignInButton` island ("Continue with GitHub", read:org) + access-denied state.
+- [x] T10 `signOutAction` + `UserMenu` island; public API via `index.ts`.
 
 ## Phase 2 — projects slice (AC-3 … AC-6)
 
