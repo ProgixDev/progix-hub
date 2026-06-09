@@ -29,3 +29,10 @@ export const envVarInputSchema = z.object({
 });
 
 export type EnvVarInput = z.infer<typeof envVarInputSchema>;
+
+/** Edit input: like create, but the value is optional — blank means keep the stored secret (AC-8). */
+export const envVarEditSchema = envVarInputSchema.extend({
+  value: z.preprocess(emptyToUndefined, z.string().optional()),
+});
+
+export type EnvVarEditInput = z.infer<typeof envVarEditSchema>;

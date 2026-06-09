@@ -21,11 +21,11 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 3 — slice (AC-1, AC-2, AC-9)
 
-- [ ] T8 `types.ts`: `envVarInputSchema` (key required + format, value, optional service) + `EnvVar`/`EnvVarMeta`/`AuditRow` types + `types.test.ts` · done: schema tests green (**AC-1**, **AC-7** input)
-- [ ] T9 `lib.ts`: `SERVICES` registry + `detectService(key)` + `lib.test.ts` · done: detect + override tests green (**AC-1**, **AC-2**)
-- [ ] T10 `store.ts` + `provider.tsx`: modal `{closed|create|edit}` + `revealed` map; `store.test.ts` · done: store tests green
-- [ ] T11 `data.ts` (`server-only`): `listProjectEnvVars` (metadata only) + `listEnvVarAudit` · done: `pnpm typecheck`; returns no ciphertext
-- [ ] T12 `actions.ts`: `create`/`update`/`delete`/`revealEnvVarValueAction(id, intent)` — `requireMember` → zod → `supabase.rpc(...)`; app-generate `id` + `encryptSecret` on write; decrypt on reveal; map unique violation → field error, decrypt failure → “key may have changed” · done: action unit tests (authz **AC-6**, duplicate **AC-7**) green
+- [x] T8 `types.ts`: `envVarInputSchema` (key required + format, value, optional service) + `EnvVar`/`EnvVarMeta`/`AuditRow` types + `types.test.ts` · done: schema tests green (**AC-1**, **AC-7** input)
+- [x] T9 `lib.ts`: `SERVICES` registry + `detectService(key)` + `lib.test.ts` · done: detect + override tests green (**AC-1**, **AC-2**)
+- [x] T10 `store.ts` + `provider.tsx`: modal `{closed|create|edit}` + `revealed` map; `store.test.ts` · done: store tests green
+- [x] T11 `data.ts` (`server-only`): `listProjectEnvVars` (metadata only) + `listEnvVarAudit` · done: `pnpm typecheck`; returns no ciphertext
+- [x] T12 `actions.ts`: `create`/`update`/`delete`/`revealEnvVarValueAction(id, intent)` — `requireMember` → zod → `supabase.rpc(...)`; app-generate `id` + `encryptSecret` on write; decrypt on reveal; map unique violation → field error, decrypt failure → “key may have changed” · done: action unit tests (authz **AC-6**, duplicate **AC-7**) green
 - [ ] T13 Components: `env-vars-section.tsx` (list + empty state), `env-var-row.tsx` (masked / reveal / copy), `env-var-form.tsx` (add/edit modal, service picker + auto-detect), `service-logo.tsx` (inline SVGs + default) · done: states render; empty-state component test green (**AC-9**)
 - [ ] T14 `index.ts` public API: server-only data fns + `EnvVarsSection` + types only · done: app imports only the barrel (boundaries lint green)
 - [ ] T15 Compose into the route: `src/app/projects/[id]/page.tsx` renders `EnvVarsSection` (RSC fetches metadata + audit, passes as props); ensure `loading.tsx`/`error.tsx` exist · done: env section serves under a project
