@@ -4,7 +4,7 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 0 — setup
 
-- [ ] T0 Branch `feat/003-secure-env-vars` (exists); scaffold the slice with `/new-module env-vars` · done: `src/features/env-vars/*` exist, `pnpm lint` green
+- [x] T0 Branch `feat/003-secure-env-vars` (exists); scaffold the slice with `/new-module env-vars` · done: `src/features/env-vars/*` exist, `pnpm lint` green
 - [x] T1 ADR-0007 (env-var encryption, keyring + AAD + DEFINER RPCs) written + indexed · done: `docs/architecture/decisions/0007-env-var-encryption.md`, `pnpm check:docs` green
 
 ## Phase 1 — data layer (AC-5, AC-6, AC-7, AC-10)
