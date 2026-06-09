@@ -34,8 +34,8 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 - [x] T16 E2E `e2e/env-vars.spec.ts` (CUJ-03): add → see logo → reveal → copy → edit → delete, with audit-trail assertions and `grantPermissions` for clipboard; `shot()` `env-*` captures · done: `FEATURE=003-secure-env-vars pnpm e2e:shots` green (**AC-1..4, 8, 10**)
 - [x] T17 Integration tests (security invariants): raw `env_var_secrets` row is ciphertext (**AC-5**); a member `SELECT` on `env_var_secrets` is denied; a direct member `INSERT` into `env_var_audit` is denied (**AC-6** forgery); deleting a variable retains its audit rows incl. the delete event (**AC-10**); `UPDATE/DELETE` on audit denied · done: tests green
-- [ ] T18 Run `/verify-ui 003` — inspect screenshots against ACs; fix what you see · done: attestation recorded
-- [ ] T19 `pnpm verify` green; commit history clean (conventional) · done: full gate green
+- [x] T18 Run `/verify-ui 003` — inspect screenshots against ACs; fix what you see · done: attestation recorded
+- [x] T19 `pnpm verify` green; commit history clean (conventional) · done: full gate green
 
 ## Phase 5 — review & ship
 
