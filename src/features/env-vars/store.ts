@@ -15,6 +15,7 @@ export type EnvVarsState = {
   closeModal: () => void;
   setRevealed: (id: string, value: string) => void;
   hideValue: (id: string) => void;
+  hideAll: () => void;
 };
 
 /** UI-only store (create/edit modal + which values are currently revealed). Server data is passed via props. */
@@ -32,6 +33,7 @@ export function createEnvVarsStore() {
         delete next[id];
         return { revealed: next };
       }),
+    hideAll: () => set({ revealed: {} }),
   }));
 }
 

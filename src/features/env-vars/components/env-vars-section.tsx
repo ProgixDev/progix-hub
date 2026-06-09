@@ -48,21 +48,34 @@ export function EnvVarsSection({
 
 function Header() {
   const openCreate = useEnvVarsStore((s) => s.openCreate);
+  const hideAll = useEnvVarsStore((s) => s.hideAll);
+  const anyRevealed = useEnvVarsStore((s) => Object.keys(s.revealed).length > 0);
   return (
     <div className="flex items-center justify-between">
       <div>
         <h2 className="text-text text-[15px] font-semibold">Environment variables</h2>
         <p className="text-text-3 text-[12px]">
-          Encrypted at rest · revealed and copied are audited.
+          Encrypted at rest · reveals and copies are audited.
         </p>
       </div>
-      <button
-        type="button"
-        onClick={openCreate}
-        className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
-      >
-        Add variable
-      </button>
+      <div className="flex items-center gap-2">
+        {anyRevealed && (
+          <button
+            type="button"
+            onClick={hideAll}
+            className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+          >
+            Hide all
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={openCreate}
+          className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+        >
+          Add variable
+        </button>
+      </div>
     </div>
   );
 }
@@ -84,7 +97,11 @@ function AuditTrail({ audit }: { audit: AuditRow[] }) {
               {ACTION_LABEL[row.action]}{" "}
               <span className="text-text font-mono">{row.env_var_key}</span>
             </span>
-            <time className="text-text-3 flex-none font-mono">
+            <time
+              dateTime={row.created_at}
+              suppressHydrationWarning
+              className="text-text-3 flex-none font-mono"
+            >
               {new Date(row.created_at).toLocaleString()}
             </time>
           </li>

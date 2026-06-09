@@ -24,6 +24,8 @@ export function ServiceLogo({ service, size = 24 }: { service: string | null; si
         className="text-text-3 bg-bg-2 border-line-1 inline-flex flex-none items-center justify-center rounded-md border"
         style={{ width: size, height: size, fontSize: size * 0.5 }}
         aria-hidden
+        data-testid="service-logo"
+        data-service="none"
       >
         ·
       </span>
@@ -40,6 +42,8 @@ export function ServiceLogo({ service, size = 24 }: { service: string | null; si
         fontSize: size * 0.4,
       }}
       aria-hidden
+      data-testid="service-logo"
+      data-service={service}
     >
       {brand.mark}
     </span>

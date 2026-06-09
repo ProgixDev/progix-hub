@@ -32,44 +32,60 @@ test("@cuj CUJ-03: member adds, reveals, copies, edits, and deletes an env var",
   await shot(page, "env-create-form");
   await dialog.getByRole("button", { name: "Add variable" }).click();
 
-  // The env row is the listitem with the key that also carries an Edit button
-  // (the audit trail lists the same key but has no row controls).
+  // The env row is the listitem with the key that also carries an Edit control
+  // (the audit trail lists the same key but has no row buttons).
   const row = page
     .getByRole("listitem")
     .filter({ hasText: key })
-    .filter({ has: page.getByRole("button", { name: "Edit" }) });
+    .filter({ has: page.getByRole("button", { name: /^Edit/ }) });
   await expect(row).toBeVisible();
   await expect(row.getByLabel("value")).toHaveText("••••••••••••");
   await shot(page, "env-list");
 
+  // AC-7: a second variable with the same key is rejected with a clear message.
+  await page.getByRole("button", { name: "Add variable" }).click();
+  const dup = page.getByRole("dialog", { name: /new variable/i });
+  await dup.getByLabel("Key").fill(key);
+  await dup.getByLabel("Value").fill("another");
+  await dup.getByRole("button", { name: "Add variable" }).click();
+  await expect(dup.getByText(/already exists/i).first()).toBeVisible();
+  await dup.getByRole("button", { name: "Cancel" }).click();
+
   // AC-3: reveal shows the real value.
-  await row.getByRole("button", { name: "Reveal" }).click();
+  await row.getByRole("button", { name: /^Reveal/ }).click();
   await expect(row.getByLabel("value")).toHaveText(value);
   await shot(page, "env-revealed");
 
   // AC-4: copy places it on the clipboard.
-  await row.getByRole("button", { name: "Copy" }).click();
-  await expect(row.getByRole("button", { name: "Copied" })).toBeVisible();
+  await row.getByRole("button", { name: /^Copy/ }).click();
+  await expect(row.getByRole("button", { name: /^Copied/ })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(value);
 
-  // AC-10: the audit trail records the activity (open the collapsible).
-  await page.getByText(/recent activity/i).click();
-  await expect(page.getByText(/revealed/i).first()).toBeVisible();
-  await shot(page, "env-audit");
-
   // AC-8: edit (keep the value) then delete with confirmation.
-  await row.getByRole("button", { name: "Edit" }).click();
+  await row.getByRole("button", { name: /^Edit/ }).click();
   const editDialog = page.getByRole("dialog", { name: /edit variable/i });
   await editDialog.getByRole("button", { name: "Save changes" }).click();
   await expect(editDialog).toBeHidden();
 
   page.once("dialog", (d) => d.accept());
-  await row.getByRole("button", { name: "Delete" }).click();
+  await row.getByRole("button", { name: /^Delete/ }).click();
   await expect(
     page
       .getByRole("listitem")
       .filter({ hasText: key })
-      .filter({ has: page.getByRole("button", { name: "Edit" }) }),
+      .filter({ has: page.getByRole("button", { name: /^Edit/ }) }),
   ).toHaveCount(0);
   await shot(page, "env-deleted");
+
+  // AC-3 / AC-4 / AC-10: the delete's revalidate refreshes the trail, which now shows the full
+  // history — reveal, copy, and delete — and OUTLIVES the variable (the key is still recorded).
+  await page
+    .locator("details")
+    .first()
+    .evaluate((d) => ((d as HTMLDetailsElement).open = true));
+  await expect(page.getByText(/revealed/i).first()).toBeVisible();
+  await expect(page.getByText(/copied/i).first()).toBeVisible();
+  await expect(page.getByText(/deleted/i).first()).toBeVisible();
+  await expect(page.getByText(key).first()).toBeVisible();
+  await shot(page, "env-audit");
 });

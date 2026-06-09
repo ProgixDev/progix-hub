@@ -52,24 +52,47 @@ export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId
         <p className="text-text-2 truncate font-mono text-[12px]" aria-label="value">
           {revealed ?? "••••••••••••"}
         </p>
-        {error && <p className="text-[11px] text-[#FFB6A2]">{error}</p>}
+        {error && (
+          <p role="alert" className="text-[11px] text-[#FFB6A2]">
+            {error}
+          </p>
+        )}
       </div>
       <div className="flex flex-none items-center gap-1.5">
         <button
           type="button"
           className={btn}
           disabled={pending}
+          aria-pressed={Boolean(revealed)}
+          aria-label={`${revealed ? "Hide" : "Reveal"} ${envVar.key}`}
           onClick={() => (revealed ? hideValue(envVar.id) : access("reveal"))}
         >
           {revealed ? "Hide" : "Reveal"}
         </button>
-        <button type="button" className={btn} disabled={pending} onClick={() => access("copy")}>
+        <button
+          type="button"
+          className={btn}
+          disabled={pending}
+          aria-label={`${copied ? "Copied" : "Copy"} ${envVar.key}`}
+          onClick={() => access("copy")}
+        >
           {copied ? "Copied" : "Copy"}
         </button>
-        <button type="button" className={btn} onClick={() => openEdit(envVar)}>
+        <button
+          type="button"
+          className={btn}
+          aria-label={`Edit ${envVar.key}`}
+          onClick={() => openEdit(envVar)}
+        >
           Edit
         </button>
-        <button type="button" className={btn} disabled={pending} onClick={onDelete}>
+        <button
+          type="button"
+          className={btn}
+          disabled={pending}
+          aria-label={`Delete ${envVar.key}`}
+          onClick={onDelete}
+        >
           Delete
         </button>
       </div>

@@ -16,6 +16,7 @@ export type RevealResult = { ok: true; value: string } | { ok: false; error: str
 
 const NOT_AUTHORIZED = "You aren’t authorized to do that.";
 const DUPLICATE = "A variable with that key already exists in this project.";
+const ENC_NOT_CONFIGURED = "Encryption isn’t configured — contact an admin.";
 
 function fieldErrorsOf(error: z.ZodError): Record<string, string> {
   const flat = z.flattenError(error);
@@ -43,7 +44,12 @@ export async function createEnvVarAction(projectId: string, input: unknown): Pro
   }
 
   const id = randomUUID();
-  const ciphertext = encryptSecret(parsed.data.value, id);
+  let ciphertext: string;
+  try {
+    ciphertext = encryptSecret(parsed.data.value, id);
+  } catch {
+    return { ok: false, error: ENC_NOT_CONFIGURED };
+  }
   const supabase = await createClient();
   const { error } = await supabase.rpc("create_env_var", {
     p_id: id,
@@ -80,7 +86,14 @@ export async function updateEnvVarAction(
     };
   }
 
-  const ciphertext = parsed.data.value !== undefined ? encryptSecret(parsed.data.value, id) : null;
+  let ciphertext: string | null = null;
+  if (parsed.data.value !== undefined) {
+    try {
+      ciphertext = encryptSecret(parsed.data.value, id);
+    } catch {
+      return { ok: false, error: ENC_NOT_CONFIGURED };
+    }
+  }
   const supabase = await createClient();
   const { error } = await supabase.rpc("update_env_var", {
     p_id: id,
