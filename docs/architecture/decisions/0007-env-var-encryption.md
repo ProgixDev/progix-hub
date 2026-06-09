@@ -1,6 +1,6 @@
 # 0007 — Encrypt env-var values with an app-held keyring (AES-256-GCM) behind SECURITY DEFINER RPCs
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-06-09
 - **Deciders:** Achref Arabi (founder), Claude
 - **Review:** hardened after an adversarial pre-implementation design review (4 P0 + 4 P1 findings folded in).
