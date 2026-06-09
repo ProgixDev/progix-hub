@@ -6,10 +6,11 @@ Adding or changing a CUJ is a product decision — PR must be approved by the pr
 
 ## Registry
 
-| ID     | Journey          | Steps (user's words)                                                                            | E2E spec               | Screenshots                |
-| ------ | ---------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | -------------------------- |
-| CUJ-01 | Land and orient  | Open `/` → see the projects portfolio in the app shell → read each project’s status at a glance | `e2e/home.spec.ts`     | `home-*`                   |
-| CUJ-02 | Create a project | Sign in → New project → fill name + links → see it in the portfolio → open it → archive it      | `e2e/projects.spec.ts` | `portfolio-*`, `project-*` |
+| ID     | Journey          | Steps (user's words)                                                                                                                | E2E spec               | Screenshots                |
+| ------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | -------------------------- |
+| CUJ-01 | Land and orient  | Open `/` → see the projects portfolio in the app shell → read each project’s status at a glance                                     | `e2e/home.spec.ts`     | `home-*`                   |
+| CUJ-02 | Create a project | Sign in → New project → fill name + links → see it in the portfolio → open it → archive it                                          | `e2e/projects.spec.ts` | `portfolio-*`, `project-*` |
+| CUJ-03 | Manage env vars  | Open a project → add a variable (logo auto-fills) → reveal → copy → edit → delete; the audit trail records it and survives deletion | `e2e/env-vars.spec.ts` | `env-*`                    |
 
 ## Rules
 
