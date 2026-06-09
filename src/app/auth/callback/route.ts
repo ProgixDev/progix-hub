@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchOrgMembership, isAllowedMember } from "@/features/auth";
 
 /**
- * GitHub OAuth callback (spec 002). Exchanges the code, verifies DigitariaWebs membership
+ * GitHub OAuth callback (spec 002). Exchanges the code, verifies ProgixDev membership
  * with the user's GitHub token, and either stamps `app_metadata.is_member` (then refreshes
  * the session so the JWT carries it) or signs the user out with an access-denied message.
  */

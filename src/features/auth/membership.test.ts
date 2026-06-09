@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isAllowedMember } from "./membership";
 
 describe("isAllowedMember (AC-2)", () => {
-  it("allows an active DigitariaWebs member", () => {
+  it("allows an active ProgixDev member", () => {
     expect(isAllowedMember({ state: "active" })).toBe(true);
   });
 

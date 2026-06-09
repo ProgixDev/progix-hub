@@ -6,7 +6,7 @@
 
 ## What & why
 
-progixHub had no sign-in and a painted-door portfolio of fake projects. This feature makes it real: a visitor must sign in with GitHub and be a member of the **DigitariaWebs** org to enter, and signed-in members can create, edit, and archive real projects — each carrying its four surface links (Notion, Slack, GitHub, Live). It is the foundation every later feature (env vars, documents, feedback) builds on, so it shipped first; it wires Supabase (ADR-0006) into the app for the first time.
+progixHub had no sign-in and a painted-door portfolio of fake projects. This feature makes it real: a visitor must sign in with GitHub and be a member of the **ProgixDev** org to enter, and signed-in members can create, edit, and archive real projects — each carrying its four surface links (Notion, Slack, GitHub, Live). It is the foundation every later feature (env vars, documents, feedback) builds on, so it shipped first; it wires Supabase (ADR-0006) into the app for the first time.
 
 ## Acceptance criteria → evidence
 
