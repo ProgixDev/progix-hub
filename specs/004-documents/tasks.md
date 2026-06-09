@@ -26,9 +26,9 @@ Ordered, executable, checkboxed. `[P]` = parallel-safe. Each names files + a don
 
 ## Phase 3 — verification
 
-- [ ] T13 E2E `e2e/documents.spec.ts` (CUJ-04): upload a small file → add a link → add a note → switch tabs → edit → archive; `shot()` `doc-*` · done: `FEATURE=004-documents` green
-- [ ] T14 Integration: a member can’t read another path’s ciphertext-equivalent — here: storage RLS denies anon, and `documents` RLS denies non-members (extend `security.integration.test.ts` or add one) · done: green
-- [ ] T15 Run `/verify-ui 004`; `pnpm verify` green
+- [x] T13 E2E `e2e/documents.spec.ts` (CUJ-04): upload a small file → add a link → add a note → switch tabs → edit → archive; `shot()` `doc-*` · done: `FEATURE=004-documents` green
+- [x] T14 Integration: a member can’t read another path’s ciphertext-equivalent — here: storage RLS denies anon, and `documents` RLS denies non-members (extend `security.integration.test.ts` or add one) · done: green
+- [x] T15 Run `/verify-ui 004`; `pnpm verify` green
 
 ## Phase 4 — review & ship
 
