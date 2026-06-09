@@ -39,8 +39,8 @@ Ordered, executable, checkboxed. Work top-to-bottom, tick boxes as you commit, n
 
 ## Phase 5 — review & ship
 
-- [ ] T20 Run `/review` — **AppSec is mandatory** (crypto + AAD, keyring/rotation, RLS + DEFINER RPCs, audit atomicity/immutability, key handling); fix P0/P1
-- [ ] T21 `/feature-report 003` → `docs/reports/003-secure-env-vars.md` (AC→evidence table + curated screenshots)
+- [x] T20 Run `/review` — **AppSec is mandatory** (crypto + AAD, keyring/rotation, RLS + DEFINER RPCs, audit atomicity/immutability, key handling); fix P0/P1
+- [x] T21 `/feature-report 003` → `docs/reports/003-secure-env-vars.md` (AC→evidence table + curated screenshots)
 - [ ] T22 Open PR (template filled; spec + plan + ADR-0007 + report linked)
 - [ ] T23 After merge: `/update-docs` — feature doc, register **CUJ-03**, specs index → shipped, ADR-0007 → Accepted
 
