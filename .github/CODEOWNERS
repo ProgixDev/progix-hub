@@ -2,25 +2,25 @@
 # Shared layers and gate-bearing files get mandatory owner review (docs/conventions/git.md).
 # Replace the placeholder teams with real GitHub teams/users when cloning the skeleton.
 
-*                           @DigitariaWebs/engineering
+*                           @Achref23illi
 
 # The harness itself — changes here steer every agent and every PR.
-/AGENTS.md                  @DigitariaWebs/engineering
-/CLAUDE.md                  @DigitariaWebs/engineering
-/.claude/                   @DigitariaWebs/engineering
-/docs/                      @DigitariaWebs/engineering
-/specs/constitution.md      @DigitariaWebs/engineering
-/scripts/                   @DigitariaWebs/engineering
+/AGENTS.md                  @Achref23illi
+/CLAUDE.md                  @Achref23illi
+/.claude/                   @Achref23illi
+/docs/                      @Achref23illi
+/specs/constitution.md      @Achref23illi
+/scripts/                   @Achref23illi
 
 # Gates and CI.
-/.github/                   @DigitariaWebs/engineering
-/eslint.config.mjs          @DigitariaWebs/engineering
-/tsconfig.json              @DigitariaWebs/engineering
+/.github/                   @Achref23illi
+/eslint.config.mjs          @Achref23illi
+/tsconfig.json              @Achref23illi
 
 # Shared design system.
-/src/components/            @DigitariaWebs/engineering
-/src/core/                  @DigitariaWebs/engineering
+/src/components/            @Achref23illi
+/src/core/                  @Achref23illi
 
 # Product knowledge.
-/docs/product/              @DigitariaWebs/engineering
-/specs/                     @DigitariaWebs/engineering
+/docs/product/              @Achref23illi
+/specs/                     @Achref23illi
