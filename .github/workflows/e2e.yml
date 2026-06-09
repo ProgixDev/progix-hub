@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # The app needs a Supabase backend to boot. These come from repo secrets — ideally a
-    # DISPOSABLE Supabase project, not prod (e2e creates/deletes rows). Absent secrets
-    # (forks / pre-setup) skip the suite cleanly instead of timing out.
+    # DISPOSABLE Supabase project, not prod (e2e + integration tests create/delete rows). Absent
+    # secrets (forks / pre-setup) skip the suite cleanly instead of timing out.
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -28,7 +28,7 @@ jobs:
         id: guard
         run: |
           if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            echo "::warning::E2E skipped — Supabase secrets not configured. Add NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (ideally a disposable project) to run the CUJ suite in CI."
+            echo "::warning::E2E + integration skipped — Supabase secrets not configured. Add NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (ideally a disposable project) to run them in CI."
             echo "run=false" >> "$GITHUB_OUTPUT"
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
@@ -55,6 +55,9 @@ jobs:
       - name: Run E2E (CUJ suite)
         if: steps.guard.outputs.run == 'true'
         run: pnpm e2e
+      - name: Run security integration tests (live DB)
+        if: steps.guard.outputs.run == 'true'
+        run: pnpm test:integration
       - name: Upload screenshot evidence
         if: ${{ always() && steps.guard.outputs.run == 'true' }}
         uses: actions/upload-artifact@v4

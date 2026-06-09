@@ -21,7 +21,7 @@ Inside a project, a signed-in Progix member keeps that project’s environment v
 - 2026-06-09 — App-held keyring over Supabase Vault/pgsodium: the `service_role` key leaked once, and Vault keeps key material in the DB; app-held splits the trust domains (ADR-0007).
 - 2026-06-09 — Hardened by an adversarial pre-implementation review (4 P0): AAD row-binding, the keyring (a single key can’t rotate without bricking data), audit actor-binding, and atomic reveal+audit were all added before code.
 - 2026-06-09 — Logos are brand-coloured **monograms** (dependency-free); real `simple-icons` marks are a deferred ADR. Stripe and Supabase both render “S”.
-- Gotcha: the DB-level invariants (ciphertext isolation, non-member raise, audit-forgery, append-only) are verified live + encoded in `0002` grants but have **no committed CI integration test yet** — needs a disposable CI Supabase project (same gate as CI e2e).
+- The DB-level invariants (ciphertext isolation, non-member raise, audit-forgery, append-only, retention) are covered by **`src/features/env-vars/security.integration.test.ts`** — run with `pnpm test:integration` (a separate vitest project; hits a real Supabase with a member JWT and skips when the env is absent). It runs in the CI e2e job when secrets are present; **point it at a disposable Supabase project, not prod** (it creates + deletes test users/rows).
 - Gotcha: a client component must not import the slice barrel (`index.ts` re-exports server-only `data.ts`); client islands use relative imports (same as `projects`).
 
 ## CUJs covered
