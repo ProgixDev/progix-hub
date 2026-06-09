@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { EnvVarsSection, listEnvVarAudit, listProjectEnvVars } from "@/features/env-vars";
 import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
 import { getCurrentUser } from "@/lib/auth/session";
 
@@ -15,10 +16,12 @@ function toRecent(projects: Project[]): RecentProject[] {
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [user, project, projects] = await Promise.all([
+  const [user, project, projects, envVars, audit] = await Promise.all([
     getCurrentUser(),
     getProject(id),
     listProjects(),
+    listProjectEnvVars(id),
+    listEnvVarAudit(id),
   ]);
 
   if (!project) notFound();
@@ -30,6 +33,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectDetail project={project} />
+      <EnvVarsSection projectId={id} envVars={envVars} audit={audit} />
     </AppShell>
   );
 }
