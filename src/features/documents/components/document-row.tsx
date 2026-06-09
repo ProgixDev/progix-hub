@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { archiveDocumentAction, getDocumentDownloadUrlAction } from "../actions";
+import {
+  archiveDocumentAction,
+  getDocumentDownloadUrlAction,
+  restoreDocumentAction,
+} from "../actions";
 import { formatBytes, mimeLabel } from "../lib";
 import { useDocumentsStore } from "../provider";
 import type { ProjectDocument } from "../types";
@@ -10,7 +14,15 @@ import { NoteBody } from "./note-body";
 const btn =
   "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
 
-export function DocumentRow({ doc, projectId }: { doc: ProjectDocument; projectId: string }) {
+export function DocumentRow({
+  doc,
+  projectId,
+  archived = false,
+}: {
+  doc: ProjectDocument;
+  projectId: string;
+  archived?: boolean;
+}) {
   const openEdit = useDocumentsStore((s) => s.openEdit);
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +31,13 @@ export function DocumentRow({ doc, projectId }: { doc: ProjectDocument; projectI
     if (!window.confirm(`Archive “${doc.title}”? You can restore it later.`)) return;
     start(async () => {
       const res = await archiveDocumentAction(doc.id, projectId);
+      if (!res.ok) setError(res.error);
+    });
+  }
+
+  function onRestore() {
+    start(async () => {
+      const res = await restoreDocumentAction(doc.id, projectId);
       if (!res.ok) setError(res.error);
     });
   }
@@ -82,30 +101,44 @@ export function DocumentRow({ doc, projectId }: { doc: ProjectDocument; projectI
           )}
         </div>
         <div className="flex flex-none items-center gap-1.5">
-          {doc.kind === "file" && (
-            <button type="button" className={btn} disabled={pending} onClick={onDownload}>
-              {pending ? "…" : "Download"}
-            </button>
-          )}
-          {doc.kind !== "file" && (
+          {archived ? (
             <button
               type="button"
               className={btn}
-              aria-label={`Edit ${doc.title}`}
-              onClick={() => openEdit(doc)}
+              disabled={pending}
+              aria-label={`Restore ${doc.title}`}
+              onClick={onRestore}
             >
-              Edit
+              Restore
             </button>
+          ) : (
+            <>
+              {doc.kind === "file" && (
+                <button type="button" className={btn} disabled={pending} onClick={onDownload}>
+                  {pending ? "…" : "Download"}
+                </button>
+              )}
+              {doc.kind !== "file" && (
+                <button
+                  type="button"
+                  className={btn}
+                  aria-label={`Edit ${doc.title}`}
+                  onClick={() => openEdit(doc)}
+                >
+                  Edit
+                </button>
+              )}
+              <button
+                type="button"
+                className={btn}
+                disabled={pending}
+                aria-label={`Archive ${doc.title}`}
+                onClick={onArchive}
+              >
+                Archive
+              </button>
+            </>
           )}
-          <button
-            type="button"
-            className={btn}
-            disabled={pending}
-            aria-label={`Archive ${doc.title}`}
-            onClick={onArchive}
-          >
-            Archive
-          </button>
         </div>
       </div>
     </li>

@@ -69,4 +69,13 @@ test("@cuj CUJ-04: member uploads a file, adds a link + note, switches tabs, edi
     .click();
   await expect(page.getByRole("link", { name: "Figma board v2" })).toHaveCount(0);
   await shot(page, "doc-archived");
+
+  // AC-7: restore it from the Archived panel.
+  await page.getByText(/^Archived \(/).click();
+  await page
+    .getByRole("listitem")
+    .filter({ hasText: "Figma board v2" })
+    .getByRole("button", { name: /^Restore/ })
+    .click();
+  await expect(page.getByRole("link", { name: "Figma board v2" })).toBeVisible();
 });

@@ -14,3 +14,16 @@ export async function listProjectDocuments(projectId: string): Promise<ProjectDo
   if (error) throw new Error(error.message);
   return (data ?? []) as ProjectDocument[];
 }
+
+/** A project's archived documents (AC-7) — so they can be restored from the UI. */
+export async function listArchivedProjectDocuments(projectId: string): Promise<ProjectDocument[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("documents")
+    .select("*")
+    .eq("project_id", projectId)
+    .not("archived_at", "is", null)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ProjectDocument[];
+}

@@ -17,9 +17,11 @@ const TABS: { id: DocumentTab; label: string }[] = [
 export function DocumentsSection({
   projectId,
   documents,
+  archived,
 }: {
   projectId: string;
   documents: ProjectDocument[];
+  archived: ProjectDocument[];
 }) {
   return (
     <DocumentsStoreProvider>
@@ -27,9 +29,31 @@ export function DocumentsSection({
         <Header projectId={projectId} />
         <Tabs documents={documents} />
         <List projectId={projectId} documents={documents} />
+        {archived.length > 0 && <ArchivedPanel projectId={projectId} archived={archived} />}
         <DocForm projectId={projectId} />
       </section>
     </DocumentsStoreProvider>
+  );
+}
+
+function ArchivedPanel({
+  projectId,
+  archived,
+}: {
+  projectId: string;
+  archived: ProjectDocument[];
+}) {
+  return (
+    <details className="border-line-1 mt-6 rounded-lg border">
+      <summary className="text-text-2 hover:text-text cursor-pointer px-4 py-3 text-[13px] font-medium">
+        Archived ({archived.length})
+      </summary>
+      <ul className="space-y-2 px-3 pb-3">
+        {archived.map((d) => (
+          <DocumentRow key={d.id} doc={d} projectId={projectId} archived />
+        ))}
+      </ul>
+    </details>
   );
 }
 

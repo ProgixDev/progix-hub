@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
-import { DocumentsSection, listProjectDocuments } from "@/features/documents";
+import {
+  DocumentsSection,
+  listArchivedProjectDocuments,
+  listProjectDocuments,
+} from "@/features/documents";
 import { EnvVarsSection, listEnvVarAudit, listProjectEnvVars } from "@/features/env-vars";
 import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -17,13 +21,14 @@ function toRecent(projects: Project[]): RecentProject[] {
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [user, project, projects, envVars, audit, documents] = await Promise.all([
+  const [user, project, projects, envVars, audit, documents, archivedDocs] = await Promise.all([
     getCurrentUser(),
     getProject(id),
     listProjects(),
     listProjectEnvVars(id),
     listEnvVarAudit(id),
     listProjectDocuments(id),
+    listArchivedProjectDocuments(id),
   ]);
 
   if (!project) notFound();
@@ -36,7 +41,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     >
       <ProjectDetail project={project} />
       <EnvVarsSection projectId={id} envVars={envVars} audit={audit} />
-      <DocumentsSection projectId={id} documents={documents} />
+      <DocumentsSection projectId={id} documents={documents} archived={archivedDocs} />
     </AppShell>
   );
 }

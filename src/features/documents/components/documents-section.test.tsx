@@ -33,12 +33,12 @@ const link: ProjectDocument = {
 
 describe("DocumentsSection", () => {
   it("shows the empty state when there are no documents (AC-9)", () => {
-    render(<DocumentsSection projectId="p" documents={[]} />);
+    render(<DocumentsSection projectId="p" documents={[]} archived={[]} />);
     expect(screen.getByText(/no documents yet/i)).toBeTruthy();
   });
 
   it("renders a link row and the kind tabs (AC-2 / AC-4)", () => {
-    render(<DocumentsSection projectId="p" documents={[link]} />);
+    render(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
     expect(screen.getByRole("link", { name: "Figma" })).toBeTruthy();
     expect(screen.getByRole("tab", { name: /Files/ })).toBeTruthy();
     expect(screen.getByRole("tab", { name: /Notes/ })).toBeTruthy();
