@@ -1,0 +1,200 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { requireMember } from "@/lib/auth/session";
+import { createClient } from "@/lib/supabase/server";
+import { fileMetaSchema, linkInputSchema, noteInputSchema } from "./types";
+
+export type ActionResult =
+  | { ok: true }
+  | { ok: false; error: string; fieldErrors?: Record<string, string> };
+
+export type DownloadResult = { ok: true; url: string } | { ok: false; error: string };
+
+const NOT_AUTHORIZED = "You aren’t authorized to do that.";
+const SIGNED_URL_TTL = 60 * 60; // 1 hour
+
+function fieldErrorsOf(error: z.ZodError): Record<string, string> {
+  const flat = z.flattenError(error);
+  const out: Record<string, string> = {};
+  for (const [key, messages] of Object.entries(flat.fieldErrors)) {
+    const list = messages as string[] | undefined;
+    if (list && list.length > 0) out[key] = list[0]!;
+  }
+  return out;
+}
+
+const FIX_FIELDS = "Please fix the highlighted fields.";
+
+/** Add an external link (AC-2). */
+export async function addLinkDocumentAction(
+  projectId: string,
+  input: unknown,
+): Promise<ActionResult> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: NOT_AUTHORIZED };
+  if (!z.uuid().safeParse(projectId).success) return { ok: false, error: "Unknown project." };
+
+  const parsed = linkInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: FIX_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("documents").insert({
+    project_id: projectId,
+    kind: "link",
+    title: parsed.data.title,
+    url: parsed.data.url,
+    created_by: member.id,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}
+
+/** Add a rich-text (Markdown) note (AC-3). */
+export async function addNoteDocumentAction(
+  projectId: string,
+  input: unknown,
+): Promise<ActionResult> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: NOT_AUTHORIZED };
+  if (!z.uuid().safeParse(projectId).success) return { ok: false, error: "Unknown project." };
+
+  const parsed = noteInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: FIX_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("documents").insert({
+    project_id: projectId,
+    kind: "note",
+    title: parsed.data.title,
+    body: parsed.data.body,
+    created_by: member.id,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}
+
+/** Record a file's metadata after the browser has uploaded it to Storage (AC-1). Re-validates size + MIME. */
+export async function recordFileDocumentAction(
+  projectId: string,
+  input: unknown,
+): Promise<ActionResult> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: NOT_AUTHORIZED };
+  if (!z.uuid().safeParse(projectId).success) return { ok: false, error: "Unknown project." };
+
+  const parsed = fileMetaSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: "That file isn’t allowed.",
+      fieldErrors: fieldErrorsOf(parsed.error),
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("documents").insert({
+    project_id: projectId,
+    kind: "file",
+    title: parsed.data.title,
+    file_path: parsed.data.file_path,
+    file_size: parsed.data.file_size,
+    file_mime: parsed.data.file_mime,
+    created_by: member.id,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}
+
+/** Edit a link or a note (AC-8). */
+export async function updateDocumentAction(
+  id: string,
+  projectId: string,
+  kind: "link" | "note",
+  input: unknown,
+): Promise<ActionResult> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: NOT_AUTHORIZED };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+
+  const schema = kind === "link" ? linkInputSchema : noteInputSchema;
+  const parsed = schema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: FIX_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
+  }
+  const patch =
+    kind === "link"
+      ? {
+          title: (parsed.data as z.infer<typeof linkInputSchema>).title,
+          url: (parsed.data as z.infer<typeof linkInputSchema>).url,
+        }
+      : {
+          title: (parsed.data as z.infer<typeof noteInputSchema>).title,
+          body: (parsed.data as z.infer<typeof noteInputSchema>).body,
+        };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("documents").update(patch).eq("id", id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}
+
+/** Archive a document (AC-7) — soft delete; there is no hard delete. */
+export async function archiveDocumentAction(id: string, projectId: string): Promise<ActionResult> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: NOT_AUTHORIZED };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("documents")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}
+
+/** Restore an archived document (AC-7). */
+export async function restoreDocumentAction(id: string, projectId: string): Promise<ActionResult> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: NOT_AUTHORIZED };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("documents").update({ archived_at: null }).eq("id", id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}
+
+/** Member-only download: a short-lived signed URL for the private file (AC-1, AC-6). */
+export async function getDocumentDownloadUrlAction(id: string): Promise<DownloadResult> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: NOT_AUTHORIZED };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+
+  const supabase = await createClient();
+  const { data: doc, error: readErr } = await supabase
+    .from("documents")
+    .select("file_path")
+    .eq("id", id)
+    .maybeSingle();
+  if (readErr) return { ok: false, error: readErr.message };
+  if (!doc?.file_path) return { ok: false, error: "That file could not be found." };
+
+  const { data, error } = await supabase.storage
+    .from("project-documents")
+    .createSignedUrl(doc.file_path as string, SIGNED_URL_TTL);
+  if (error || !data) return { ok: false, error: "Could not prepare the download." };
+  return { ok: true, url: data.signedUrl };
+}
