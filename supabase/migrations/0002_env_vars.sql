@@ -59,6 +59,10 @@ create policy "members read env_vars" on public.env_vars
   for select to authenticated
   using ((auth.jwt() -> 'app_metadata' ->> 'is_member')::boolean is true);
 
+-- Writes go only through the RPCs (run as the function owner); block direct member writes at the
+-- grant level too, so RLS isn't the only thing standing between a member and a raw write.
+revoke insert, update, delete, truncate on public.env_vars from anon, authenticated;
+
 -- env_var_secrets: no policies at all, and grants revoked — unreachable except via the DEFINER RPCs.
 revoke all on public.env_var_secrets from anon, authenticated;
 
@@ -68,7 +72,7 @@ create policy "members read env_var_audit" on public.env_var_audit
   for select to authenticated
   using ((auth.jwt() -> 'app_metadata' ->> 'is_member')::boolean is true);
 
-revoke insert, update, delete on public.env_var_audit from anon, authenticated;
+revoke insert, update, delete, truncate on public.env_var_audit from anon, authenticated;
 
 -- ============================== RPCs (SECURITY DEFINER) ==============================
 -- search_path='' + schema-qualified refs + an internal is_member gate make these safe in public
