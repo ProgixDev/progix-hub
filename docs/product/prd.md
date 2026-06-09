@@ -2,7 +2,7 @@
 
 > Product Requirements Document. The source of intent: what we’re building and why, before how. Human original lives in Notion; this is the repo mirror agents read. Filled by `/write-prd`; updated by `/meeting-intake` when requirements change.
 
-**Client:** Progix (internal) · **Owner:** Progix team · **Status:** draft · **Updated:** 2026-06-08
+**Client:** Progix (internal) · **Owner:** Progix team · **Status:** active — MVP in progress (2 of 4 features shipped & deployed) · **Updated:** 2026-06-09
 
 ## Problem & opportunity
 
@@ -39,8 +39,8 @@ Every Progix project lives across four surfaces — Notion explains it, GitHub t
 The non-negotiables for launch, ranked. Each becomes one or more specs via `/create-spec`.
 
 0. **App shell** (foundation, not a user feature) — sidebar (Projects, Settings·“soon”, recent projects), top bar with a **⌘K command menu**, dark dev-tool design system ported from the approved Claude Design. Features drop into this shell.
-1. **Project creation + the four links** — create/edit/list projects with a status (**Active / At risk / Archived**); attach four surface links by pasting URLs: **Notion, Slack, GitHub, and Live** (deployed site). Project detail header presents the four links as shortcuts plus a **Client link** action and member avatars. _(Signature — must be impeccable.)_
-2. **Secure env-vars management** — per-project key/value envs with a **scope** (Production / Preview / Development), masked by default, gated per-row reveal + “Hide all”, behind secured login, **encrypted at rest**. Each variable carries a **service logo** (Stripe, Twilio, Next.js, Redis, SendGrid, Algolia, Postgres, …) so it’s recognizable at a glance — auto-detected from the key (e.g. `STRIPE_*` → Stripe, `REDIS_*` → Redis) with a manual override and a generic key fallback. _(Signature — must be impeccable.)_
+1. ✅ **Project creation + the four links** (shipped — spec 002) — create/edit/list projects with a status (**Active / At risk / Archived**); attach four surface links by pasting URLs: **Notion, Slack, GitHub, and Live** (deployed site). Project detail header presents the four links as shortcuts plus a **Client link** action and member avatars. _(Signature — must be impeccable.)_
+2. ✅ **Secure env-vars management** (shipped — spec 003) — per-project key/value envs, masked by default, gated per-row reveal + “Hide all”, behind secured login, **encrypted at rest** (app-held keyring, ADR-0007). Each variable carries a **service logo** auto-detected from the key (e.g. `STRIPE_*` → Stripe) with a manual override and a generic fallback. _Deferred (fast-follows):_ per-environment **scope** (Production / Preview / Development), bulk `.env` paste, and real `simple-icons` logos (currently brand-coloured monograms). _(Signature — must be impeccable.)_
 3. **Documents** — per project, three kinds in one tabbed view (**All / Files / Links / Notes**): file uploads to Supabase Storage (PDF, DOCX, images, ZIP — **up to 50 MB**), external links, and rich-text notes; each row shows type/size, uploader, and date.
 4. **Client feedback page** — a **private-link** (secret URL, not public) per-project page where a client leaves a **star rating + message + optional name**; visible only to the Progix team. In-app: a rating summary, the response list, Copy-client-link and Preview actions.
 
@@ -71,7 +71,8 @@ Resolved before the relevant spec proceeds (carried into `/create-spec` intervie
 - [x] **Brand assets** — resolved for MVP: wordmark + palette come from the approved design (`icons.jsx`, `styles.css`). A standalone logo file is still nice-to-have.
 - [x] **Secrets access model** — resolved: any signed-in Progix member may reveal (design: “Access is limited to signed-in Progix members”); reveal stays object-level-authorized + audit-logged. Per-project-membership gating is a possible later refinement, not MVP.
 - [x] **Feedback page auth** — resolved: **private secret link** (design: “Private link”), not public.
-- [ ] **Roles & permissions** — MVP assumes any authenticated member can create/edit/archive; granular roles deferred (Settings is “soon”). Confirm before the project-creation spec if that’s wrong.
+- [x] **Roles & permissions** — resolved 2026-06-09: **flat** — any authenticated member can create/edit/archive/reveal anything; granular roles deferred (Settings is “soon”).
+- [ ] **i18n (EN + FR)** — reaffirmed as a requirement, but **not yet built** (the app shipped English-only). To be set up as a foundation before/with the Documents feature, then existing features retrofitted.
 - [ ] **Feedback notifications** — should a new client response notify the team (email/Slack)? Not shown in the design; decide during the feedback spec.
 
 ## Decision log
@@ -85,3 +86,8 @@ Resolved before the relevant spec proceeds (carried into `/create-spec` intervie
 - 2026-06-08 — Surface links are **four**: Notion, Slack, GitHub, **Live** (deployed site) — Live added per the approved design.
 - 2026-06-08 — Env vars carry a **per-variable service logo** auto-detected from the key, with manual override — approved product detail.
 - 2026-06-08 — **Settings is out of MVP** (“soon” in the design); MVP assumes flat permissions (any authenticated member).
+- 2026-06-09 — **Spec 002 shipped & deployed** — sign-in (GitHub OAuth, ProgixDev-gated) + project registry; live at progix-hub.vercel.app.
+- 2026-06-09 — **Spec 003 shipped & deployed** — secure env vars, encrypted at rest (app-held keyring, ADR-0007). Shipped as a **flat list**; per-environment scope, bulk `.env` paste, and real service-logo art are deferred fast-follows.
+- 2026-06-09 — **Roles confirmed flat** — any authenticated member can do anything; no per-project or role gating in the MVP.
+- 2026-06-09 — **i18n (EN + FR) reaffirmed and prioritized** — the app shipped English-only; bilingual is set up as a foundation next, then existing features retrofitted.
+- 2026-06-09 — **One Supabase project serves dev + prod** (no separate environments) — accepted for the solo MVP; tests write to the same DB, and a disposable test/CI project is a known follow-up.
