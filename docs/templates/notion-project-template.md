@@ -17,7 +17,7 @@ Page properties (Projets database): `Nom du projet`, `Description`, `Status`, `G
 - **Description** — one paragraph: what this product is, in plain language.
 - **Status** — Planning / Active / Maintenance.
 - **Client** — name + company + primary contact.
-- **GitHub repository** — `https://github.com/DigitariaWebs/<repo>`.
+- **GitHub repository** — `https://github.com/ProgixDev/<repo>`.
 - **PRD** — link to the PRD page (below).
 - **Current focus** — what we're working on this week.
 - **Current milestone** — sprint / milestone + target date.

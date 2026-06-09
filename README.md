@@ -54,8 +54,8 @@ Three workflows run on every PR: **CI** (lint/types/format/docs/typography/tests
 
 ## Cloning this skeleton for a new project
 
-1. Create the repo from this template (GitHub "Use this template", or `npx degit DigitariaWebs/nextjs-skeleton my-project`).
-2. Open it in Claude Code and run **`/progix`** — the one front door. It interviews you, fills the Notion project, creates the GitHub repo under DigitariaWebs, initializes the clone (via `/setup-project`), writes the PRD, and emits the Claude Design prompt. (`/setup-project <name>` still works standalone if you only want the repo init.) First time? Rehearse safely with **`/progix <name> --dry-run`** — it plans everything and creates nothing.
+1. Create the repo from this template (GitHub "Use this template", or `npx degit ProgixDev/nextjs-skeleton my-project`).
+2. Open it in Claude Code and run **`/progix`** — the one front door. It interviews you, fills the Notion project, creates the GitHub repo under ProgixDev, initializes the clone (via `/setup-project`), writes the PRD, and emits the Claude Design prompt. (`/setup-project <name>` still works standalone if you only want the repo init.) First time? Rehearse safely with **`/progix <name> --dry-run`** — it plans everything and creates nothing.
 3. Do the two steps only a human can: protect `main` (require CI + E2E) and add the `ANTHROPIC_API_KEY` secret (`/install-github-app`).
 4. Write your first spec: `/create-spec`.
 

@@ -14,7 +14,7 @@ const STATUS_LABEL: Record<ProjectStatus, string> = {
 const LINK_FIELDS = [
   { name: "notion_url", label: "Notion", placeholder: "https://www.notion.so/…" },
   { name: "slack_url", label: "Slack", placeholder: "https://app.slack.com/…" },
-  { name: "github_url", label: "GitHub", placeholder: "https://github.com/DigitariaWebs/…" },
+  { name: "github_url", label: "GitHub", placeholder: "https://github.com/ProgixDev/…" },
   { name: "live_url", label: "Live", placeholder: "https://…" },
 ] as const;
 

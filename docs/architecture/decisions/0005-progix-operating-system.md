@@ -16,7 +16,7 @@ Adopt a project operating system with **one front door and four surfaces**, gove
 
 Each fact lives in exactly one home. Duplicating it anywhere else is a bug.
 
-**One front door — `/progix`.** A new project starts with a clone of the skeleton and one message: `/progix`. The skill runs an intake interview (ask as many questions as needed — easy to answer, never assumed), then: creates the GitHub repo under the `DigitariaWebs` org, creates and fills the Notion project from the canonical template, runs `/setup-project` to initialize the clone, and emits the Claude Design prompt as a clean copy-paste `.md`. It subsumes the old two-step kickoff (kickoff prompt + `/setup-project`), which remain as internal steps.
+**One front door — `/progix`.** A new project starts with a clone of the skeleton and one message: `/progix`. The skill runs an intake interview (ask as many questions as needed — easy to answer, never assumed), then: creates the GitHub repo under the `ProgixDev` org, creates and fills the Notion project from the canonical template, runs `/setup-project` to initialize the clone, and emits the Claude Design prompt as a clean copy-paste `.md`. It subsumes the old two-step kickoff (kickoff prompt + `/setup-project`), which remain as internal steps.
 
 **Two workflows (from the R2R proposal):**
 

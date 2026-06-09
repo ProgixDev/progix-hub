@@ -1,6 +1,6 @@
 ---
 name: progix
-description: The one front door for a new Progix project. Run this first, in a fresh skeleton clone, with one message — "/progix". It interviews you about the project, fills the Notion project from the canonical template, creates the GitHub repo under DigitariaWebs, initializes the clone (/setup-project), writes the PRD, and emits the Claude Design prompt as a clean copy-paste .md. Add "--dry-run" to rehearse safely — it plans everything and creates nothing. Subsumes the old kickoff prompt + /setup-project. Use whenever starting any new client project.
+description: The one front door for a new Progix project. Run this first, in a fresh skeleton clone, with one message — "/progix". It interviews you about the project, fills the Notion project from the canonical template, creates the GitHub repo under ProgixDev, initializes the clone (/setup-project), writes the PRD, and emits the Claude Design prompt as a clean copy-paste .md. Add "--dry-run" to rehearse safely — it plans everything and creates nothing. Subsumes the old kickoff prompt + /setup-project. Use whenever starting any new client project.
 disable-model-invocation: true
 argument-hint: [project-name-kebab-case] [--dry-run]
 allowed-tools: Read Write Edit Glob Grep AskUserQuestion Bash(gh *) Bash(git *) Bash(pnpm *)
@@ -52,9 +52,9 @@ Run `/write-prd` with the intake answers → `docs/product/prd.md` (repo mirror)
 
 **Duplicate the live master, don't rebuild it.** The ready master page is `Project Template v2 — Progix OS`, id `379bfde8-7d02-81a7-8881-e89edfc4ac19`, under the **Projets** data source `collection://378bfde8-7d02-8088-941f-000bf7aa576f`. Use the Notion `duplicate-page` tool on that id, then rename the copy to the project and fill every section from the intake + the PRD (step 3) + the PM narrative (`docs/templates/pm-page.md`). The duplicate already contains the seven sub-pages (PRD, Meetings, Feature Specs, Technical Notes, GitHub, Resources, PM). If duplication isn't available, recreate the structure from `docs/templates/notion-project-template.md`. If the MCP isn't connected at all, write the filled content to `docs/notion-export/` as markdown and tell the user to paste it. Make the PM page genuinely human — narrate the project, don't dump fields.
 
-### Step 5 — GitHub repo + project board (gh CLI, org DigitariaWebs)
+### Step 5 — GitHub repo + project board (gh CLI, org ProgixDev)
 
-If `gh auth status` is OK: `gh repo create DigitariaWebs/<name> --private --source . --remote origin` (the clone is the source), then create the project board — `gh project create --owner DigitariaWebs --title "<name>"` — and add its URL plus the repo URL to the Notion **GitHub** sub-page and `docs/product/overview.md`. Tasks live on this board, not in a Notion database (four-surface rule); the Notion GitHub page embeds/links it. If `gh` isn't authed, output the exact commands and continue.
+If `gh auth status` is OK: `gh repo create ProgixDev/<name> --private --source . --remote origin` (the clone is the source), then create the project board — `gh project create --owner ProgixDev --title "<name>"` — and add its URL plus the repo URL to the Notion **GitHub** sub-page and `docs/product/overview.md`. Tasks live on this board, not in a Notion database (four-surface rule); the Notion GitHub page embeds/links it. If `gh` isn't authed, output the exact commands and continue.
 
 ### Step 6 — Initialize the clone
 
