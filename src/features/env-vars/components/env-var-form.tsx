@@ -1,0 +1,200 @@
+"use client";
+
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { createEnvVarAction, updateEnvVarAction, type ActionResult } from "../actions";
+import { detectService, SERVICES } from "../lib";
+import { useEnvVarsStore } from "../provider";
+import type { EnvVarMeta } from "../types";
+
+const inputCls =
+  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
+
+export function EnvVarForm({ projectId }: { projectId: string }) {
+  const modal = useEnvVarsStore((s) => s.modal);
+  const close = useEnvVarsStore((s) => s.closeModal);
+  if (modal.mode === "closed") return null;
+  const editing = modal.mode === "edit" ? modal.envVar : null;
+  return (
+    <EnvVarFormModal
+      key={editing?.id ?? "new"}
+      projectId={projectId}
+      editing={editing}
+      onClose={close}
+    />
+  );
+}
+
+function Field({
+  label,
+  error,
+  required,
+  hint,
+  children,
+}: {
+  label: string;
+  error?: string;
+  required?: boolean;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-text-1 text-[12.5px] font-medium">
+        {label}
+        {required && <span className="text-[#FFB6A2]"> *</span>}
+        {hint && <span className="text-text-3 font-normal"> — {hint}</span>}
+      </span>
+      {children}
+      {error && <span className="text-[12px] text-[#FFB6A2]">{error}</span>}
+    </label>
+  );
+}
+
+function EnvVarFormModal({
+  projectId,
+  editing,
+  onClose,
+}: {
+  projectId: string;
+  editing: EnvVarMeta | null;
+  onClose: () => void;
+}) {
+  const [pending, start] = useTransition();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [key, setKey] = useState(editing?.key ?? "");
+  const [service, setService] = useState<string>(editing?.service ?? "");
+  const [serviceTouched, setServiceTouched] = useState(Boolean(editing?.service));
+
+  // Auto-detect the service from the key until the user overrides it (AC-1/AC-2).
+  const detected = useMemo(() => detectService(key), [key]);
+  const effectiveService = serviceTouched ? service : (detected ?? "");
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      previouslyFocused?.focus?.();
+    };
+  }, [onClose]);
+
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const fd = new FormData(event.currentTarget);
+    const input = {
+      key: fd.get("key"),
+      value: fd.get("value"),
+      service: effectiveService,
+    };
+    start(async () => {
+      const res: ActionResult = editing
+        ? await updateEnvVarAction(editing.id, projectId, input)
+        : await createEnvVarAction(projectId, input);
+      if (res.ok) {
+        onClose();
+      } else {
+        setErrors(res.fieldErrors ?? {});
+        setFormError(res.error);
+      }
+    });
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/60 px-4 py-[7vh] backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label={editing ? "Edit variable" : "New variable"}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <form
+        onSubmit={onSubmit}
+        className="bg-card border-line-1 w-full max-w-lg rounded-xl border shadow-2xl"
+      >
+        <div className="border-line flex items-center justify-between border-b px-5 py-4">
+          <h2 className="text-text text-[15px] font-semibold">
+            {editing ? "Edit variable" : "New variable"}
+          </h2>
+        </div>
+
+        <div className="flex flex-col gap-4 p-5">
+          {formError && (
+            <p className="border-red/30 bg-red-tint rounded-md border px-3 py-2 text-[13px] text-[#FFB6A2]">
+              {formError}
+            </p>
+          )}
+
+          <Field label="Key" error={errors.key} required>
+            <input
+              name="key"
+              value={key}
+              onChange={(e) => setKey(e.target.value)}
+              placeholder="STRIPE_SECRET_KEY"
+              className={`${inputCls} font-mono text-[13px]`}
+              required
+              aria-required="true"
+              autoFocus
+            />
+          </Field>
+
+          <Field
+            label="Value"
+            error={errors.value}
+            required={!editing}
+            hint={editing ? "leave blank to keep the current value" : undefined}
+          >
+            <input
+              name="value"
+              type="password"
+              autoComplete="off"
+              placeholder={editing ? "••••••••" : "Paste the secret value"}
+              className={`${inputCls} font-mono text-[13px]`}
+              required={!editing}
+            />
+          </Field>
+
+          <Field label="Service" hint="for the logo — auto-detected, override if needed">
+            <select
+              value={effectiveService}
+              onChange={(e) => {
+                setService(e.target.value);
+                setServiceTouched(true);
+              }}
+              className={inputCls}
+            >
+              <option value="">Other / none</option>
+              {SERVICES.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+
+        <div className="border-line flex items-center justify-end gap-2 border-t px-5 py-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={pending}
+            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
+          >
+            {pending ? "Saving…" : editing ? "Save changes" : "Add variable"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

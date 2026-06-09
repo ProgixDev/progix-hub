@@ -14,38 +14,56 @@ jobs:
     name: Playwright CUJs + screenshot evidence
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # The app needs a Supabase backend to boot. These come from repo secrets — ideally a
+    # DISPOSABLE Supabase project, not prod (e2e creates/deletes rows). Absent secrets
+    # (forks / pre-setup) skip the suite cleanly instead of timing out.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ENV_VAR_ENCRYPTION_KEYS: ${{ secrets.ENV_VAR_ENCRYPTION_KEYS }}
+      ENV_VAR_ENCRYPTION_ACTIVE_VERSION: ${{ secrets.ENV_VAR_ENCRYPTION_ACTIVE_VERSION }}
     steps:
+      - name: Check for Supabase secrets
+        id: guard
+        run: |
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            echo "::warning::E2E skipped — Supabase secrets not configured. Add NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY (ideally a disposable project) to run the CUJ suite in CI."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
-
+        if: steps.guard.outputs.run == 'true'
       - uses: pnpm/action-setup@v4
-
+        if: steps.guard.outputs.run == 'true'
       - uses: actions/setup-node@v4
+        if: steps.guard.outputs.run == 'true'
         with:
           node-version-file: .nvmrc
           cache: pnpm
-
       - name: Install dependencies
+        if: steps.guard.outputs.run == 'true'
         run: pnpm install --frozen-lockfile
-
       - name: Install Playwright browsers
+        if: steps.guard.outputs.run == 'true'
         run: pnpm exec playwright install --with-deps chromium
-
       - name: Build production bundle
+        if: steps.guard.outputs.run == 'true'
         run: pnpm build
-
       - name: Run E2E (CUJ suite)
+        if: steps.guard.outputs.run == 'true'
         run: pnpm e2e
-
       - name: Upload screenshot evidence
-        if: always()
+        if: ${{ always() && steps.guard.outputs.run == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: screenshots
           path: artifacts/screenshots/
           retention-days: 14
-
       - name: Upload Playwright report
-        if: failure()
+        if: ${{ failure() && steps.guard.outputs.run == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report

@@ -36,7 +36,10 @@ export async function updateSession(request: NextRequest) {
   const isMember = appMeta.is_member === true;
 
   const path = request.nextUrl.pathname;
-  const isPublic = path.startsWith("/sign-in") || path.startsWith("/auth");
+  // /api/health is the secrets-config canary (ADR-0007) — it must answer to an unauthenticated
+  // monitor, so it stays public alongside the sign-in/auth routes.
+  const isPublic =
+    path.startsWith("/sign-in") || path.startsWith("/auth") || path.startsWith("/api/health");
 
   // The gate enforces membership, not just "signed in": a signed-in non-member is bounced
   // to the access-denied screen, so the database RLS isn't the only thing standing guard.

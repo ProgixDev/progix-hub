@@ -1,5 +1,6 @@
 # AI persona review on every PR (ADR-0004). Requires the ANTHROPIC_API_KEY repo secret —
-# easiest setup: run `claude` locally and use /install-github-app.
+# easiest setup: run `claude` locally and use /install-github-app. Skips cleanly if unset
+# (reviews are run locally via /review instead).
 name: Claude persona review
 
 on:
@@ -12,7 +13,6 @@ concurrency:
 
 jobs:
   review:
-    # Skip drafts and bot PRs; keep token spend bounded.
     if: ${{ !github.event.pull_request.draft && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -21,15 +21,28 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
+      - name: Check for API key
+        id: guard
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::warning::Persona review skipped — ANTHROPIC_API_KEY not set. Reviews run locally via /review."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.guard.outputs.run == 'true'
         with:
           fetch-depth: 0
-
       - name: Run persona review board
+        if: steps.guard.outputs.run == 'true'
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ env.ANTHROPIC_API_KEY }}
           prompt: |
             You are the review board for this repository. Review this pull request the way
             .claude/skills/review/SKILL.md prescribes, adapted to CI:

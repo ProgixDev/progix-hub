@@ -18,6 +18,12 @@ const serverEnvSchema = z.object({
   // Public Supabase values (NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY) are
   // exposed as NEXT_PUBLIC_* and read at the client boundary by the @supabase/ssr factories,
   // never through this server-only module.
+  // Env-var encryption (spec 003, ADR-0007): a keyring — JSON map of version → base64 32-byte key —
+  // plus the active version used for new writes. Optional at parse so builds stay green before the
+  // secret is provisioned; src/lib/crypto/secrets.ts validates (32 bytes) and fails closed at use.
+  // NEVER expose these client-side (no NEXT_PUBLIC_ prefix).
+  ENV_VAR_ENCRYPTION_KEYS: z.string().min(1).optional(),
+  ENV_VAR_ENCRYPTION_ACTIVE_VERSION: z.string().min(1).optional(),
 });
 
 export const env = serverEnvSchema.parse(process.env);

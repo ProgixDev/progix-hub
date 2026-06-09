@@ -12,7 +12,9 @@
 <type>(<scope>): <imperative summary ≤ 72 chars>
 ```
 
-Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`, `revert`. Scope = feature slug or area (`task-list`, `harness`, `ci`). Body explains _why_ when non-obvious. `BREAKING CHANGE:` footer when contracts change.
+Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`, `revert`. Scope = feature slug or area (`projects`, `harness`, `ci`). Body explains _why_ when non-obvious. `BREAKING CHANGE:` footer when contracts change.
+
+**Subject case — the common trip-up:** commitlint's `subject-case` rejects subjects that read as sentence-, start-, pascal-, or upper-case, which means **a subject that starts with a capitalized token is blocked**. In particular, **do not lead with a task id** — `feat(env-vars): T3 add the store` ✗ is read as start-case and fails the commit-msg hook. Start the summary with a **lowercase word** and put the task reference in the **body**: `feat(env-vars): add the store factory` ✓ with a body line `T3: …`. (Proper nouns mid-subject, e.g. `ProgixDev`, are fine.)
 
 ## Pull requests
 
