@@ -32,4 +32,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [001](001-task-list/spec.md)         | Task list demo feature      | abandoned |
 | [002](002-auth-and-projects/spec.md) | Sign-in & project registry  | shipped   |
 | [003](003-secure-env-vars/spec.md)   | Secure env vars per project | shipped   |
-| [004](004-documents/spec.md)         | Documents per project       | draft     |
+| [004](004-documents/spec.md)         | Documents per project       | active    |
