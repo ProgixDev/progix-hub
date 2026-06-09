@@ -48,6 +48,7 @@ export async function addLinkDocumentAction(
     title: parsed.data.title,
     url: parsed.data.url,
     created_by: member.id,
+    created_by_email: member.email,
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/projects/${projectId}`);
@@ -75,6 +76,7 @@ export async function addNoteDocumentAction(
     title: parsed.data.title,
     body: parsed.data.body,
     created_by: member.id,
+    created_by_email: member.email,
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/projects/${projectId}`);
@@ -108,6 +110,7 @@ export async function recordFileDocumentAction(
     file_size: parsed.data.file_size,
     file_mime: parsed.data.file_mime,
     created_by: member.id,
+    created_by_email: member.email,
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/projects/${projectId}`);
@@ -142,7 +145,12 @@ export async function updateDocumentAction(
         };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("documents").update(patch).eq("id", id);
+  // Bind the mutation to (id, project_id) so a mismatched projectId can't edit a row
+  // in another project (and leave that project's cache stale). RLS still applies.
+  const { error } = await supabase
+    .from("documents")
+    .update(patch)
+    .match({ id, project_id: projectId });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/projects/${projectId}`);
   return { ok: true };
@@ -158,7 +166,7 @@ export async function archiveDocumentAction(id: string, projectId: string): Prom
   const { error } = await supabase
     .from("documents")
     .update({ archived_at: new Date().toISOString() })
-    .eq("id", id);
+    .match({ id, project_id: projectId });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/projects/${projectId}`);
   return { ok: true };
@@ -171,7 +179,10 @@ export async function restoreDocumentAction(id: string, projectId: string): Prom
   if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("documents").update({ archived_at: null }).eq("id", id);
+  const { error } = await supabase
+    .from("documents")
+    .update({ archived_at: null })
+    .match({ id, project_id: projectId });
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/projects/${projectId}`);
   return { ok: true };
@@ -194,7 +205,9 @@ export async function getDocumentDownloadUrlAction(id: string): Promise<Download
 
   const { data, error } = await supabase.storage
     .from("project-documents")
-    .createSignedUrl(doc.file_path as string, SIGNED_URL_TTL);
+    // `download: true` forces Content-Disposition: attachment, so an uploaded SVG/HTML
+    // can never render (and run script) inline in the storage origin — it only downloads.
+    .createSignedUrl(doc.file_path as string, SIGNED_URL_TTL, { download: true });
   if (error || !data) return { ok: false, error: "Could not prepare the download." };
   return { ok: true, url: data.signedUrl };
 }

@@ -163,7 +163,7 @@ function DocFormModal({
               />
             </Field>
           ) : (
-            <Field label="Note (Markdown)" error={errors.body}>
+            <Field label="Note" error={errors.body}>
               <textarea
                 name="body"
                 defaultValue={editing?.body ?? ""}

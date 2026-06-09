@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { formatDate } from "@/lib/format";
 import {
   archiveDocumentAction,
   getDocumentDownloadUrlAction,
@@ -8,7 +9,7 @@ import {
 } from "../actions";
 import { formatBytes, mimeLabel } from "../lib";
 import { useDocumentsStore } from "../provider";
-import type { ProjectDocument } from "../types";
+import { isHttpUrl, type ProjectDocument } from "../types";
 import { NoteBody } from "./note-body";
 
 const btn =
@@ -54,9 +55,9 @@ export function DocumentRow({
     });
   }
 
-  const date = (
-    <time suppressHydrationWarning>{new Date(doc.created_at).toLocaleDateString()}</time>
-  );
+  const date = <time suppressHydrationWarning>{formatDate(new Date(doc.created_at))}</time>;
+  // Who added it (AC-1/2/3) — stamped at write time, may be null for older rows.
+  const by = doc.created_by_email ? <>{doc.created_by_email} · </> : null;
 
   return (
     <li className="bg-bg-2 border-line-1 rounded-lg border px-3.5 py-3">
@@ -66,22 +67,25 @@ export function DocumentRow({
             <>
               <p className="text-text truncate text-[13px] font-medium">{doc.title}</p>
               <p className="text-text-3 text-[11px]">
-                {mimeLabel(doc.file_mime)} · {formatBytes(doc.file_size)} · {date}
+                {mimeLabel(doc.file_mime)} · {formatBytes(doc.file_size)} · {by}
+                {date}
               </p>
             </>
           )}
           {doc.kind === "link" && (
             <>
               <a
-                href={doc.url ?? "#"}
+                href={isHttpUrl(doc.url) ? doc.url : undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-text hover:text-blue-text text-[13px] font-medium"
               >
                 {doc.title}
               </a>
-              <p className="text-text-2 truncate font-mono text-[11px]">
-                {doc.url} · {date}
+              <p className="text-text-2 truncate font-mono text-[11px]">{doc.url}</p>
+              <p className="text-text-3 text-[11px]">
+                {by}
+                {date}
               </p>
             </>
           )}
@@ -91,7 +95,10 @@ export function DocumentRow({
               <div className="mt-1">
                 <NoteBody body={doc.body ?? ""} />
               </div>
-              <p className="text-text-3 mt-1 text-[11px]">{date}</p>
+              <p className="text-text-3 mt-1 text-[11px]">
+                {by}
+                {date}
+              </p>
             </>
           )}
           {error && (

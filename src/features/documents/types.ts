@@ -15,6 +15,7 @@ export type ProjectDocument = {
   url: string | null;
   body: string | null;
   created_by: string | null;
+  created_by_email: string | null;
   archived_at: string | null;
   created_at: string;
   updated_at: string;
@@ -34,10 +35,20 @@ export const ALLOWED_MIME: Record<string, string> = {
   "application/x-zip-compressed": "ZIP",
 };
 
+// `z.url()` accepts any well-formed URI, including `javascript:`/`data:` — which would
+// be a stored-XSS sink once rendered as an <a href>. Pin the scheme to http(s).
+const HTTP_URL = /^https?:\/\//i;
 export const linkInputSchema = z.object({
   title: z.string().trim().min(1, { error: "Title is required" }).max(300),
-  url: z.url({ error: "Enter a valid URL (including https://)" }),
+  url: z
+    .url({ error: "Enter a valid URL (including https://)" })
+    .refine((value) => HTTP_URL.test(value), { error: "Use an http:// or https:// URL" }),
 });
+
+/** True only for safe, renderable link hrefs — defense in depth for the <a> sink. */
+export function isHttpUrl(value: string | null | undefined): value is string {
+  return typeof value === "string" && HTTP_URL.test(value);
+}
 export type LinkInput = z.infer<typeof linkInputSchema>;
 
 export const noteInputSchema = z.object({

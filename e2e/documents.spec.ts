@@ -68,14 +68,16 @@ test("@cuj CUJ-04: member uploads a file, adds a link + note, switches tabs, edi
     .getByRole("button", { name: /^Archive/ })
     .click();
   await expect(page.getByRole("link", { name: "Figma board v2" })).toHaveCount(0);
-  await shot(page, "doc-archived");
 
-  // AC-7: restore it from the Archived panel.
-  await page.getByText(/^Archived \(/).click();
-  await page
-    .getByRole("listitem")
-    .filter({ hasText: "Figma board v2" })
-    .getByRole("button", { name: /^Restore/ })
-    .click();
+  // AC-7: restore it from the Archived panel. Wait for the server revalidation to
+  // repopulate the archived list before opening the panel (it renders only when non-empty).
+  const archivedSummary = page.getByText(/^Archived \(/);
+  await expect(archivedSummary).toBeVisible();
+  await archivedSummary.click();
+  const archivedRow = page.getByRole("listitem").filter({ hasText: "Figma board v2" });
+  const restore = archivedRow.getByRole("button", { name: /^Restore/ });
+  await expect(restore).toBeVisible();
+  await shot(page, "doc-archived"); // the expanded panel + Restore — AC-7 evidence
+  await restore.click();
   await expect(page.getByRole("link", { name: "Figma board v2" })).toBeVisible();
 });

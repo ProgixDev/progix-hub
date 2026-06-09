@@ -32,7 +32,7 @@ export function FileUpload({ projectId }: { projectId: string }) {
         .from("project-documents")
         .upload(path, file, { contentType: file.type });
       if (uploaded.error) {
-        setError(uploaded.error.message);
+        setError("Couldn’t upload that file — please try again.");
         return;
       }
       const res = await recordFileDocumentAction(projectId, {

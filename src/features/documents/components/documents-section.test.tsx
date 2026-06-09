@@ -26,6 +26,7 @@ const link: ProjectDocument = {
   url: "https://figma.com",
   body: null,
   created_by: null,
+  created_by_email: "alice@progix.test",
   archived_at: null,
   created_at: "2026-06-09T00:00:00Z",
   updated_at: "2026-06-09T00:00:00Z",
@@ -42,5 +43,18 @@ describe("DocumentsSection", () => {
     expect(screen.getByRole("link", { name: "Figma" })).toBeTruthy();
     expect(screen.getByRole("tab", { name: /Files/ })).toBeTruthy();
     expect(screen.getByRole("tab", { name: /Notes/ })).toBeTruthy();
+  });
+
+  it("shows the uploader on each row (AC-1/2/3)", () => {
+    render(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
+    expect(screen.getByText(/alice@progix\.test/)).toBeTruthy();
+  });
+
+  it("wires the active tab to its panel (ARIA tabs)", () => {
+    render(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
+    const panel = screen.getByRole("tabpanel");
+    const all = screen.getByRole("tab", { name: /All/ });
+    expect(all.getAttribute("aria-controls")).toBe(panel.getAttribute("id"));
+    expect(all.getAttribute("aria-selected")).toBe("true");
   });
 });

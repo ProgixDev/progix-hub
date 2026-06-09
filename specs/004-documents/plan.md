@@ -44,6 +44,13 @@ A new `documents` feature slice mirrors `projects`/`env-vars`: a UI-only store (
 - **e2e file upload** → use Playwright `setInputFiles` with a tiny in-repo fixture; runs against the live Storage (same shared-project caveat as 002/003).
 - **New deps** (react-markdown, rehype-sanitize) → ADR-0008; client-only on the documents view.
 
+## Review decisions (T16, 2026-06-09)
+
+- **Download = 1-hour signed URL, regenerated per click, `download: true`.** Realizes the spec's "member-gated, non-expiring" intent (a member can always download) while bounding link-leakage: every click mints a fresh URL, and forcing `Content-Disposition: attachment` means an uploaded SVG/HTML can never render-and-run-script inline — so the image whitelist safely keeps SVG.
+- **Link URLs are pinned to http(s).** `z.url()` accepts `javascript:`/`data:`, which would be a stored-XSS sink once rendered as an `<a href>`; `linkInputSchema` + the `isHttpUrl` render guard reject anything else.
+- **Uploader is denormalized as `created_by_email`** (migration `0004`), stamped at write time — the RLS-bound client can't read `auth.users`, mirroring 003's `actor_email`. Satisfies AC-1/2/3 "uploader".
+- **Mutations bind to `(id, project_id)`** so a mismatched `projectId` can't edit/archive another project's row or leave its cache stale.
+
 ## Overlap check
 
 No other spec is `active` (002/003 shipped, 001 abandoned). Integrates with the `projects` route `/projects/[id]` and the spec-002 auth/RLS model — composed in the app layer; reuses `requireMember`, the RLS client, and `is_member`. No new boundary exceptions.

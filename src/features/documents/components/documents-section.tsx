@@ -14,6 +14,9 @@ const TABS: { id: DocumentTab; label: string }[] = [
   { id: "note", label: "Notes" },
 ];
 
+const PANEL_ID = "documents-panel";
+const tabId = (id: DocumentTab) => `documents-tab-${id}`;
+
 export function DocumentsSection({
   projectId,
   documents,
@@ -90,16 +93,40 @@ function Header({ projectId }: { projectId: string }) {
 function Tabs({ documents }: { documents: ProjectDocument[] }) {
   const tab = useDocumentsStore((s) => s.tab);
   const setTab = useDocumentsStore((s) => s.setTab);
+
+  // Roving focus: arrow/Home/End move between tabs (WAI-ARIA tabs pattern).
+  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    const current = TABS.findIndex((t) => t.id === tab);
+    let next = current;
+    if (event.key === "ArrowRight") next = (current + 1) % TABS.length;
+    else if (event.key === "ArrowLeft") next = (current - 1 + TABS.length) % TABS.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = TABS.length - 1;
+    else return;
+    event.preventDefault();
+    const nextId = TABS[next]!.id;
+    setTab(nextId);
+    document.getElementById(tabId(nextId))?.focus();
+  }
+
   return (
-    <div role="tablist" className="border-line mt-4 flex gap-1 border-b">
+    <div
+      role="tablist"
+      aria-label="Document type"
+      onKeyDown={onKeyDown}
+      className="border-line mt-4 flex gap-1 border-b"
+    >
       {TABS.map((t) => {
         const active = tab === t.id;
         return (
           <button
             key={t.id}
+            id={tabId(t.id)}
             type="button"
             role="tab"
             aria-selected={active}
+            aria-controls={PANEL_ID}
+            tabIndex={active ? 0 : -1}
             onClick={() => setTab(t.id)}
             className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-medium transition-colors ${
               active ? "border-blue text-text" : "text-text-2 hover:text-text border-transparent"
@@ -116,6 +143,12 @@ function Tabs({ documents }: { documents: ProjectDocument[] }) {
 function List({ projectId, documents }: { projectId: string; documents: ProjectDocument[] }) {
   const tab = useDocumentsStore((s) => s.tab);
   const shown = byTab(documents, tab);
+  const panelProps = {
+    id: PANEL_ID,
+    role: "tabpanel" as const,
+    "aria-labelledby": tabId(tab),
+    tabIndex: 0,
+  };
   if (shown.length === 0) {
     const msg =
       tab === "file"
@@ -123,16 +156,19 @@ function List({ projectId, documents }: { projectId: string; documents: ProjectD
         : tab === "link"
           ? "No links yet — add an external URL."
           : tab === "note"
-            ? "No notes yet — write one in Markdown."
+            ? "No notes yet — write one."
             : "No documents yet — upload a file, add a link, or write a note.";
     return (
-      <div className="border-line/60 text-text-3 mt-3 rounded-lg border border-dashed px-4 py-10 text-center text-[13px]">
+      <div
+        {...panelProps}
+        className="border-line/60 text-text-3 mt-3 rounded-lg border border-dashed px-4 py-10 text-center text-[13px]"
+      >
         {msg}
       </div>
     );
   }
   return (
-    <ul className="mt-3 space-y-2">
+    <ul {...panelProps} className="mt-3 space-y-2">
       {shown.map((d) => (
         <DocumentRow key={d.id} doc={d} projectId={projectId} />
       ))}

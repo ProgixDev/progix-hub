@@ -29,13 +29,13 @@ const docId = "22222222-2222-4222-8222-222222222222";
 
 function mockClient() {
   const insert = vi.fn().mockResolvedValue({ error: null });
-  const eq = vi.fn().mockResolvedValue({ error: null });
-  const update = vi.fn(() => ({ eq }));
+  const match = vi.fn().mockResolvedValue({ error: null });
+  const update = vi.fn(() => ({ match }));
   const from = vi.fn(() => ({ insert, update }));
   mockCreateClient.mockResolvedValue({
     from,
   } as unknown as Awaited<ReturnType<typeof createClient>>);
-  return { from, insert, update, eq };
+  return { from, insert, update, match };
 }
 
 beforeEach(() => vi.clearAllMocks());
@@ -117,7 +117,7 @@ describe("addLinkDocumentAction (AC-2)", () => {
     expect(c.insert).not.toHaveBeenCalled();
   });
 
-  it("inserts a valid link", async () => {
+  it("inserts a valid link and stamps the uploader email (AC-2)", async () => {
     const c = mockClient();
     const res = await addLinkDocumentAction(projectId, {
       title: "Figma",
@@ -125,7 +125,35 @@ describe("addLinkDocumentAction (AC-2)", () => {
     });
     expect(res.ok).toBe(true);
     expect(c.insert).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "link", url: "https://figma.com" }),
+      expect.objectContaining({
+        kind: "link",
+        url: "https://figma.com",
+        created_by_email: "m@progix.test",
+      }),
     );
+  });
+
+  it("rejects a javascript: URL (stored-XSS guard)", async () => {
+    const c = mockClient();
+    const res = await addLinkDocumentAction(projectId, {
+      title: "evil",
+      url: "javascript:alert(document.cookie)",
+    });
+    expect(res.ok).toBe(false);
+    expect(c.insert).not.toHaveBeenCalled();
+  });
+});
+
+describe("archiveDocumentAction (AC-7)", () => {
+  beforeEach(() => mockRequireMember.mockResolvedValue(member));
+
+  it("binds the update to (id, project_id) so it can't touch another project's row", async () => {
+    const c = mockClient();
+    const res = await archiveDocumentAction(docId, projectId);
+    expect(res.ok).toBe(true);
+    expect(c.update).toHaveBeenCalledWith(
+      expect.objectContaining({ archived_at: expect.any(String) }),
+    );
+    expect(c.match).toHaveBeenCalledWith({ id: docId, project_id: projectId });
   });
 });

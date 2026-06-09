@@ -13,6 +13,7 @@ const doc = (kind: ProjectDocument["kind"], id: string): ProjectDocument => ({
   url: null,
   body: null,
   created_by: null,
+  created_by_email: null,
   archived_at: null,
   created_at: "2026-06-09T00:00:00Z",
   updated_at: "2026-06-09T00:00:00Z",

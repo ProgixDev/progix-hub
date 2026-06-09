@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fileMetaSchema, linkInputSchema, noteInputSchema } from "./types";
+import { fileMetaSchema, isHttpUrl, linkInputSchema, noteInputSchema } from "./types";
 
 describe("linkInputSchema", () => {
   it("accepts a title + valid URL", () => {
@@ -10,6 +10,28 @@ describe("linkInputSchema", () => {
   it("rejects a missing title or bad URL", () => {
     expect(linkInputSchema.safeParse({ title: "", url: "https://x.com" }).success).toBe(false);
     expect(linkInputSchema.safeParse({ title: "X", url: "not-a-url" }).success).toBe(false);
+  });
+  // Regression: z.url() alone accepts dangerous schemes — these are stored-XSS sinks.
+  it("rejects non-http(s) schemes (javascript:, data:)", () => {
+    expect(
+      linkInputSchema.safeParse({ title: "x", url: "javascript:alert(document.cookie)" }).success,
+    ).toBe(false);
+    expect(linkInputSchema.safeParse({ title: "x", url: "data:text/html,<script>1" }).success).toBe(
+      false,
+    );
+    expect(linkInputSchema.safeParse({ title: "x", url: "vbscript:msgbox(1)" }).success).toBe(
+      false,
+    );
+  });
+});
+
+describe("isHttpUrl (render-sink guard)", () => {
+  it("allows only http(s) URLs", () => {
+    expect(isHttpUrl("https://x.com")).toBe(true);
+    expect(isHttpUrl("http://x.com")).toBe(true);
+    expect(isHttpUrl("javascript:alert(1)")).toBe(false);
+    expect(isHttpUrl(null)).toBe(false);
+    expect(isHttpUrl(undefined)).toBe(false);
   });
 });
 
