@@ -71,10 +71,10 @@ export function CardItem({
 
   return (
     <li className="bg-bg-2 border-line-1 rounded-lg border px-3.5 py-3">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-text text-[13.5px] font-medium">{card.title}</p>
+            <p className="text-text min-w-0 text-[13.5px] font-medium break-words">{card.title}</p>
             <StatusBadge status={card.status} />
             {card.origin === "client" && (
               <span className="border-line-1 bg-bg-3 text-text-2 rounded-full border px-2 py-0.5 text-[11px]">
@@ -90,7 +90,7 @@ export function CardItem({
             <time suppressHydrationWarning>{formatDate(new Date(card.created_at), locale)}</time>
           </p>
         </div>
-        <div className="flex flex-none items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <select
             value={card.status}
             aria-label={t("fieldStatus")}
@@ -190,13 +190,13 @@ function MemberCommentForm({ cardId, projectId }: { cardId: string; projectId: s
 
   return (
     <div className="mt-2.5">
-      <form onSubmit={onSubmit} className="flex items-center gap-2">
+      <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-2">
         <input
           name="body"
           aria-label={t("commentPlaceholder")}
           placeholder={t("commentPlaceholder")}
           required
-          className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 w-full rounded-md border px-2.5 text-[12.5px] outline-none"
+          className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 min-w-40 flex-1 rounded-md border px-2.5 text-[12.5px] outline-none"
         />
         <button type="submit" disabled={pending} className={btn}>
           {pending ? t("sending") : t("send")}

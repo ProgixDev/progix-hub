@@ -14,7 +14,7 @@ import { ShareLinkManager } from "./share-link-manager";
 export function PortalSection({ projectId, portal }: { projectId: string; portal: MemberPortal }) {
   return (
     <PortalStoreProvider>
-      <section className="mx-auto w-full max-w-5xl px-6 pb-12">
+      <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
         <Header projectId={projectId} hasActiveLink={portal.shareLink !== null} />
         <Blocks projectId={projectId} portal={portal} />
         <ProposalsInbox projectId={projectId} portal={portal} />

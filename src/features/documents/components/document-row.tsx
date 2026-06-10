@@ -83,11 +83,11 @@ export function DocumentRow({
                 href={isHttpUrl(doc.url) ? doc.url : undefined}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text hover:text-blue-text text-[13px] font-medium"
+                className="text-text hover:text-blue-text text-[13px] font-medium break-words"
               >
                 {doc.title}
               </a>
-              <p className="text-text-2 truncate font-mono text-[11px]">{doc.url}</p>
+              <p className="text-text-2 truncate font-mono text-[11px] break-all">{doc.url}</p>
               <p className="text-text-3 text-[11px]">
                 {by}
                 {date}
@@ -96,7 +96,7 @@ export function DocumentRow({
           )}
           {doc.kind === "note" && (
             <>
-              <p className="text-text text-[13px] font-medium">{doc.title}</p>
+              <p className="text-text text-[13px] font-medium break-words">{doc.title}</p>
               <div className="mt-1">
                 <NoteBody body={doc.body ?? ""} />
               </div>
@@ -112,7 +112,7 @@ export function DocumentRow({
             </p>
           )}
         </div>
-        <div className="flex flex-none items-center gap-1.5">
+        <div className="flex flex-none flex-wrap items-center justify-end gap-1.5">
           {archived ? (
             <button
               type="button"

@@ -59,7 +59,7 @@ export function ProjectCard({ project }: { project: Project }) {
         <p className="text-text-2 mt-3 line-clamp-2 text-[13px]">{project.description}</p>
       )}
 
-      <div className="mt-4 flex items-center gap-2" aria-label={t("linkedSurfaces")}>
+      <div className="mt-4 flex flex-wrap items-center gap-2" aria-label={t("linkedSurfaces")}>
         {projectSurfaces(project).map(({ key, url, Glyph, label }) =>
           url ? (
             <a

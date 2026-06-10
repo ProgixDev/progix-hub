@@ -32,7 +32,7 @@ export function DocumentsSection({
 }) {
   return (
     <DocumentsStoreProvider>
-      <section className="mx-auto w-full max-w-5xl px-6 pb-12">
+      <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
         <Header projectId={projectId} />
         <Tabs documents={documents} />
         <List projectId={projectId} documents={documents} />
@@ -121,7 +121,7 @@ function Tabs({ documents }: { documents: ProjectDocument[] }) {
       role="tablist"
       aria-label={t("documentType")}
       onKeyDown={onKeyDown}
-      className="border-line mt-4 flex gap-1 border-b"
+      className="border-line -mx-1 mt-4 flex gap-1 overflow-x-auto border-b px-1"
     >
       {TAB_IDS.map((id) => {
         const active = tab === id;
@@ -135,7 +135,7 @@ function Tabs({ documents }: { documents: ProjectDocument[] }) {
             aria-controls={PANEL_ID}
             tabIndex={active ? 0 : -1}
             onClick={() => setTab(id)}
-            className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-medium transition-colors ${
+            className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-medium whitespace-nowrap transition-colors ${
               active ? "border-blue text-text" : "text-text-2 hover:text-text border-transparent"
             }`}
           >

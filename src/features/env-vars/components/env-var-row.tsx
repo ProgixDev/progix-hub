@@ -48,10 +48,10 @@ export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId
   }
 
   return (
-    <li className="bg-bg-2 border-line-1 flex items-center gap-3 rounded-lg border px-3.5 py-2.5">
+    <li className="bg-bg-2 border-line-1 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border px-3.5 py-2.5">
       <ServiceLogo service={envVar.service} />
       <div className="min-w-0 flex-1">
-        <p className="text-text font-mono text-[13px] font-medium">{envVar.key}</p>
+        <p className="text-text font-mono text-[13px] font-medium break-all">{envVar.key}</p>
         <p className="text-text-2 truncate font-mono text-[12px]" aria-label="value">
           {revealed ?? "••••••••••••"}
         </p>
@@ -61,7 +61,7 @@ export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId
           </p>
         )}
       </div>
-      <div className="flex flex-none items-center gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"
           className={btn}
