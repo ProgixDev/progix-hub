@@ -32,7 +32,7 @@ Ordered, checkboxed. `[P]` = parallel-safe. Tick on commit. The migration is the
 ## Phase 4 — review & ship
 
 - [x] T15 `/review` — appsec + frontend + qa + ux board run. No P0s. Fixed: AppSec P1 (projects-read carve-out leaked metadata to a removed creator → `create_project` DEFINER RPC + narrowed SELECT policy, migration `0008`, AC-2 regression test); QA P1 (`changeMemberRoleAction` unit coverage; AC-6 backfill verified on live data: 58/58 creators seated as PM, 0 PM-less projects, owner=superadmin); UX P1 (read-only notice for downgraded roles); a11y P2s (aria fallbacks, field-error `role="alert"`/`aria-describedby`). Logged follow-ups: app-wide `window.confirm` → styled dialog, role badges · done: `pnpm verify` + 24 integration + 17 e2e green, advisors clean
-- [ ] T16 `/feature-report 008`
+- [x] T16 `/feature-report 008` · done: `docs/reports/008-roles-permissions.md` (AC→evidence table, screenshots, follow-ups); `pnpm check:docs` green
 - [ ] T17 Open PR; merge; deploy `vercel --prod`; verify Achref still has full access on prod
 - [ ] T18 `/update-docs` — feature doc, CUJ-07, specs index → shipped; note the model in env-vars/documents/portal feature docs; clean E2E test data
 
