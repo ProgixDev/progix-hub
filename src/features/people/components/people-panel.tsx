@@ -88,7 +88,7 @@ export function PeoplePanel({
               <div className="flex flex-none items-center gap-1.5">
                 <select
                   value={member.role}
-                  aria-label={t("roleFor", { name: member.email ?? "" })}
+                  aria-label={t("roleFor", { name: member.email ?? member.display_name ?? "" })}
                   disabled={pending}
                   onChange={(e) => onChangeRole(member.user_id, e.target.value)}
                   className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-md border px-2 text-[12px] disabled:opacity-60"
@@ -103,7 +103,9 @@ export function PeoplePanel({
                   type="button"
                   disabled={pending}
                   onClick={() => onRemove(member)}
-                  aria-label={t("removeMember", { name: member.email ?? "" })}
+                  aria-label={t("removeMember", {
+                    name: member.email ?? member.display_name ?? "",
+                  })}
                   className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                 >
                   {t("remove")}
@@ -124,10 +126,14 @@ export function PeoplePanel({
               required
               placeholder={t("emailPlaceholder")}
               aria-label={t("emailLabel")}
+              aria-describedby={fieldErrors.email ? "people-email-error" : undefined}
+              aria-invalid={fieldErrors.email ? true : undefined}
               className={`${inputCls} w-full`}
             />
             {fieldErrors.email && (
-              <p className="text-red-text mt-1 text-[11px]">{fieldErrors.email}</p>
+              <p id="people-email-error" role="alert" className="text-red-text mt-1 text-[11px]">
+                {fieldErrors.email}
+              </p>
             )}
           </div>
           <select

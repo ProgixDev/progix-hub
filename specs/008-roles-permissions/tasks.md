@@ -31,12 +31,12 @@ Ordered, checkboxed. `[P]` = parallel-safe. Tick on commit. The migration is the
 
 ## Phase 4 — review & ship
 
-- [ ] T15 `/review` — appsec MANDATORY (RLS rewrite, DEFINER RPCs, last-PM, privilege escalation, storage path checks) + frontend + qa + ux · fix P0/P1
+- [x] T15 `/review` — appsec + frontend + qa + ux board run. No P0s. Fixed: AppSec P1 (projects-read carve-out leaked metadata to a removed creator → `create_project` DEFINER RPC + narrowed SELECT policy, migration `0008`, AC-2 regression test); QA P1 (`changeMemberRoleAction` unit coverage; AC-6 backfill verified on live data: 58/58 creators seated as PM, 0 PM-less projects, owner=superadmin); UX P1 (read-only notice for downgraded roles); a11y P2s (aria fallbacks, field-error `role="alert"`/`aria-describedby`). Logged follow-ups: app-wide `window.confirm` → styled dialog, role badges · done: `pnpm verify` + 24 integration + 17 e2e green, advisors clean
 - [ ] T16 `/feature-report 008`
 - [ ] T17 Open PR; merge; deploy `vercel --prod`; verify Achref still has full access on prod
 - [ ] T18 `/update-docs` — feature doc, CUJ-07, specs index → shipped; note the model in env-vars/documents/portal feature docs; clean E2E test data
 
 ## AC coverage
 
-- [ ] AC-1 → T1,T2,T12 · [ ] AC-2 → T2,T12,T13 · [ ] AC-3 → T3,T7,T8,T12,T13 · [ ] AC-4 → T2,T3,T12
-- [ ] AC-5 → T2,T3,T10,T12 · [ ] AC-6 → T1,T4,T12 · [ ] AC-7 → T3,T7,T12 · [ ] AC-8 → T2,T3,T12
+- [x] AC-1 → T1,T2,T12 · [x] AC-2 → T2,T12,T13,T15 · [x] AC-3 → T3,T7,T8,T12,T13 · [x] AC-4 → T2,T3,T12
+- [x] AC-5 → T2,T3,T10,T12 · [x] AC-6 → T1,T4,T12,T15 · [x] AC-7 → T3,T7,T12 · [x] AC-8 → T2,T3,T12

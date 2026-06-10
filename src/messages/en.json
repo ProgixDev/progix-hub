@@ -71,7 +71,8 @@
     "notLinked": "not linked",
     "linkedSurfaces": "Linked surfaces",
     "errorNameRequired": "Name is required",
-    "errorUrl": "Enter a valid URL (including https://)"
+    "errorUrl": "Enter a valid URL (including https://)",
+    "readOnlyNotice": "Read-only access — ask a PM to make changes."
   },
   "envVars": {
     "title": "Environment variables",

@@ -40,7 +40,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       getTranslations("portal"),
     ]);
 
-  if (!project) notFound();
+  // No effective role (e.g. a removed member) ⇒ no access, even if the row were readable (AC-2).
+  if (!project || !role) notFound();
+
+  const tProjects = await getTranslations("projects");
+  // A role that grants no writes anywhere is read-only — say so, so vanished controls read as
+  // intentional rather than broken (spec 008 review, UX).
+  const readOnly =
+    !can.manageProject && !can.managePeople && !can.writeEnvVars && !can.writeContent;
 
   return (
     <AppShell
@@ -49,6 +56,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectDetail project={project} canManage={can.manageProject} />
+      {readOnly && (
+        <div className="mx-auto w-full max-w-5xl px-4 pb-2 sm:px-6">
+          <p
+            role="status"
+            className="border-line-1 bg-bg-inset text-text-2 rounded-md border px-3 py-2 text-[12px]"
+          >
+            {tProjects("readOnlyNotice")}
+          </p>
+        </div>
+      )}
       <div className="mx-auto w-full max-w-5xl px-4 pb-2 sm:px-6">
         <Link
           href={`/projects/${id}/portal`}

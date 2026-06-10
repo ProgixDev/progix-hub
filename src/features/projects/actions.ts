@@ -39,10 +39,18 @@ export async function createProjectAction(input: unknown): Promise<ActionResult>
     };
   }
 
+  // Create through the SECURITY DEFINER RPC so the row + the creator's PM membership are
+  // seated atomically and read back without the projects-SELECT carve-out (spec 008 review).
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("projects")
-    .insert({ ...parsed.data, created_by: member.id });
+  const { error } = await supabase.rpc("create_project", {
+    p_name: parsed.data.name,
+    p_status: parsed.data.status,
+    p_description: parsed.data.description ?? null,
+    p_notion_url: parsed.data.notion_url ?? null,
+    p_slack_url: parsed.data.slack_url ?? null,
+    p_github_url: parsed.data.github_url ?? null,
+    p_live_url: parsed.data.live_url ?? null,
+  });
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/");

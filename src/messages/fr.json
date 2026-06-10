@@ -71,7 +71,8 @@
     "notLinked": "non lié",
     "linkedSurfaces": "Surfaces liées",
     "errorNameRequired": "Le nom est requis",
-    "errorUrl": "Saisissez une URL valide (avec https://)"
+    "errorUrl": "Saisissez une URL valide (avec https://)",
+    "readOnlyNotice": "Accès en lecture seule — demandez à un PM d’apporter des modifications."
   },
   "envVars": {
     "title": "Variables d’environnement",

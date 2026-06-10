@@ -52,12 +52,8 @@ describe.skipIf(!configured)("roles & permissions matrix (live DB)", () => {
     viewer = await makeUser("viewer");
     outsider = await makeUser("outsider");
 
-    // PM creates the project → trigger makes them PM.
-    const project = await pm
-      .from("projects")
-      .insert({ name: `IT Roles ${stamp}` })
-      .select("id")
-      .single();
+    // PM creates the project via the create_project RPC → trigger makes them PM.
+    const project = await pm.rpc("create_project", { p_name: `IT Roles ${stamp}` });
     if (project.error) throw project.error;
     projectId = project.data.id as string;
 
@@ -207,11 +203,7 @@ describe.skipIf(!configured)("roles & permissions matrix (live DB)", () => {
   });
 
   it("AC-6: a freshly created project auto-gets a PM row (trigger)", async () => {
-    const p = await pm
-      .from("projects")
-      .insert({ name: `IT Trigger ${stamp}` })
-      .select("id")
-      .single();
+    const p = await pm.rpc("create_project", { p_name: `IT Trigger ${stamp}` });
     expect(p.error).toBeNull();
     const pmRow = await admin
       .from("project_members")
@@ -221,6 +213,29 @@ describe.skipIf(!configured)("roles & permissions matrix (live DB)", () => {
       .maybeSingle();
     expect(pmRow.data?.role).toBe("pm");
     await admin.from("projects").delete().eq("id", p.data!.id);
+  });
+
+  it("AC-2: a removed creator can no longer read their old project (no created_by carve-out)", async () => {
+    // The developer creates a project (→ PM via trigger), then a superadmin removes them.
+    const created = await developer.rpc("create_project", { p_name: `IT Removed ${stamp}` });
+    expect(created.error).toBeNull();
+    const removedId = created.data.id as string;
+    // Seat a second PM so the last-PM guard doesn't block the removal.
+    const second = await superadmin.rpc("set_project_member", {
+      p_project: removedId,
+      p_email: viewerEmail,
+      p_role: "pm",
+    });
+    expect(second.error).toBeNull();
+    const removal = await superadmin.rpc("remove_project_member", {
+      p_project: removedId,
+      p_user: userIds[2] as string, // the developer
+    });
+    expect(removal.error).toBeNull();
+    // The former creator now sees nothing of the project (AC-2), despite created_by matching.
+    const read = await developer.from("projects").select("id").eq("id", removedId);
+    expect(read.data ?? []).toHaveLength(0);
+    await admin.from("projects").delete().eq("id", removedId);
   });
 
   it("AC-7: the last PM cannot be demoted or removed", async () => {

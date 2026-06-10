@@ -16,7 +16,11 @@ vi.mock("next-intl/server", async () => {
 
 import { requireMember } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { removeProjectMemberAction, setProjectMemberAction } from "./actions";
+import {
+  changeMemberRoleAction,
+  removeProjectMemberAction,
+  setProjectMemberAction,
+} from "./actions";
 
 const mockRequireMember = vi.mocked(requireMember);
 const mockCreateClient = vi.mocked(createClient);
@@ -92,6 +96,63 @@ describe("setProjectMemberAction (AC-3)", () => {
     const b = await setProjectMemberAction(projectId, { email: "pm@progix.test", role: "viewer" });
     expect(b.ok).toBe(false);
     if (!b.ok) expect(b.error).toMatch(/at least one pm/i);
+  });
+});
+
+describe("changeMemberRoleAction (AC-3)", () => {
+  // This action resolves userId → email via list_project_members, then delegates to
+  // set_project_member, so the RPC mock dispatches on the call name.
+  function mockRpcByName(
+    roster: Array<{ user_id: string; email: string | null }>,
+    setError = null,
+  ) {
+    const rpc = vi.fn((name: string) => {
+      if (name === "list_project_members") return Promise.resolve({ data: roster, error: null });
+      return Promise.resolve({ data: null, error: setError });
+    });
+    mockCreateClient.mockResolvedValue({ rpc } as unknown as Awaited<
+      ReturnType<typeof createClient>
+    >);
+    return rpc;
+  }
+
+  it("resolves the user's email and forwards the new role to set_project_member", async () => {
+    mockRequireMember.mockResolvedValue(member);
+    const rpc = mockRpcByName([{ user_id: userId, email: "dev@progix.test" }]);
+    const res = await changeMemberRoleAction(projectId, { userId, role: "viewer" });
+    expect(res.ok).toBe(true);
+    expect(rpc).toHaveBeenCalledWith("set_project_member", {
+      p_project: projectId,
+      p_email: "dev@progix.test",
+      p_role: "viewer",
+    });
+  });
+
+  it("returns the no-account error when the user isn't on the roster", async () => {
+    mockRequireMember.mockResolvedValue(member);
+    const rpc = mockRpcByName([]); // empty roster → user not found
+    const res = await changeMemberRoleAction(projectId, { userId, role: "viewer" });
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error).toMatch(/no progixhub account/i);
+    expect(rpc).not.toHaveBeenCalledWith("set_project_member", expect.anything());
+  });
+
+  it("maps a last-PM raise from set_project_member to friendly copy (AC-7)", async () => {
+    mockRequireMember.mockResolvedValue(member);
+    mockRpcByName([{ user_id: userId, email: "pm@progix.test" }], {
+      message: "last_pm",
+    } as unknown as null);
+    const res = await changeMemberRoleAction(projectId, { userId, role: "viewer" });
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error).toMatch(/at least one pm/i);
+  });
+
+  it("rejects a bad userId without touching the RPC", async () => {
+    mockRequireMember.mockResolvedValue(member);
+    const rpc = mockRpcByName([]);
+    const res = await changeMemberRoleAction(projectId, { userId: "not-a-uuid", role: "viewer" });
+    expect(res.ok).toBe(false);
+    expect(rpc).not.toHaveBeenCalled();
   });
 });
 
