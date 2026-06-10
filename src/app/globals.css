@@ -51,6 +51,7 @@
   --amber-tint: rgba(224, 165, 59, 0.14);
   --red: #f0613b;
   --red-tint: rgba(240, 97, 59, 0.14);
+  --red-text: #ffb6a2; /* legible error text on --red-tint (was a hardcoded hex everywhere) */
 
   /* shadcn semantic tokens → mapped onto the palette */
   --background: var(--bg);
@@ -73,6 +74,39 @@
   --input: var(--line-1);
   --ring: var(--blue-ring);
   --radius: 0.5625rem; /* 9px — the design's base radius */
+}
+
+/*
+ * Light theme (spec 005 / ADR-0009). Overriding only the raw palette tokens is enough —
+ * the shadcn semantic tokens above are var() references, so they follow automatically.
+ * The brand blue, status hues, and radius are shared; surfaces/text/borders invert.
+ */
+:root[data-theme="light"] {
+  /* Surfaces */
+  --bg: #ffffff;
+  --bg-1: #f7f8fa;
+  --bg-2: #f1f3f7;
+  --bg-3: #e7eaf0;
+  --bg-inset: #ffffff;
+  --bg-sidebar: #f7f8fa;
+
+  /* Borders */
+  --line: rgba(13, 17, 23, 0.08);
+  --line-1: rgba(13, 17, 23, 0.12);
+  --line-strong: rgba(13, 17, 23, 0.18);
+
+  /* Text */
+  --text: #0d1117;
+  --text-1: #36404e;
+  --text-2: #5b6675;
+  --text-3: #8a94a4;
+
+  /* Blue text needs to darken to stay legible on light surfaces */
+  --blue-text: #2c5fd0;
+  --blue-deep: #dbe6ff;
+
+  /* Error text: the salmon reads as low-contrast on light — use a deep red */
+  --red-text: #b42318;
 }
 
 @theme inline {
@@ -103,6 +137,7 @@
   --color-amber-tint: var(--amber-tint);
   --color-red: var(--red);
   --color-red-tint: var(--red-tint);
+  --color-red-text: var(--red-text);
 
   /* shadcn semantic colors */
   --color-background: var(--background);

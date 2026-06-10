@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
 import { MotionProvider } from "@/components/motion";
+import { getServerPrefs } from "@/lib/settings/server";
 import "./globals.css";
 
 const ibmSans = IBM_Plex_Sans({
@@ -24,15 +26,20 @@ export const metadata: Metadata = {
     "The internal hub for every Progix project — link its Notion, Slack, and GitHub, and keep its env vars and documents in one secured place.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Locale + theme are resolved server-side (cookie → JWT → default) so the first paint
+  // is already correct — no flash of the wrong language or theme (spec 005 AC-5, ADR-0009).
+  const { locale, theme } = await getServerPrefs();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} data-theme={theme} suppressHydrationWarning>
       <body className={`${ibmSans.variable} ${ibmMono.variable} font-sans antialiased`}>
-        <MotionProvider>{children}</MotionProvider>
+        <NextIntlClientProvider>
+          <MotionProvider>{children}</MotionProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
