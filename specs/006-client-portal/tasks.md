@@ -35,8 +35,8 @@ Ordered, executable, checkboxed. `[P]` = parallel-safe. Tick on commit; never re
 
 - [x] T17 `/review` — appsec MANDATORY (public RPCs, token handling, admin client, rate limits, XSS) + frontend + qa + ux · fix P0/P1
 - [x] T18 `/feature-report 006`
-- [ ] T19 Open PR; merge; deploy `vercel --prod`; verify share flow on prod
-- [ ] T20 `/update-docs` — feature doc, CUJ-06, specs index → shipped; clean E2E test data
+- [x] T19 Open PR; merge; deploy `vercel --prod`; verify share flow on prod
+- [x] T20 `/update-docs` — feature doc, CUJ-06, specs index → shipped; clean E2E test data
 
 ## AC coverage
 

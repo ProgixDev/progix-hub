@@ -27,13 +27,13 @@ The bet: the cost of finding "where is everything for this project" — scattere
 1. Project creation + the four links — create/edit/list projects; paste-and-validate Notion, Slack, GitHub URLs. _(Signature.)_
 2. Secure env-vars management — per-project key/value, masked by default, gated reveal, behind secured login; each variable shows a recognizable **service logo** (Stripe, Twilio, Next.js, Redis, …) auto-detected from the key with a manual override. _(Signature.)_
 3. Documents — file uploads (Supabase Storage) + external links + rich-text notes.
-4. Client feedback page — per-project link-gated feedback; team reads it in-app.
+4. Client portal — per-project, link-gated. Shipped as a two-way playground (blocks + feature cards the client can comment on, attach files to, and propose features into), evolved from the original one-way “feedback page”.
 
-Full intent and acceptance criteria: [prd.md](prd.md). Stack & data layer: [ADR-0006](../architecture/decisions/0006-data-layer.md).
+All four MVP scope items are now shipped & deployed. Full intent and acceptance criteria: [prd.md](prd.md). Stack & data layer: [ADR-0006](../architecture/decisions/0006-data-layer.md).
 
 ## Current feature map
 
-Shipped: **sign-in & project registry** (002, [auth-and-projects.md](features/auth-and-projects.md)), **secure environment variables** (003, [env-vars.md](features/env-vars.md)), **documents** (004, [documents.md](features/documents.md)), and **settings — language & theme** (005, [settings.md](features/settings.md); the app is bilingual EN/FR and supports light/dark). Living per-feature docs: [features/](features/README.md). Journeys that must never break: [critical-user-journeys.md](critical-user-journeys.md).
+Shipped: **sign-in & project registry** (002, [auth-and-projects.md](features/auth-and-projects.md)), **secure environment variables** (003, [env-vars.md](features/env-vars.md)), **documents** (004, [documents.md](features/documents.md)), **settings — language & theme** (005, [settings.md](features/settings.md); the app is bilingual EN/FR and supports light/dark), and the **client portal** (006, [client-portal.md](features/client-portal.md); the first external/token-gated surface). Living per-feature docs: [features/](features/README.md). Journeys that must never break: [critical-user-journeys.md](critical-user-journeys.md).
 
 ## Glossary
 
