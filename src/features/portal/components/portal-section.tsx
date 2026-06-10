@@ -11,20 +11,40 @@ import { CardItem } from "./card-item";
 import { PortalForms } from "./portal-forms";
 import { ShareLinkManager } from "./share-link-manager";
 
-export function PortalSection({ projectId, portal }: { projectId: string; portal: MemberPortal }) {
+export function PortalSection({
+  projectId,
+  portal,
+  canWrite = true,
+}: {
+  projectId: string;
+  portal: MemberPortal;
+  canWrite?: boolean;
+}) {
   return (
     <PortalStoreProvider>
       <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
-        <Header projectId={projectId} hasActiveLink={portal.shareLink !== null} />
-        <Blocks projectId={projectId} portal={portal} />
-        <ProposalsInbox projectId={projectId} portal={portal} />
+        <Header
+          projectId={projectId}
+          hasActiveLink={portal.shareLink !== null}
+          canWrite={canWrite}
+        />
+        <Blocks projectId={projectId} portal={portal} canWrite={canWrite} />
+        <ProposalsInbox projectId={projectId} portal={portal} canWrite={canWrite} />
         <PortalForms projectId={projectId} blocks={portal.blocks} />
       </section>
     </PortalStoreProvider>
   );
 }
 
-function Header({ projectId, hasActiveLink }: { projectId: string; hasActiveLink: boolean }) {
+function Header({
+  projectId,
+  hasActiveLink,
+  canWrite,
+}: {
+  projectId: string;
+  hasActiveLink: boolean;
+  canWrite: boolean;
+}) {
   const t = useTranslations("portal");
   const openAddBlock = usePortalStore((s) => s.openAddBlock);
   return (
@@ -34,20 +54,30 @@ function Header({ projectId, hasActiveLink }: { projectId: string; hasActiveLink
           <h1 className="text-text text-[18px] font-semibold">{t("title")}</h1>
           <p className="text-text-3 text-[12.5px]">{t("subtitle")}</p>
         </div>
-        <button
-          type="button"
-          onClick={openAddBlock}
-          className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
-        >
-          {t("addBlock")}
-        </button>
+        {canWrite && (
+          <button
+            type="button"
+            onClick={openAddBlock}
+            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+          >
+            {t("addBlock")}
+          </button>
+        )}
       </div>
-      <ShareLinkManager projectId={projectId} hasActiveLink={hasActiveLink} />
+      {canWrite && <ShareLinkManager projectId={projectId} hasActiveLink={hasActiveLink} />}
     </div>
   );
 }
 
-function Blocks({ projectId, portal }: { projectId: string; portal: MemberPortal }) {
+function Blocks({
+  projectId,
+  portal,
+  canWrite,
+}: {
+  projectId: string;
+  portal: MemberPortal;
+  canWrite: boolean;
+}) {
   const t = useTranslations("portal");
   if (portal.blocks.length === 0) {
     return (
@@ -59,7 +89,13 @@ function Blocks({ projectId, portal }: { projectId: string; portal: MemberPortal
   return (
     <div className="mt-6 space-y-6">
       {portal.blocks.map((block) => (
-        <BlockPanel key={block.id} block={block} projectId={projectId} portal={portal} />
+        <BlockPanel
+          key={block.id}
+          block={block}
+          projectId={projectId}
+          portal={portal}
+          canWrite={canWrite}
+        />
       ))}
     </div>
   );
@@ -69,10 +105,12 @@ function BlockPanel({
   block,
   projectId,
   portal,
+  canWrite,
 }: {
   block: PortalBlock;
   projectId: string;
   portal: MemberPortal;
+  canWrite: boolean;
 }) {
   const t = useTranslations("portal");
   const openAddCard = usePortalStore((s) => s.openAddCard);
@@ -94,24 +132,26 @@ function BlockPanel({
         <h2 className="text-text text-[14px] font-semibold">
           {block.name} <span className="text-text-3 font-normal">{cards.length}</span>
         </h2>
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => openAddCard(block.id)}
-            className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors"
-          >
-            {t("addCard")}
-          </button>
-          <button
-            type="button"
-            disabled={pending}
-            onClick={onArchiveBlock}
-            aria-label={`${t("archiveCard")} ${block.name}`}
-            className="text-text-3 hover:text-text h-8 rounded-md px-2 text-[12px] transition-colors disabled:opacity-60"
-          >
-            {t("archiveCard")}
-          </button>
-        </div>
+        {canWrite && (
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => openAddCard(block.id)}
+              className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors"
+            >
+              {t("addCard")}
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={onArchiveBlock}
+              aria-label={`${t("archiveCard")} ${block.name}`}
+              className="text-text-3 hover:text-text h-8 rounded-md px-2 text-[12px] transition-colors disabled:opacity-60"
+            >
+              {t("archiveCard")}
+            </button>
+          </div>
+        )}
       </div>
       {cards.length === 0 ? (
         <p className="text-text-3 px-4 py-6 text-center text-[12.5px]">{t("emptyBlock")}</p>
@@ -122,6 +162,7 @@ function BlockPanel({
               key={card.id}
               card={card}
               projectId={projectId}
+              canWrite={canWrite}
               comments={portal.comments.filter((c) => c.card_id === card.id)}
               attachments={portal.attachments.filter((a) => a.card_id === card.id)}
             />
@@ -138,7 +179,15 @@ function BlockPanel({
 }
 
 /** Client proposals that arrived without a block — the triage inbox. */
-function ProposalsInbox({ projectId, portal }: { projectId: string; portal: MemberPortal }) {
+function ProposalsInbox({
+  projectId,
+  portal,
+  canWrite,
+}: {
+  projectId: string;
+  portal: MemberPortal;
+  canWrite: boolean;
+}) {
   const t = useTranslations("portal");
   const unassigned = cardsForBlock(portal.cards, null);
   if (unassigned.length === 0) return null;
@@ -156,6 +205,7 @@ function ProposalsInbox({ projectId, portal }: { projectId: string; portal: Memb
             key={card.id}
             card={card}
             projectId={projectId}
+            canWrite={canWrite}
             comments={portal.comments.filter((c) => c.card_id === card.id)}
             attachments={portal.attachments.filter((a) => a.card_id === card.id)}
           />

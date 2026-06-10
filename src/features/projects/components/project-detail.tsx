@@ -22,16 +22,22 @@ const STATUS_KEY = {
   archived: "statusArchived",
 } as const satisfies Record<ProjectStatus, string>;
 
-export function ProjectDetail({ project }: { project: Project }) {
+export function ProjectDetail({
+  project,
+  canManage = true,
+}: {
+  project: Project;
+  canManage?: boolean;
+}) {
   return (
     <ProjectsStoreProvider>
-      <DetailInner project={project} />
+      <DetailInner project={project} canManage={canManage} />
       <ProjectForm />
     </ProjectsStoreProvider>
   );
 }
 
-function DetailInner({ project }: { project: Project }) {
+function DetailInner({ project, canManage }: { project: Project; canManage: boolean }) {
   const t = useTranslations("projects");
   const tCommon = useTranslations("common");
   const openEdit = useProjectsStore((s) => s.openEdit);
@@ -60,25 +66,27 @@ function DetailInner({ project }: { project: Project }) {
             <p className="text-text-2 mt-1.5 max-w-2xl text-[14px]">{project.description}</p>
           )}
         </div>
-        <div className="flex flex-none items-center gap-2">
-          <button
-            type="button"
-            onClick={() => openEdit(project)}
-            className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
-          >
-            {tCommon("edit")}
-          </button>
-          {project.status !== "archived" && (
+        {canManage && (
+          <div className="flex flex-none items-center gap-2">
             <button
               type="button"
-              disabled={pending}
-              onClick={() => start(() => archiveProjectAction(project.id).then(() => undefined))}
-              className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+              onClick={() => openEdit(project)}
+              className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
             >
-              {pending ? t("archiving") : t("archive")}
+              {tCommon("edit")}
             </button>
-          )}
-        </div>
+            {project.status !== "archived" && (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => start(() => archiveProjectAction(project.id).then(() => undefined))}
+                className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+              >
+                {pending ? t("archiving") : t("archive")}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

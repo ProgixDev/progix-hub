@@ -54,4 +54,20 @@ describe("EnvVarsSection", () => {
     );
     expect(screen.getByTestId("service-logo").getAttribute("data-service")).toBe("none");
   });
+
+  it("hides mutation controls for a viewer who cannot write (AC-roles)", () => {
+    renderWithIntl(
+      <EnvVarsSection
+        projectId="22222222-2222-2222-2222-222222222222"
+        envVars={[baseVar]}
+        audit={[]}
+        canWrite={false}
+      />,
+    );
+    // The key stays visible — viewers can SEE which variables exist.
+    expect(screen.getByText("STRIPE_SECRET_KEY")).toBeTruthy();
+    // But no add button and no per-row reveal control.
+    expect(screen.queryByRole("button", { name: /add variable/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /reveal/i })).toBeNull();
+  });
 });

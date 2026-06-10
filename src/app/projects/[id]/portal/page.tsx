@@ -5,7 +5,8 @@ import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import { PortalSection, getPortal } from "@/features/portal";
 import { getProject, listProjects, type Project } from "@/features/projects";
-import { getCurrentUser } from "@/lib/auth/session";
+import { capabilities } from "@/lib/auth/roles";
+import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
   return projects.slice(0, 5).map((p) => ({
@@ -18,6 +19,7 @@ function toRecent(projects: Project[]): RecentProject[] {
 
 export default async function ProjectPortalPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const role = await getProjectRole(id);
   const [user, project, projects, portal, t] = await Promise.all([
     getCurrentUser(),
     getProject(id),
@@ -26,6 +28,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
     getTranslations("portal"),
   ]);
   if (!project) notFound();
+  const canWrite = capabilities(role).writeContent;
 
   return (
     <AppShell
@@ -41,7 +44,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
           ← {t("backToProject")}
         </Link>
       </div>
-      <PortalSection projectId={id} portal={portal} />
+      <PortalSection projectId={id} portal={portal} canWrite={canWrite} />
     </AppShell>
   );
 }

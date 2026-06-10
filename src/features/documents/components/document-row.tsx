@@ -20,10 +20,12 @@ export function DocumentRow({
   doc,
   projectId,
   archived = false,
+  canWrite = true,
 }: {
   doc: ProjectDocument;
   projectId: string;
   archived?: boolean;
+  canWrite?: boolean;
 }) {
   const t = useTranslations("documents");
   const tCommon = useTranslations("common");
@@ -114,15 +116,17 @@ export function DocumentRow({
         </div>
         <div className="flex flex-none flex-wrap items-center justify-end gap-1.5">
           {archived ? (
-            <button
-              type="button"
-              className={btn}
-              disabled={pending}
-              aria-label={`${tCommon("restore")} ${doc.title}`}
-              onClick={onRestore}
-            >
-              {tCommon("restore")}
-            </button>
+            canWrite && (
+              <button
+                type="button"
+                className={btn}
+                disabled={pending}
+                aria-label={`${tCommon("restore")} ${doc.title}`}
+                onClick={onRestore}
+              >
+                {tCommon("restore")}
+              </button>
+            )
           ) : (
             <>
               {doc.kind === "file" && (
@@ -130,7 +134,7 @@ export function DocumentRow({
                   {pending ? "…" : tCommon("download")}
                 </button>
               )}
-              {doc.kind !== "file" && (
+              {canWrite && doc.kind !== "file" && (
                 <button
                   type="button"
                   className={btn}
@@ -140,15 +144,17 @@ export function DocumentRow({
                   {tCommon("edit")}
                 </button>
               )}
-              <button
-                type="button"
-                className={btn}
-                disabled={pending}
-                aria-label={`${tCommon("archive")} ${doc.title}`}
-                onClick={onArchive}
-              >
-                {tCommon("archive")}
-              </button>
+              {canWrite && (
+                <button
+                  type="button"
+                  className={btn}
+                  disabled={pending}
+                  aria-label={`${tCommon("archive")} ${doc.title}`}
+                  onClick={onArchive}
+                >
+                  {tCommon("archive")}
+                </button>
+              )}
             </>
           )}
         </div>

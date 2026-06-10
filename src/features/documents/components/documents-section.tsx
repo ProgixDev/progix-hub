@@ -25,18 +25,22 @@ export function DocumentsSection({
   projectId,
   documents,
   archived,
+  canWrite = true,
 }: {
   projectId: string;
   documents: ProjectDocument[];
   archived: ProjectDocument[];
+  canWrite?: boolean;
 }) {
   return (
     <DocumentsStoreProvider>
       <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
-        <Header projectId={projectId} />
+        <Header projectId={projectId} canWrite={canWrite} />
         <Tabs documents={documents} />
-        <List projectId={projectId} documents={documents} />
-        {archived.length > 0 && <ArchivedPanel projectId={projectId} archived={archived} />}
+        <List projectId={projectId} documents={documents} canWrite={canWrite} />
+        {archived.length > 0 && (
+          <ArchivedPanel projectId={projectId} archived={archived} canWrite={canWrite} />
+        )}
         <DocForm projectId={projectId} />
       </section>
     </DocumentsStoreProvider>
@@ -46,9 +50,11 @@ export function DocumentsSection({
 function ArchivedPanel({
   projectId,
   archived,
+  canWrite,
 }: {
   projectId: string;
   archived: ProjectDocument[];
+  canWrite: boolean;
 }) {
   const t = useTranslations("documents");
   return (
@@ -58,14 +64,14 @@ function ArchivedPanel({
       </summary>
       <ul className="space-y-2 px-3 pb-3">
         {archived.map((d) => (
-          <DocumentRow key={d.id} doc={d} projectId={projectId} archived />
+          <DocumentRow key={d.id} doc={d} projectId={projectId} archived canWrite={canWrite} />
         ))}
       </ul>
     </details>
   );
 }
 
-function Header({ projectId }: { projectId: string }) {
+function Header({ projectId, canWrite }: { projectId: string; canWrite: boolean }) {
   const t = useTranslations("documents");
   const openAddLink = useDocumentsStore((s) => s.openAddLink);
   const openAddNote = useDocumentsStore((s) => s.openAddNote);
@@ -75,23 +81,25 @@ function Header({ projectId }: { projectId: string }) {
         <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
         <p className="text-text-3 text-[12px]">{t("subtitle")}</p>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <FileUpload projectId={projectId} />
-        <button
-          type="button"
-          onClick={openAddLink}
-          className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
-        >
-          {t("addLink")}
-        </button>
-        <button
-          type="button"
-          onClick={openAddNote}
-          className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
-        >
-          {t("addNote")}
-        </button>
-      </div>
+      {canWrite && (
+        <div className="flex flex-wrap items-center gap-2">
+          <FileUpload projectId={projectId} />
+          <button
+            type="button"
+            onClick={openAddLink}
+            className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+          >
+            {t("addLink")}
+          </button>
+          <button
+            type="button"
+            onClick={openAddNote}
+            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+          >
+            {t("addNote")}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -148,7 +156,15 @@ function Tabs({ documents }: { documents: ProjectDocument[] }) {
   );
 }
 
-function List({ projectId, documents }: { projectId: string; documents: ProjectDocument[] }) {
+function List({
+  projectId,
+  documents,
+  canWrite,
+}: {
+  projectId: string;
+  documents: ProjectDocument[];
+  canWrite: boolean;
+}) {
   const t = useTranslations("documents");
   const tab = useDocumentsStore((s) => s.tab);
   const shown = byTab(documents, tab);
@@ -179,7 +195,7 @@ function List({ projectId, documents }: { projectId: string; documents: ProjectD
   return (
     <ul {...panelProps} className="mt-3 space-y-2">
       {shown.map((d) => (
-        <DocumentRow key={d.id} doc={d} projectId={projectId} />
+        <DocumentRow key={d.id} doc={d} projectId={projectId} canWrite={canWrite} />
       ))}
     </ul>
   );

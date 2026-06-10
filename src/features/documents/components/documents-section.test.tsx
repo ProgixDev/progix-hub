@@ -33,6 +33,23 @@ const link: ProjectDocument = {
   updated_at: "2026-06-09T00:00:00Z",
 };
 
+const file: ProjectDocument = {
+  id: "22222222-2222-4222-8222-222222222222",
+  project_id: "p",
+  kind: "file",
+  title: "Spec.pdf",
+  file_path: "p/spec.pdf",
+  file_size: 1024,
+  file_mime: "application/pdf",
+  url: null,
+  body: null,
+  created_by: null,
+  created_by_email: "alice@progix.test",
+  archived_at: null,
+  created_at: "2026-06-09T00:00:00Z",
+  updated_at: "2026-06-09T00:00:00Z",
+};
+
 describe("DocumentsSection", () => {
   it("shows the empty state when there are no documents (AC-9)", () => {
     renderWithIntl(<DocumentsSection projectId="p" documents={[]} archived={[]} />);
@@ -49,6 +66,17 @@ describe("DocumentsSection", () => {
   it("shows the uploader on each row (AC-1/2/3)", () => {
     renderWithIntl(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
     expect(screen.getByText(/alice@progix\.test/)).toBeTruthy();
+  });
+
+  it("hides mutation controls for a viewer but keeps Download (spec 008)", () => {
+    renderWithIntl(
+      <DocumentsSection projectId="p" documents={[link, file]} archived={[]} canWrite={false} />,
+    );
+    expect(screen.queryByRole("button", { name: /upload file/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /add link/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /add note/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /edit figma/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /download/i })).toBeTruthy();
   });
 
   it("wires the active tab to its panel (ARIA tabs)", () => {
