@@ -1,15 +1,16 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { createProjectAction, updateProjectAction, type ActionResult } from "../actions";
 import { useProjectsStore } from "../provider";
 import { PROJECT_STATUSES, type Project, type ProjectStatus } from "../types";
 
-const STATUS_LABEL: Record<ProjectStatus, string> = {
-  active: "Active",
-  at_risk: "At risk",
-  archived: "Archived",
-};
+const STATUS_KEY = {
+  active: "statusActive",
+  at_risk: "statusAtRisk",
+  archived: "statusArchived",
+} as const satisfies Record<ProjectStatus, string>;
 
 const LINK_FIELDS = [
   { name: "notion_url", label: "Notion", placeholder: "https://www.notion.so/…" },
@@ -41,10 +42,10 @@ function Field({
     <label className="flex flex-col gap-1.5">
       <span className="text-text-1 text-[12.5px] font-medium">
         {label}
-        {required && <span className="text-[#FFB6A2]"> *</span>}
+        {required && <span className="text-red-text"> *</span>}
       </span>
       {children}
-      {error && <span className="text-[12px] text-[#FFB6A2]">{error}</span>}
+      {error && <span className="text-red-text text-[12px]">{error}</span>}
     </label>
   );
 }
@@ -59,6 +60,8 @@ export function ProjectFormModal({
   editing: Project | null;
   onClose: () => void;
 }) {
+  const t = useTranslations("projects");
+  const tCommon = useTranslations("common");
   const [pending, start] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -98,7 +101,7 @@ export function ProjectFormModal({
       className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/60 px-4 py-[7vh] backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label={editing ? "Edit project" : "New project"}
+      aria-label={editing ? t("editProject") : t("newProject")}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -109,18 +112,18 @@ export function ProjectFormModal({
       >
         <div className="border-line flex items-center justify-between border-b px-5 py-4">
           <h2 className="text-text text-[15px] font-semibold">
-            {editing ? "Edit project" : "New project"}
+            {editing ? t("editProject") : t("newProject")}
           </h2>
         </div>
 
         <div className="flex flex-col gap-4 p-5">
           {formError && (
-            <p className="border-red/30 bg-red-tint rounded-md border px-3 py-2 text-[13px] text-[#FFB6A2]">
+            <p className="border-red/30 bg-red-tint text-red-text rounded-md border px-3 py-2 text-[13px]">
               {formError}
             </p>
           )}
 
-          <Field label="Name" error={errors.name} required>
+          <Field label={t("fieldName")} error={errors.name} required>
             <input
               name="name"
               defaultValue={editing?.name ?? ""}
@@ -131,7 +134,7 @@ export function ProjectFormModal({
             />
           </Field>
 
-          <Field label="Description" error={errors.description}>
+          <Field label={t("fieldDescription")} error={errors.description}>
             <textarea
               name="description"
               defaultValue={editing?.description ?? ""}
@@ -140,11 +143,11 @@ export function ProjectFormModal({
             />
           </Field>
 
-          <Field label="Status">
+          <Field label={t("fieldStatus")}>
             <select name="status" defaultValue={editing?.status ?? "active"} className={inputCls}>
               {PROJECT_STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {STATUS_LABEL[s]}
+                  {t(STATUS_KEY[s])}
                 </option>
               ))}
             </select>
@@ -168,14 +171,14 @@ export function ProjectFormModal({
             onClick={onClose}
             className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
           >
-            Cancel
+            {tCommon("cancel")}
           </button>
           <button
             type="submit"
             disabled={pending}
             className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
           >
-            {pending ? "Saving…" : editing ? "Save changes" : "Create project"}
+            {pending ? tCommon("saving") : editing ? tCommon("save") : t("createProject")}
           </button>
         </div>
       </form>

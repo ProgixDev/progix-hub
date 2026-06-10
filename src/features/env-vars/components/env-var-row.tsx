@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { deleteEnvVarAction, revealEnvVarValueAction } from "../actions";
 import { useEnvVarsStore } from "../provider";
@@ -10,6 +11,8 @@ const btn =
   "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
 
 export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId: string }) {
+  const t = useTranslations("envVars");
+  const tCommon = useTranslations("common");
   const revealed = useEnvVarsStore((s) => s.revealed[envVar.id]);
   const setRevealed = useEnvVarsStore((s) => s.setRevealed);
   const hideValue = useEnvVarsStore((s) => s.hideValue);
@@ -37,7 +40,7 @@ export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId
   }
 
   function onDelete() {
-    if (!window.confirm(`Delete ${envVar.key}? This can’t be undone.`)) return;
+    if (!window.confirm(t("confirmDelete", { key: envVar.key }))) return;
     start(async () => {
       const res = await deleteEnvVarAction(envVar.id, projectId);
       if (!res.ok) setError(res.error);
@@ -53,7 +56,7 @@ export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId
           {revealed ?? "••••••••••••"}
         </p>
         {error && (
-          <p role="alert" className="text-[11px] text-[#FFB6A2]">
+          <p role="alert" className="text-red-text text-[11px]">
             {error}
           </p>
         )}
@@ -64,36 +67,36 @@ export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId
           className={btn}
           disabled={pending}
           aria-pressed={Boolean(revealed)}
-          aria-label={`${revealed ? "Hide" : "Reveal"} ${envVar.key}`}
+          aria-label={`${revealed ? t("hide") : t("reveal")} ${envVar.key}`}
           onClick={() => (revealed ? hideValue(envVar.id) : access("reveal"))}
         >
-          {revealed ? "Hide" : "Reveal"}
+          {revealed ? t("hide") : t("reveal")}
         </button>
         <button
           type="button"
           className={btn}
           disabled={pending}
-          aria-label={`${copied ? "Copied" : "Copy"} ${envVar.key}`}
+          aria-label={`${copied ? t("copied") : t("copy")} ${envVar.key}`}
           onClick={() => access("copy")}
         >
-          {copied ? "Copied" : "Copy"}
+          {copied ? t("copied") : t("copy")}
         </button>
         <button
           type="button"
           className={btn}
-          aria-label={`Edit ${envVar.key}`}
+          aria-label={`${tCommon("edit")} ${envVar.key}`}
           onClick={() => openEdit(envVar)}
         >
-          Edit
+          {tCommon("edit")}
         </button>
         <button
           type="button"
           className={btn}
           disabled={pending}
-          aria-label={`Delete ${envVar.key}`}
+          aria-label={`${tCommon("delete")} ${envVar.key}`}
           onClick={onDelete}
         >
-          Delete
+          {tCommon("delete")}
         </button>
       </div>
     </li>

@@ -1,6 +1,7 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderWithIntl } from "@/test/intl";
 
 const createProjectAction = vi.fn();
 const updateProjectAction = vi.fn();
@@ -26,7 +27,7 @@ describe("ProjectFormModal (AC-4)", () => {
       fieldErrors: { github_url: "Enter a valid URL (including https://)" },
     });
 
-    render(<ProjectFormModal editing={null} onClose={onClose} />);
+    renderWithIntl(<ProjectFormModal editing={null} onClose={onClose} />);
 
     await user.type(screen.getByRole("textbox", { name: /name/i }), "Atlas");
     await user.type(screen.getByRole("textbox", { name: /github/i }), "not-a-url");
@@ -43,7 +44,7 @@ describe("ProjectFormModal (AC-4)", () => {
     const onClose = vi.fn();
     createProjectAction.mockResolvedValue({ ok: true });
 
-    render(<ProjectFormModal editing={null} onClose={onClose} />);
+    renderWithIntl(<ProjectFormModal editing={null} onClose={onClose} />);
     await user.type(screen.getByRole("textbox", { name: /name/i }), "Atlas");
     await user.click(screen.getByRole("button", { name: "Create project" }));
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { requireMember } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -12,33 +13,35 @@ export type ActionResult =
 
 export type DownloadResult = { ok: true; url: string } | { ok: false; error: string };
 
-const NOT_AUTHORIZED = "You aren’t authorized to do that.";
+type Translate = Awaited<ReturnType<typeof getTranslations>>;
+
 const SIGNED_URL_TTL = 60 * 60; // 1 hour
 
-function fieldErrorsOf(error: z.ZodError): Record<string, string> {
+/** Resolve each zod field-error message — now a translation key — through next-intl. */
+function fieldErrorsOf(error: z.ZodError, t: Translate): Record<string, string> {
   const flat = z.flattenError(error);
   const out: Record<string, string> = {};
   for (const [key, messages] of Object.entries(flat.fieldErrors)) {
     const list = messages as string[] | undefined;
-    if (list && list.length > 0) out[key] = list[0]!;
+    if (list && list.length > 0) out[key] = t(list[0]!);
   }
   return out;
 }
-
-const FIX_FIELDS = "Please fix the highlighted fields.";
 
 /** Add an external link (AC-2). */
 export async function addLinkDocumentAction(
   projectId: string,
   input: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(projectId).success) return { ok: false, error: "Unknown project." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(projectId).success)
+    return { ok: false, error: t("errors.unknownProject") };
 
   const parsed = linkInputSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: FIX_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
+    return { ok: false, error: t("errors.fixFields"), fieldErrors: fieldErrorsOf(parsed.error, t) };
   }
 
   const supabase = await createClient();
@@ -60,13 +63,15 @@ export async function addNoteDocumentAction(
   projectId: string,
   input: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(projectId).success) return { ok: false, error: "Unknown project." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(projectId).success)
+    return { ok: false, error: t("errors.unknownProject") };
 
   const parsed = noteInputSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: FIX_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
+    return { ok: false, error: t("errors.fixFields"), fieldErrors: fieldErrorsOf(parsed.error, t) };
   }
 
   const supabase = await createClient();
@@ -88,16 +93,18 @@ export async function recordFileDocumentAction(
   projectId: string,
   input: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(projectId).success) return { ok: false, error: "Unknown project." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(projectId).success)
+    return { ok: false, error: t("errors.unknownProject") };
 
   const parsed = fileMetaSchema.safeParse(input);
   if (!parsed.success) {
     return {
       ok: false,
-      error: "That file isn’t allowed.",
-      fieldErrors: fieldErrorsOf(parsed.error),
+      error: t("documents.errorFileNotAllowed"),
+      fieldErrors: fieldErrorsOf(parsed.error, t),
     };
   }
 
@@ -124,14 +131,15 @@ export async function updateDocumentAction(
   kind: "link" | "note",
   input: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("documents.errorUnknownDoc") };
 
   const schema = kind === "link" ? linkInputSchema : noteInputSchema;
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: FIX_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
+    return { ok: false, error: t("errors.fixFields"), fieldErrors: fieldErrorsOf(parsed.error, t) };
   }
   const patch =
     kind === "link"
@@ -158,9 +166,10 @@ export async function updateDocumentAction(
 
 /** Archive a document (AC-7) — soft delete; there is no hard delete. */
 export async function archiveDocumentAction(id: string, projectId: string): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("documents.errorUnknownDoc") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -174,9 +183,10 @@ export async function archiveDocumentAction(id: string, projectId: string): Prom
 
 /** Restore an archived document (AC-7). */
 export async function restoreDocumentAction(id: string, projectId: string): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("documents.errorUnknownDoc") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -190,9 +200,10 @@ export async function restoreDocumentAction(id: string, projectId: string): Prom
 
 /** Member-only download: a short-lived signed URL for the private file (AC-1, AC-6). */
 export async function getDocumentDownloadUrlAction(id: string): Promise<DownloadResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown document." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("documents.errorUnknownDoc") };
 
   const supabase = await createClient();
   const { data: doc, error: readErr } = await supabase
@@ -201,13 +212,13 @@ export async function getDocumentDownloadUrlAction(id: string): Promise<Download
     .eq("id", id)
     .maybeSingle();
   if (readErr) return { ok: false, error: readErr.message };
-  if (!doc?.file_path) return { ok: false, error: "That file could not be found." };
+  if (!doc?.file_path) return { ok: false, error: t("documents.errorFileNotFound") };
 
   const { data, error } = await supabase.storage
     .from("project-documents")
     // `download: true` forces Content-Disposition: attachment, so an uploaded SVG/HTML
     // can never render (and run script) inline in the storage origin — it only downloads.
     .createSignedUrl(doc.file_path as string, SIGNED_URL_TTL, { download: true });
-  if (error || !data) return { ok: false, error: "Could not prepare the download." };
+  if (error || !data) return { ok: false, error: t("documents.errorDownload") };
   return { ok: true, url: data.signedUrl };
 }

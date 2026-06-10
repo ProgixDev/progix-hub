@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import {
   addLinkDocumentAction,
@@ -53,7 +54,7 @@ function Field({
     <label className="flex flex-col gap-1.5">
       <span className="text-text-1 text-[12.5px] font-medium">{label}</span>
       {children}
-      {error && <span className="text-[12px] text-[#FFB6A2]">{error}</span>}
+      {error && <span className="text-red-text text-[12px]">{error}</span>}
     </label>
   );
 }
@@ -70,6 +71,8 @@ function DocFormModal({
   editing: ProjectDocument | null;
   onClose: () => void;
 }) {
+  const t = useTranslations("documents");
+  const tCommon = useTranslations("common");
   const [pending, start] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -88,11 +91,11 @@ function DocFormModal({
 
   const heading = editing
     ? kind === "link"
-      ? "Edit link"
-      : "Edit note"
+      ? t("editLink")
+      : t("editNote")
     : kind === "link"
-      ? "New link"
-      : "New note";
+      ? t("newLink")
+      : t("newNote");
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -136,12 +139,12 @@ function DocFormModal({
 
         <div className="flex flex-col gap-4 p-5">
           {formError && (
-            <p className="border-red/30 bg-red-tint rounded-md border px-3 py-2 text-[13px] text-[#FFB6A2]">
+            <p className="border-red/30 bg-red-tint text-red-text rounded-md border px-3 py-2 text-[13px]">
               {formError}
             </p>
           )}
 
-          <Field label="Title" error={errors.title}>
+          <Field label={t("fieldTitle")} error={errors.title}>
             <input
               name="title"
               defaultValue={editing?.title ?? ""}
@@ -152,7 +155,7 @@ function DocFormModal({
           </Field>
 
           {kind === "link" ? (
-            <Field label="URL" error={errors.url}>
+            <Field label={t("fieldUrl")} error={errors.url}>
               <input
                 name="url"
                 type="url"
@@ -163,7 +166,7 @@ function DocFormModal({
               />
             </Field>
           ) : (
-            <Field label="Note" error={errors.body}>
+            <Field label={t("fieldNote")} error={errors.body}>
               <textarea
                 name="body"
                 defaultValue={editing?.body ?? ""}
@@ -182,14 +185,14 @@ function DocFormModal({
             onClick={onClose}
             className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
           >
-            Cancel
+            {tCommon("cancel")}
           </button>
           <button
             type="submit"
             disabled={pending}
             className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
           >
-            {pending ? "Saving…" : editing ? "Save changes" : "Add"}
+            {pending ? tCommon("saving") : editing ? tCommon("save") : tCommon("add")}
           </button>
         </div>
       </form>

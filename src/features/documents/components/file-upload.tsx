@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { recordFileDocumentAction } from "../actions";
@@ -9,6 +10,7 @@ const ACCEPT = ".pdf,.docx,.png,.jpg,.jpeg,.gif,.webp,.svg,.zip";
 
 /** Validates client-side, uploads to the private bucket (RLS-gated), then records the metadata. */
 export function FileUpload({ projectId }: { projectId: string }) {
+  const t = useTranslations("documents");
   const inputRef = useRef<HTMLInputElement>(null);
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,7 @@ export function FileUpload({ projectId }: { projectId: string }) {
 
     const invalid = validateFile(file);
     if (invalid) {
-      setError(invalid);
+      setError(invalid === "type" ? t("errorFileType") : t("errorFileSize"));
       return;
     }
     setError(null);
@@ -32,7 +34,7 @@ export function FileUpload({ projectId }: { projectId: string }) {
         .from("project-documents")
         .upload(path, file, { contentType: file.type });
       if (uploaded.error) {
-        setError("Couldn’t upload that file — please try again.");
+        setError(t("errorUpload"));
         return;
       }
       const res = await recordFileDocumentAction(projectId, {
@@ -56,11 +58,11 @@ export function FileUpload({ projectId }: { projectId: string }) {
         onClick={() => inputRef.current?.click()}
         className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
       >
-        {pending ? "Uploading…" : "Upload file"}
+        {pending ? t("uploading") : t("uploadFile")}
       </button>
       <input ref={inputRef} type="file" accept={ACCEPT} className="hidden" onChange={onPick} />
       {error && (
-        <p role="alert" className="text-[12px] text-[#FFB6A2]">
+        <p role="alert" className="text-red-text text-[12px]">
           {error}
         </p>
       )}

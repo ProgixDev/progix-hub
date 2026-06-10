@@ -23,11 +23,11 @@ describe("validateFile (AC-5)", () => {
   it("allows a small PDF", () => {
     expect(validateFile({ size: 1000, type: "application/pdf" })).toBeNull();
   });
-  it("rejects a disallowed type", () => {
-    expect(validateFile({ size: 1000, type: "text/x-shellscript" })).toMatch(/unsupported/i);
+  it("rejects a disallowed type with the 'type' code", () => {
+    expect(validateFile({ size: 1000, type: "text/x-shellscript" })).toBe("type");
   });
-  it("rejects an oversized file", () => {
-    expect(validateFile({ size: 60 * 1024 * 1024, type: "application/pdf" })).toMatch(/too large/i);
+  it("rejects an oversized file with the 'size' code", () => {
+    expect(validateFile({ size: 60 * 1024 * 1024, type: "application/pdf" })).toBe("size");
   });
 });
 
@@ -48,8 +48,8 @@ describe("formatBytes / mimeLabel", () => {
     expect(formatBytes(2048)).toBe("2 KB");
     expect(formatBytes(5 * 1024 * 1024)).toBe("5.0 MB");
   });
-  it("labels known MIME types", () => {
+  it("labels known MIME types and returns null for unknown ones", () => {
     expect(mimeLabel("application/pdf")).toBe("PDF");
-    expect(mimeLabel(null)).toBe("File");
+    expect(mimeLabel(null)).toBeNull();
   });
 });

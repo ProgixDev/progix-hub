@@ -11,6 +11,7 @@
     "download": "Download",
     "loading": "Loading…",
     "search": "Search…",
+    "searchLabel": "Search",
     "comingSoon": "soon"
   },
   "nav": {
@@ -65,6 +66,7 @@
     "addLink": "Add {service}",
     "opensNewTab": "opens in a new tab",
     "notLinked": "not linked",
+    "linkedSurfaces": "Linked surfaces",
     "errorNameRequired": "Name is required",
     "errorUrl": "Enter a valid URL (including https://)"
   },
@@ -88,6 +90,7 @@
     "hideAll": "Hide all",
     "confirmDelete": "Delete {key}? This can’t be undone.",
     "recentActivity": "Recent activity ({count})",
+    "someone": "Someone",
     "empty": "No variables yet — add the first one to keep this project’s secrets in one secured place.",
     "actionAdded": "added",
     "actionEdited": "edited",
@@ -154,7 +157,8 @@
     "optionEnglish": "English",
     "optionFrench": "Français",
     "optionLight": "Light",
-    "optionDark": "Dark"
+    "optionDark": "Dark",
+    "saveError": "Couldn’t save your settings — please try again."
   },
   "errors": {
     "notAuthorized": "You aren’t authorized to do that.",

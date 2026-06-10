@@ -1,16 +1,18 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
+import { formatDate } from "@/lib/format";
 import { EnvVarsStoreProvider, useEnvVarsStore } from "../provider";
 import type { AuditRow, EnvVarMeta } from "../types";
 import { EnvVarForm } from "./env-var-form";
 import { EnvVarRow } from "./env-var-row";
 
-const ACTION_LABEL: Record<AuditRow["action"], string> = {
-  create: "added",
-  edit: "edited",
-  delete: "deleted",
-  reveal: "revealed",
-  copy: "copied",
+const ACTION_KEY: Record<AuditRow["action"], string> = {
+  create: "actionAdded",
+  edit: "actionEdited",
+  delete: "actionDeleted",
+  reveal: "actionRevealed",
+  copy: "actionCopied",
 };
 
 export function EnvVarsSection({
@@ -22,14 +24,14 @@ export function EnvVarsSection({
   envVars: EnvVarMeta[];
   audit: AuditRow[];
 }) {
+  const t = useTranslations("envVars");
   return (
     <EnvVarsStoreProvider>
       <section className="mx-auto w-full max-w-5xl px-6 pb-12">
         <Header />
         {envVars.length === 0 ? (
           <div className="border-line/60 text-text-3 mt-3 rounded-lg border border-dashed px-4 py-10 text-center text-[13px]">
-            No variables yet — add the first one to keep this project’s secrets in one secured
-            place.
+            {t("empty")}
           </div>
         ) : (
           <ul className="mt-3 space-y-2">
@@ -47,16 +49,15 @@ export function EnvVarsSection({
 }
 
 function Header() {
+  const t = useTranslations("envVars");
   const openCreate = useEnvVarsStore((s) => s.openCreate);
   const hideAll = useEnvVarsStore((s) => s.hideAll);
   const anyRevealed = useEnvVarsStore((s) => Object.keys(s.revealed).length > 0);
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h2 className="text-text text-[15px] font-semibold">Environment variables</h2>
-        <p className="text-text-3 text-[12px]">
-          Encrypted at rest · reveals and copies are audited.
-        </p>
+        <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
+        <p className="text-text-3 text-[12px]">{t("subtitle")}</p>
       </div>
       <div className="flex items-center gap-2">
         {anyRevealed && (
@@ -65,7 +66,7 @@ function Header() {
             onClick={hideAll}
             className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
           >
-            Hide all
+            {t("hideAll")}
           </button>
         )}
         <button
@@ -73,7 +74,7 @@ function Header() {
           onClick={openCreate}
           className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
         >
-          Add variable
+          {t("addVariable")}
         </button>
       </div>
     </div>
@@ -81,10 +82,12 @@ function Header() {
 }
 
 function AuditTrail({ audit }: { audit: AuditRow[] }) {
+  const t = useTranslations("envVars");
+  const locale = useLocale();
   return (
     <details className="border-line-1 mt-6 rounded-lg border">
       <summary className="text-text-2 hover:text-text cursor-pointer px-4 py-3 text-[13px] font-medium">
-        Recent activity ({audit.length})
+        {t("recentActivity", { count: audit.length })}
       </summary>
       <ul className="border-line/60 divide-line/60 divide-y border-t">
         {audit.map((row) => (
@@ -93,8 +96,8 @@ function AuditTrail({ audit }: { audit: AuditRow[] }) {
             className="text-text-2 flex items-center justify-between gap-3 px-4 py-2 text-[12px]"
           >
             <span>
-              <span className="text-text font-medium">{row.actor_email ?? "Someone"}</span>{" "}
-              {ACTION_LABEL[row.action]}{" "}
+              <span className="text-text font-medium">{row.actor_email ?? t("someone")}</span>{" "}
+              {t(ACTION_KEY[row.action])}{" "}
               <span className="text-text font-mono">{row.env_var_key}</span>
             </span>
             <time
@@ -102,7 +105,7 @@ function AuditTrail({ audit }: { audit: AuditRow[] }) {
               suppressHydrationWarning
               className="text-text-3 flex-none font-mono"
             >
-              {new Date(row.created_at).toLocaleString()}
+              {formatDate(new Date(row.created_at), locale)}
             </time>
           </li>
         ))}

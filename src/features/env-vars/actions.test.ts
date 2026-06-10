@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import en from "@/messages/en.json";
 
 // Mock the server-only boundaries so the action module loads + runs in vitest.
 vi.mock("@/lib/auth/session", () => ({ requireMember: vi.fn() }));
@@ -8,6 +9,17 @@ vi.mock("@/lib/crypto/secrets", () => ({
 }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+
+// `getTranslations()` resolves dotted keys against the English catalog, so the action
+// returns the same user-facing strings these tests already assert on (spec 005).
+vi.mock("next-intl/server", () => ({
+  getTranslations: vi.fn(async () => (key: string) => {
+    const value = key
+      .split(".")
+      .reduce<unknown>((acc, part) => (acc as Record<string, unknown>)?.[part], en);
+    return typeof value === "string" ? value : key;
+  }),
+}));
 
 import { requireMember } from "@/lib/auth/session";
 import { decryptSecret } from "@/lib/crypto/secrets";

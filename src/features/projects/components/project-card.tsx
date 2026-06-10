@@ -1,13 +1,22 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { GitHubGlyph, LiveGlyph, NotionGlyph, SlackGlyph } from "@/components/brand/surface-glyphs";
 import { StatusBadge, type BadgeProps } from "@/components/ui/badge";
 import type { Project, ProjectStatus } from "../types";
 
-const STATUS: Record<ProjectStatus, { tone: NonNullable<BadgeProps["tone"]>; label: string }> = {
-  active: { tone: "green", label: "Active" },
-  at_risk: { tone: "amber", label: "At risk" },
-  archived: { tone: "neutral", label: "Archived" },
+const STATUS_TONE: Record<ProjectStatus, NonNullable<BadgeProps["tone"]>> = {
+  active: "green",
+  at_risk: "amber",
+  archived: "neutral",
 };
+
+const STATUS_KEY = {
+  active: "statusActive",
+  at_risk: "statusAtRisk",
+  archived: "statusArchived",
+} as const satisfies Record<ProjectStatus, string>;
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -26,7 +35,7 @@ export function projectSurfaces(project: Project) {
 }
 
 export function ProjectCard({ project }: { project: Project }) {
-  const status = STATUS[project.status];
+  const t = useTranslations("projects");
   return (
     <article className="bg-card border-line hover:border-line-strong rounded-xl border p-4 transition-colors">
       <div className="flex items-start gap-3">
@@ -40,8 +49,8 @@ export function ProjectCard({ project }: { project: Project }) {
           >
             {project.name}
           </Link>
-          <StatusBadge tone={status.tone} className="mt-1">
-            {status.label}
+          <StatusBadge tone={STATUS_TONE[project.status]} className="mt-1">
+            {t(STATUS_KEY[project.status])}
           </StatusBadge>
         </div>
       </div>
@@ -50,7 +59,7 @@ export function ProjectCard({ project }: { project: Project }) {
         <p className="text-text-2 mt-3 line-clamp-2 text-[13px]">{project.description}</p>
       )}
 
-      <div className="mt-4 flex items-center gap-2" aria-label="Linked surfaces">
+      <div className="mt-4 flex items-center gap-2" aria-label={t("linkedSurfaces")}>
         {projectSurfaces(project).map(({ key, url, Glyph, label }) =>
           url ? (
             <a
@@ -58,7 +67,7 @@ export function ProjectCard({ project }: { project: Project }) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${label} (opens in a new tab)`}
+              aria-label={`${label} (${t("opensNewTab")})`}
               className="bg-bg-2 border-line-1 hover:border-line-strong flex size-7 items-center justify-center rounded-md border transition-colors"
             >
               <Glyph size={15} />
@@ -66,7 +75,7 @@ export function ProjectCard({ project }: { project: Project }) {
           ) : (
             <span
               key={key}
-              aria-label={`${label} not linked`}
+              aria-label={`${label} ${t("notLinked")}`}
               className="border-line/60 flex size-7 items-center justify-center rounded-md border border-dashed opacity-40"
             >
               <Glyph size={15} />

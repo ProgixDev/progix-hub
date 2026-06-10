@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { byTab } from "../lib";
 import { DocumentsStoreProvider, useDocumentsStore } from "../provider";
 import type { DocumentTab, ProjectDocument } from "../types";
@@ -7,15 +8,18 @@ import { DocForm } from "./doc-form";
 import { DocumentRow } from "./document-row";
 import { FileUpload } from "./file-upload";
 
-const TABS: { id: DocumentTab; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "file", label: "Files" },
-  { id: "link", label: "Links" },
-  { id: "note", label: "Notes" },
-];
+const TAB_IDS: DocumentTab[] = ["all", "file", "link", "note"];
 
 const PANEL_ID = "documents-panel";
 const tabId = (id: DocumentTab) => `documents-tab-${id}`;
+
+/** Translation key for each tab's label (spec 005). */
+const TAB_LABEL_KEY: Record<DocumentTab, "tabAll" | "tabFiles" | "tabLinks" | "tabNotes"> = {
+  all: "tabAll",
+  file: "tabFiles",
+  link: "tabLinks",
+  note: "tabNotes",
+};
 
 export function DocumentsSection({
   projectId,
@@ -46,10 +50,11 @@ function ArchivedPanel({
   projectId: string;
   archived: ProjectDocument[];
 }) {
+  const t = useTranslations("documents");
   return (
     <details className="border-line-1 mt-6 rounded-lg border">
       <summary className="text-text-2 hover:text-text cursor-pointer px-4 py-3 text-[13px] font-medium">
-        Archived ({archived.length})
+        {t("archived", { count: archived.length })}
       </summary>
       <ul className="space-y-2 px-3 pb-3">
         {archived.map((d) => (
@@ -61,13 +66,14 @@ function ArchivedPanel({
 }
 
 function Header({ projectId }: { projectId: string }) {
+  const t = useTranslations("documents");
   const openAddLink = useDocumentsStore((s) => s.openAddLink);
   const openAddNote = useDocumentsStore((s) => s.openAddNote);
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 className="text-text text-[15px] font-semibold">Documents</h2>
-        <p className="text-text-3 text-[12px]">Files, links, and notes for this project.</p>
+        <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
+        <p className="text-text-3 text-[12px]">{t("subtitle")}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <FileUpload projectId={projectId} />
@@ -76,14 +82,14 @@ function Header({ projectId }: { projectId: string }) {
           onClick={openAddLink}
           className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
         >
-          Add link
+          {t("addLink")}
         </button>
         <button
           type="button"
           onClick={openAddNote}
           className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
         >
-          Add note
+          {t("addNote")}
         </button>
       </div>
     </div>
@@ -91,20 +97,21 @@ function Header({ projectId }: { projectId: string }) {
 }
 
 function Tabs({ documents }: { documents: ProjectDocument[] }) {
+  const t = useTranslations("documents");
   const tab = useDocumentsStore((s) => s.tab);
   const setTab = useDocumentsStore((s) => s.setTab);
 
   // Roving focus: arrow/Home/End move between tabs (WAI-ARIA tabs pattern).
   function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    const current = TABS.findIndex((t) => t.id === tab);
+    const current = TAB_IDS.indexOf(tab);
     let next = current;
-    if (event.key === "ArrowRight") next = (current + 1) % TABS.length;
-    else if (event.key === "ArrowLeft") next = (current - 1 + TABS.length) % TABS.length;
+    if (event.key === "ArrowRight") next = (current + 1) % TAB_IDS.length;
+    else if (event.key === "ArrowLeft") next = (current - 1 + TAB_IDS.length) % TAB_IDS.length;
     else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = TABS.length - 1;
+    else if (event.key === "End") next = TAB_IDS.length - 1;
     else return;
     event.preventDefault();
-    const nextId = TABS[next]!.id;
+    const nextId = TAB_IDS[next]!;
     setTab(nextId);
     document.getElementById(tabId(nextId))?.focus();
   }
@@ -112,27 +119,28 @@ function Tabs({ documents }: { documents: ProjectDocument[] }) {
   return (
     <div
       role="tablist"
-      aria-label="Document type"
+      aria-label={t("documentType")}
       onKeyDown={onKeyDown}
       className="border-line mt-4 flex gap-1 border-b"
     >
-      {TABS.map((t) => {
-        const active = tab === t.id;
+      {TAB_IDS.map((id) => {
+        const active = tab === id;
         return (
           <button
-            key={t.id}
-            id={tabId(t.id)}
+            key={id}
+            id={tabId(id)}
             type="button"
             role="tab"
             aria-selected={active}
             aria-controls={PANEL_ID}
             tabIndex={active ? 0 : -1}
-            onClick={() => setTab(t.id)}
+            onClick={() => setTab(id)}
             className={`-mb-px border-b-2 px-3 py-2 text-[13px] font-medium transition-colors ${
               active ? "border-blue text-text" : "text-text-2 hover:text-text border-transparent"
             }`}
           >
-            {t.label} <span className="text-text-3">{byTab(documents, t.id).length}</span>
+            {t(TAB_LABEL_KEY[id])}{" "}
+            <span className="text-text-3">{byTab(documents, id).length}</span>
           </button>
         );
       })}
@@ -141,6 +149,7 @@ function Tabs({ documents }: { documents: ProjectDocument[] }) {
 }
 
 function List({ projectId, documents }: { projectId: string; documents: ProjectDocument[] }) {
+  const t = useTranslations("documents");
   const tab = useDocumentsStore((s) => s.tab);
   const shown = byTab(documents, tab);
   const panelProps = {
@@ -152,12 +161,12 @@ function List({ projectId, documents }: { projectId: string; documents: ProjectD
   if (shown.length === 0) {
     const msg =
       tab === "file"
-        ? "No files yet — upload one to keep it with this project."
+        ? t("emptyFiles")
         : tab === "link"
-          ? "No links yet — add an external URL."
+          ? t("emptyLinks")
           : tab === "note"
-            ? "No notes yet — write one."
-            : "No documents yet — upload a file, add a link, or write a note.";
+            ? t("emptyNotes")
+            : t("emptyAll");
     return (
       <div
         {...panelProps}

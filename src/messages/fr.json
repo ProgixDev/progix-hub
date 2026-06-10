@@ -11,6 +11,7 @@
     "download": "Télécharger",
     "loading": "Chargement…",
     "search": "Rechercher…",
+    "searchLabel": "Rechercher",
     "comingSoon": "bientôt"
   },
   "nav": {
@@ -65,6 +66,7 @@
     "addLink": "Ajouter {service}",
     "opensNewTab": "ouvre un nouvel onglet",
     "notLinked": "non lié",
+    "linkedSurfaces": "Surfaces liées",
     "errorNameRequired": "Le nom est requis",
     "errorUrl": "Saisissez une URL valide (avec https://)"
   },
@@ -88,6 +90,7 @@
     "hideAll": "Tout masquer",
     "confirmDelete": "Supprimer {key} ? Cette action est irréversible.",
     "recentActivity": "Activité récente ({count})",
+    "someone": "Quelqu’un",
     "empty": "Aucune variable pour l’instant — ajoutez la première pour garder les secrets de ce projet en lieu sûr.",
     "actionAdded": "ajoutée",
     "actionEdited": "modifiée",
@@ -154,7 +157,8 @@
     "optionEnglish": "English",
     "optionFrench": "Français",
     "optionLight": "Clair",
-    "optionDark": "Sombre"
+    "optionDark": "Sombre",
+    "saveError": "Impossible d’enregistrer vos paramètres — veuillez réessayer."
   },
   "errors": {
     "notAuthorized": "Vous n’êtes pas autorisé à effectuer cette action.",

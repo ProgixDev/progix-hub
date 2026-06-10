@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/logo";
 import { GridIcon, PlusIcon, SearchIcon, SettingsIcon } from "@/components/ui/icons";
@@ -20,6 +21,8 @@ const toneDot: Record<RecentProject["tone"], string> = {
 };
 
 export function Sidebar({ recent }: { recent: RecentProject[] }) {
+  const t = useTranslations("nav");
+  const tCommon = useTranslations("common");
   return (
     <aside className="bg-bg-sidebar border-line flex h-dvh w-60 flex-none flex-col border-r">
       <div className="px-4 pt-4 pb-3">
@@ -31,8 +34,8 @@ export function Sidebar({ recent }: { recent: RecentProject[] }) {
           <SearchIcon className="text-text-2 size-4 flex-none" />
           <input
             type="search"
-            placeholder="Search…"
-            aria-label="Search"
+            placeholder={tCommon("search")}
+            aria-label={tCommon("searchLabel")}
             className="placeholder:text-text-3 w-full bg-transparent text-[13.5px] outline-none"
           />
           <kbd className="text-text-1 bg-bg-3 border-line-1 hidden h-[18px] min-w-[18px] items-center justify-center rounded border px-1 font-mono text-[11px] sm:inline-flex">
@@ -51,17 +54,19 @@ export function Sidebar({ recent }: { recent: RecentProject[] }) {
           className="border-line-blue bg-blue-tint text-text flex h-9 items-center gap-2.5 rounded-md border px-3 text-[13.5px] font-medium"
         >
           <GridIcon className="size-[18px]" />
-          Projects
+          {t("projects")}
         </Link>
-        <span className="text-text-3 flex h-9 cursor-default items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium">
+        <Link
+          href="/settings"
+          className="nav-proj hover:bg-bg-2 text-text-1 hover:text-text flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium transition-colors"
+        >
           <SettingsIcon className="size-[18px]" />
-          Settings
-          <span className="text-text-3 ml-auto font-mono text-[11px]">soon</span>
-        </span>
+          {t("settings")}
+        </Link>
       </nav>
 
       <div className="mt-5 px-3">
-        <p className="t-eyebrow px-3 pb-2">Recent</p>
+        <p className="t-eyebrow px-3 pb-2">{t("recent")}</p>
         <ul className="flex flex-col gap-0.5">
           {recent.map((p) => (
             <li key={p.id}>
@@ -86,7 +91,7 @@ export function Sidebar({ recent }: { recent: RecentProject[] }) {
           className="bg-blue text-primary-foreground hover:bg-blue-hover flex h-10 w-full items-center justify-center gap-2 rounded-md text-[13.5px] font-medium shadow-[0_6px_18px_rgba(76,130,251,0.28)] transition-colors"
         >
           <PlusIcon className="size-4" />
-          New project
+          {t("newProject")}
         </button>
       </div>
     </aside>

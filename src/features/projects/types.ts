@@ -24,12 +24,13 @@ const emptyToUndefined = (v: unknown) => (typeof v === "string" && v.trim() === 
 
 const optionalUrl = z.preprocess(
   emptyToUndefined,
-  z.url({ error: "Enter a valid URL (including https://)" }).optional(),
+  z.url({ error: "projects.errorUrl" }).optional(),
 );
 
-/** Validated create/edit input (AC-4): name required, links optional but valid URLs. */
+/** Validated create/edit input (AC-4): name required, links optional but valid URLs.
+ *  Zod messages are translation keys (spec 005); actions resolve them through next-intl. */
 export const projectInputSchema = z.object({
-  name: z.string().trim().min(1, { error: "Name is required" }).max(120),
+  name: z.string().trim().min(1, { error: "projects.errorNameRequired" }).max(120),
   description: z.preprocess(emptyToUndefined, z.string().trim().max(2000).optional()),
   status: z.enum(PROJECT_STATUSES).default("active"),
   notion_url: optionalUrl,

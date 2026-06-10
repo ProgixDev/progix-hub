@@ -1,6 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
+import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireMember } from "@/lib/auth/session";
@@ -14,32 +15,32 @@ export type ActionResult =
 
 export type RevealResult = { ok: true; value: string } | { ok: false; error: string };
 
-const NOT_AUTHORIZED = "You aren’t authorized to do that.";
-const DUPLICATE = "A variable with that key already exists in this project.";
-const ENC_NOT_CONFIGURED = "Encryption isn’t configured — contact an admin.";
+type Translate = Awaited<ReturnType<typeof getTranslations>>;
 
-function fieldErrorsOf(error: z.ZodError): Record<string, string> {
+function fieldErrorsOf(error: z.ZodError, t: Translate): Record<string, string> {
   const flat = z.flattenError(error);
   const out: Record<string, string> = {};
   for (const [key, messages] of Object.entries(flat.fieldErrors)) {
     const list = messages as string[] | undefined;
-    if (list && list.length > 0) out[key] = list[0]!;
+    if (list && list.length > 0) out[key] = t(list[0]!);
   }
   return out;
 }
 
 /** Create a variable (AC-1, AC-7): encrypt app-side, then the create_env_var RPC inserts + audits atomically. */
 export async function createEnvVarAction(projectId: string, input: unknown): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(projectId).success) return { ok: false, error: "Unknown project." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(projectId).success)
+    return { ok: false, error: t("errors.unknownProject") };
 
   const parsed = envVarInputSchema.safeParse(input);
   if (!parsed.success) {
     return {
       ok: false,
-      error: "Please fix the highlighted fields.",
-      fieldErrors: fieldErrorsOf(parsed.error),
+      error: t("errors.fixFields"),
+      fieldErrors: fieldErrorsOf(parsed.error, t),
     };
   }
 
@@ -48,7 +49,7 @@ export async function createEnvVarAction(projectId: string, input: unknown): Pro
   try {
     ciphertext = encryptSecret(parsed.data.value, id);
   } catch {
-    return { ok: false, error: ENC_NOT_CONFIGURED };
+    return { ok: false, error: t("envVars.errorNoEncryption") };
   }
   const supabase = await createClient();
   const { error } = await supabase.rpc("create_env_var", {
@@ -59,8 +60,10 @@ export async function createEnvVarAction(projectId: string, input: unknown): Pro
     p_ciphertext: ciphertext,
   });
   if (error) {
-    if (error.code === "23505")
-      return { ok: false, error: DUPLICATE, fieldErrors: { key: DUPLICATE } };
+    if (error.code === "23505") {
+      const duplicate = t("envVars.errorDuplicate");
+      return { ok: false, error: duplicate, fieldErrors: { key: duplicate } };
+    }
     return { ok: false, error: error.message };
   }
   revalidatePath(`/projects/${projectId}`);
@@ -73,16 +76,17 @@ export async function updateEnvVarAction(
   projectId: string,
   input: unknown,
 ): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown variable." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("envVars.errorUnknownVar") };
 
   const parsed = envVarEditSchema.safeParse(input);
   if (!parsed.success) {
     return {
       ok: false,
-      error: "Please fix the highlighted fields.",
-      fieldErrors: fieldErrorsOf(parsed.error),
+      error: t("errors.fixFields"),
+      fieldErrors: fieldErrorsOf(parsed.error, t),
     };
   }
 
@@ -91,7 +95,7 @@ export async function updateEnvVarAction(
     try {
       ciphertext = encryptSecret(parsed.data.value, id);
     } catch {
-      return { ok: false, error: ENC_NOT_CONFIGURED };
+      return { ok: false, error: t("envVars.errorNoEncryption") };
     }
   }
   const supabase = await createClient();
@@ -102,8 +106,10 @@ export async function updateEnvVarAction(
     p_ciphertext: ciphertext,
   });
   if (error) {
-    if (error.code === "23505")
-      return { ok: false, error: DUPLICATE, fieldErrors: { key: DUPLICATE } };
+    if (error.code === "23505") {
+      const duplicate = t("envVars.errorDuplicate");
+      return { ok: false, error: duplicate, fieldErrors: { key: duplicate } };
+    }
     return { ok: false, error: error.message };
   }
   revalidatePath(`/projects/${projectId}`);
@@ -112,9 +118,10 @@ export async function updateEnvVarAction(
 
 /** Delete a variable (AC-8) — the delete_env_var RPC snapshots the key into the audit row first. */
 export async function deleteEnvVarAction(id: string, projectId: string): Promise<ActionResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown variable." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("envVars.errorUnknownVar") };
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("delete_env_var", { p_id: id });
@@ -132,21 +139,19 @@ export async function revealEnvVarValueAction(
   id: string,
   intent: "reveal" | "copy",
 ): Promise<RevealResult> {
+  const t = await getTranslations();
   const member = await requireMember();
-  if (!member) return { ok: false, error: NOT_AUTHORIZED };
-  if (!z.uuid().safeParse(id).success) return { ok: false, error: "Unknown variable." };
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("envVars.errorUnknownVar") };
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("reveal_env_var", { p_id: id, p_intent: intent });
   if (error) return { ok: false, error: error.message };
-  if (typeof data !== "string") return { ok: false, error: "That variable could not be found." };
+  if (typeof data !== "string") return { ok: false, error: t("envVars.errorNotFound") };
 
   try {
     return { ok: true, value: decryptSecret(data, id) };
   } catch {
-    return {
-      ok: false,
-      error: "This value can’t be decrypted — the encryption key may have changed.",
-    };
+    return { ok: false, error: t("envVars.errorDecrypt") };
   }
 }

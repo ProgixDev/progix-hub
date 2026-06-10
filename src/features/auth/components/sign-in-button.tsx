@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { GitHubGlyph } from "@/components/brand/surface-glyphs";
 import { createClient } from "@/lib/supabase/client";
 
 /** Starts the GitHub OAuth flow (requests `read:org` so we can verify org membership). */
 export function SignInButton() {
+  const t = useTranslations("auth");
   const [loading, setLoading] = useState(false);
 
   async function signIn() {
@@ -29,7 +31,7 @@ export function SignInButton() {
       className="bg-bg-2 border-line-1 hover:bg-bg-3 text-text flex h-11 w-full items-center justify-center gap-3 rounded-md border text-sm font-medium transition-colors disabled:opacity-60"
     >
       <GitHubGlyph size={18} />
-      {loading ? "Redirecting…" : "Continue with GitHub"}
+      {loading ? t("redirecting") : t("continueWithGithub")}
     </button>
   );
 }
