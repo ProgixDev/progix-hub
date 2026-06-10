@@ -50,19 +50,13 @@ describe.skipIf(!configured)("portal security invariants (live DB)", () => {
     });
     if (signInError) throw signInError;
 
-    const project = await memberClient
-      .from("projects")
-      .insert({ name: `IT Portal ${stamp}` })
-      .select("id")
-      .single();
+    const project = await memberClient.rpc("create_project", { p_name: `IT Portal ${stamp}` });
     if (project.error) throw project.error;
     projectId = project.data.id as string;
 
-    const other = await memberClient
-      .from("projects")
-      .insert({ name: `IT Portal other ${stamp}` })
-      .select("id")
-      .single();
+    const other = await memberClient.rpc("create_project", {
+      p_name: `IT Portal other ${stamp}`,
+    });
     if (other.error) throw other.error;
     otherProjectId = other.data.id as string;
 

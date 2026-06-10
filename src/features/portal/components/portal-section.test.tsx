@@ -100,4 +100,15 @@ describe("PortalSection (member side)", () => {
     expect(screen.getByRole("heading", { name: /client proposals/i })).toBeTruthy();
     expect(screen.getByText("Dark mode everywhere")).toBeTruthy();
   });
+
+  it("hides every write control for a viewer (canWrite=false) but keeps read content", () => {
+    renderWithIntl(<PortalSection projectId={projectId} portal={filled} canWrite={false} />);
+    // Write affordances are gone.
+    expect(screen.queryByRole("button", { name: /add block/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /create share link/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /rotate/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /edit authentication/i })).toBeNull();
+    // Read content stays.
+    expect(screen.getByText("Authentication")).toBeTruthy();
+  });
 });

@@ -39,6 +39,15 @@ export async function GET(request: Request) {
     }
   }
 
+  // A second member account so the People panel (spec 008) has a real teammate to add.
+  await admin.auth.admin.createUser({
+    email: "e2e-teammate@progix.test",
+    password: TEST_PASSWORD,
+    email_confirm: true,
+    user_metadata: { full_name: "E2E Teammate" },
+    app_metadata: { is_member: true },
+  });
+
   // Sign in via the server client so @supabase/ssr writes the correct session cookies.
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({

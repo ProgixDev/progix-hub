@@ -10,7 +10,15 @@ import { ServiceLogo } from "./service-logo";
 const btn =
   "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
 
-export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId: string }) {
+export function EnvVarRow({
+  envVar,
+  projectId,
+  canWrite = true,
+}: {
+  envVar: EnvVarMeta;
+  projectId: string;
+  canWrite?: boolean;
+}) {
   const t = useTranslations("envVars");
   const tCommon = useTranslations("common");
   const revealed = useEnvVarsStore((s) => s.revealed[envVar.id]);
@@ -61,44 +69,46 @@ export function EnvVarRow({ envVar, projectId }: { envVar: EnvVarMeta; projectId
           </p>
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-1.5">
-        <button
-          type="button"
-          className={btn}
-          disabled={pending}
-          aria-pressed={Boolean(revealed)}
-          aria-label={`${revealed ? t("hide") : t("reveal")} ${envVar.key}`}
-          onClick={() => (revealed ? hideValue(envVar.id) : access("reveal"))}
-        >
-          {revealed ? t("hide") : t("reveal")}
-        </button>
-        <button
-          type="button"
-          className={btn}
-          disabled={pending}
-          aria-label={`${copied ? t("copied") : t("copy")} ${envVar.key}`}
-          onClick={() => access("copy")}
-        >
-          {copied ? t("copied") : t("copy")}
-        </button>
-        <button
-          type="button"
-          className={btn}
-          aria-label={`${tCommon("edit")} ${envVar.key}`}
-          onClick={() => openEdit(envVar)}
-        >
-          {tCommon("edit")}
-        </button>
-        <button
-          type="button"
-          className={btn}
-          disabled={pending}
-          aria-label={`${tCommon("delete")} ${envVar.key}`}
-          onClick={onDelete}
-        >
-          {tCommon("delete")}
-        </button>
-      </div>
+      {canWrite && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            className={btn}
+            disabled={pending}
+            aria-pressed={Boolean(revealed)}
+            aria-label={`${revealed ? t("hide") : t("reveal")} ${envVar.key}`}
+            onClick={() => (revealed ? hideValue(envVar.id) : access("reveal"))}
+          >
+            {revealed ? t("hide") : t("reveal")}
+          </button>
+          <button
+            type="button"
+            className={btn}
+            disabled={pending}
+            aria-label={`${copied ? t("copied") : t("copy")} ${envVar.key}`}
+            onClick={() => access("copy")}
+          >
+            {copied ? t("copied") : t("copy")}
+          </button>
+          <button
+            type="button"
+            className={btn}
+            aria-label={`${tCommon("edit")} ${envVar.key}`}
+            onClick={() => openEdit(envVar)}
+          >
+            {tCommon("edit")}
+          </button>
+          <button
+            type="button"
+            className={btn}
+            disabled={pending}
+            aria-label={`${tCommon("delete")} ${envVar.key}`}
+            onClick={onDelete}
+          >
+            {tCommon("delete")}
+          </button>
+        </div>
+      )}
     </li>
   );
 }

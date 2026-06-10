@@ -71,7 +71,8 @@
     "notLinked": "not linked",
     "linkedSurfaces": "Linked surfaces",
     "errorNameRequired": "Name is required",
-    "errorUrl": "Enter a valid URL (including https://)"
+    "errorUrl": "Enter a valid URL (including https://)",
+    "readOnlyNotice": "Read-only access — ask a PM to make changes."
   },
   "envVars": {
     "title": "Environment variables",
@@ -233,6 +234,29 @@
     "errorFileType": "Unsupported file type — use PDF, DOCX, an image, or ZIP.",
     "errorFileSize": "File is too large — the limit is 10 MB.",
     "errorUpload": "Couldn’t upload that file — please try again.",
+    "errorGeneric": "Something went wrong — please try again."
+  },
+  "people": {
+    "title": "People",
+    "subtitle": "Who’s on this project and what they can do.",
+    "openPeople": "People",
+    "add": "Add",
+    "remove": "Remove",
+    "emailLabel": "Email",
+    "emailPlaceholder": "teammate@progix.com",
+    "roleLabel": "Role",
+    "roleFor": "Role for {name}",
+    "removeMember": "Remove {name}",
+    "confirmRemove": "Remove {name} from this project?",
+    "rolePm": "PM",
+    "roleDeveloper": "Developer",
+    "roleVideoEditor": "Video editor",
+    "roleViewer": "Viewer",
+    "errorEmail": "Enter a valid email",
+    "errorNoAccount": "No progixHub account has that email yet.",
+    "errorLastPm": "A project must keep at least one PM — assign another PM first.",
+    "errorNotAuthorized": "Only a PM can manage people.",
+    "errorInvalidRole": "That role isn’t valid.",
     "errorGeneric": "Something went wrong — please try again."
   },
   "errors": {

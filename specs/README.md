@@ -36,3 +36,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [005](005-settings/spec.md)              | Settings — language & theme | shipped   |
 | [006](006-client-portal/spec.md)         | Client portal               | shipped   |
 | [007](007-mobile-responsive-pwa/spec.md) | Mobile responsive + PWA     | shipped   |
+| [008](008-roles-permissions/spec.md)     | Roles & permissions         | active    |

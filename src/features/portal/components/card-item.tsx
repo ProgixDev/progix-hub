@@ -28,11 +28,13 @@ export function CardItem({
   projectId,
   comments,
   attachments,
+  canWrite = true,
 }: {
   card: PortalCard;
   projectId: string;
   comments: PortalComment[];
   attachments: PortalAttachment[];
+  canWrite?: boolean;
 }) {
   const t = useTranslations("portal");
   const tCommon = useTranslations("common");
@@ -90,38 +92,40 @@ export function CardItem({
             <time suppressHydrationWarning>{formatDate(new Date(card.created_at), locale)}</time>
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <select
-            value={card.status}
-            aria-label={t("fieldStatus")}
-            disabled={pending}
-            onChange={(e) => onStatusChange(e.target.value)}
-            className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-md border px-1.5 text-[12px] disabled:opacity-60"
-          >
-            {CARD_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {t(STATUS_KEY[status])}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            className={btn}
-            aria-label={`${tCommon("edit")} ${card.title}`}
-            onClick={() => openEditCard(card)}
-          >
-            {tCommon("edit")}
-          </button>
-          <button
-            type="button"
-            className={btn}
-            disabled={pending}
-            aria-label={`${t("archiveCard")} ${card.title}`}
-            onClick={onArchive}
-          >
-            {t("archiveCard")}
-          </button>
-        </div>
+        {canWrite && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <select
+              value={card.status}
+              aria-label={t("fieldStatus")}
+              disabled={pending}
+              onChange={(e) => onStatusChange(e.target.value)}
+              className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-md border px-1.5 text-[12px] disabled:opacity-60"
+            >
+              {CARD_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {t(STATUS_KEY[status])}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className={btn}
+              aria-label={`${tCommon("edit")} ${card.title}`}
+              onClick={() => openEditCard(card)}
+            >
+              {tCommon("edit")}
+            </button>
+            <button
+              type="button"
+              className={btn}
+              disabled={pending}
+              aria-label={`${t("archiveCard")} ${card.title}`}
+              onClick={onArchive}
+            >
+              {t("archiveCard")}
+            </button>
+          </div>
+        )}
       </div>
 
       {(comments.length > 0 || attachments.length > 0) && (
@@ -161,7 +165,7 @@ export function CardItem({
         </div>
       )}
 
-      <MemberCommentForm cardId={card.id} projectId={projectId} />
+      {canWrite && <MemberCommentForm cardId={card.id} projectId={projectId} />}
       {error && (
         <p role="alert" className="text-red-text mt-1.5 text-[11px]">
           {error}

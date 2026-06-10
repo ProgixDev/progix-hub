@@ -9,8 +9,10 @@ import {
   listProjectDocuments,
 } from "@/features/documents";
 import { EnvVarsSection, listEnvVarAudit, listProjectEnvVars } from "@/features/env-vars";
+import { getProjectMembers, PeoplePanel } from "@/features/people";
 import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
+import { capabilities } from "@/lib/auth/roles";
 
 function toRecent(projects: Project[]): RecentProject[] {
   return projects.slice(0, 5).map((p) => ({
@@ -23,18 +25,29 @@ function toRecent(projects: Project[]): RecentProject[] {
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [user, project, projects, envVars, audit, documents, archivedDocs, t] = await Promise.all([
-    getCurrentUser(),
-    getProject(id),
-    listProjects(),
-    listProjectEnvVars(id),
-    listEnvVarAudit(id),
-    listProjectDocuments(id),
-    listArchivedProjectDocuments(id),
-    getTranslations("portal"),
-  ]);
+  const role = await getProjectRole(id);
+  const can = capabilities(role);
+  const [user, project, projects, envVars, audit, documents, archivedDocs, members, t] =
+    await Promise.all([
+      getCurrentUser(),
+      getProject(id),
+      listProjects(),
+      can.seeEnvVars ? listProjectEnvVars(id) : Promise.resolve([]),
+      can.seeEnvVars ? listEnvVarAudit(id) : Promise.resolve([]),
+      listProjectDocuments(id),
+      listArchivedProjectDocuments(id),
+      can.managePeople ? getProjectMembers(id) : Promise.resolve([]),
+      getTranslations("portal"),
+    ]);
 
-  if (!project) notFound();
+  // No effective role (e.g. a removed member) ⇒ no access, even if the row were readable (AC-2).
+  if (!project || !role) notFound();
+
+  const tProjects = await getTranslations("projects");
+  // A role that grants no writes anywhere is read-only — say so, so vanished controls read as
+  // intentional rather than broken (spec 008 review, UX).
+  const readOnly =
+    !can.manageProject && !can.managePeople && !can.writeEnvVars && !can.writeContent;
 
   return (
     <AppShell
@@ -42,7 +55,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       recent={toRecent(projects)}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
-      <ProjectDetail project={project} />
+      <ProjectDetail project={project} canManage={can.manageProject} />
+      {readOnly && (
+        <div className="mx-auto w-full max-w-5xl px-4 pb-2 sm:px-6">
+          <p
+            role="status"
+            className="border-line-1 bg-bg-inset text-text-2 rounded-md border px-3 py-2 text-[12px]"
+          >
+            {tProjects("readOnlyNotice")}
+          </p>
+        </div>
+      )}
       <div className="mx-auto w-full max-w-5xl px-4 pb-2 sm:px-6">
         <Link
           href={`/projects/${id}/portal`}
@@ -51,8 +74,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           {t("openPortal")} →
         </Link>
       </div>
-      <EnvVarsSection projectId={id} envVars={envVars} audit={audit} />
-      <DocumentsSection projectId={id} documents={documents} archived={archivedDocs} />
+      {can.managePeople && <PeoplePanel projectId={id} members={members} />}
+      {can.seeEnvVars && (
+        <EnvVarsSection
+          projectId={id}
+          envVars={envVars}
+          audit={audit}
+          canWrite={can.writeEnvVars}
+        />
+      )}
+      <DocumentsSection
+        projectId={id}
+        documents={documents}
+        archived={archivedDocs}
+        canWrite={can.writeContent}
+      />
     </AppShell>
   );
 }

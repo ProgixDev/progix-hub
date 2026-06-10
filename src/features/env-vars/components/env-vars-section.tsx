@@ -19,16 +19,18 @@ export function EnvVarsSection({
   projectId,
   envVars,
   audit,
+  canWrite = true,
 }: {
   projectId: string;
   envVars: EnvVarMeta[];
   audit: AuditRow[];
+  canWrite?: boolean;
 }) {
   const t = useTranslations("envVars");
   return (
     <EnvVarsStoreProvider>
       <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
-        <Header />
+        <Header canWrite={canWrite} />
         {envVars.length === 0 ? (
           <div className="border-line/60 text-text-3 mt-3 rounded-lg border border-dashed px-4 py-10 text-center text-[13px]">
             {t("empty")}
@@ -36,7 +38,7 @@ export function EnvVarsSection({
         ) : (
           <ul className="mt-3 space-y-2">
             {envVars.map((v) => (
-              <EnvVarRow key={v.id} envVar={v} projectId={projectId} />
+              <EnvVarRow key={v.id} envVar={v} projectId={projectId} canWrite={canWrite} />
             ))}
           </ul>
         )}
@@ -48,7 +50,7 @@ export function EnvVarsSection({
   );
 }
 
-function Header() {
+function Header({ canWrite }: { canWrite: boolean }) {
   const t = useTranslations("envVars");
   const openCreate = useEnvVarsStore((s) => s.openCreate);
   const hideAll = useEnvVarsStore((s) => s.hideAll);
@@ -59,24 +61,26 @@ function Header() {
         <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
         <p className="text-text-3 text-[12px]">{t("subtitle")}</p>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        {anyRevealed && (
+      {canWrite && (
+        <div className="flex flex-wrap items-center gap-2">
+          {anyRevealed && (
+            <button
+              type="button"
+              onClick={hideAll}
+              className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+            >
+              {t("hideAll")}
+            </button>
+          )}
           <button
             type="button"
-            onClick={hideAll}
-            className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+            onClick={openCreate}
+            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
           >
-            {t("hideAll")}
+            {t("addVariable")}
           </button>
-        )}
-        <button
-          type="button"
-          onClick={openCreate}
-          className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
-        >
-          {t("addVariable")}
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

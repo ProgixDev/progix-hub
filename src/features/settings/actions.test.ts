@@ -21,6 +21,7 @@ const member = {
   name: "M",
   avatarUrl: null,
   initials: "M",
+  isSuperadmin: false,
 };
 const cookieSet = vi.fn();
 

@@ -59,11 +59,7 @@ describe.skipIf(!configured)("env-vars security invariants (live DB)", () => {
     memberClient = await signIn(memberEmail);
     nonMemberClient = await signIn(nonMemberEmail);
 
-    const project = await memberClient
-      .from("projects")
-      .insert({ name: `IT Project ${stamp}` })
-      .select("id")
-      .single();
+    const project = await memberClient.rpc("create_project", { p_name: `IT Project ${stamp}` });
     if (project.error) throw project.error;
     projectId = project.data.id as string;
   });

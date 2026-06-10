@@ -71,7 +71,8 @@
     "notLinked": "non lié",
     "linkedSurfaces": "Surfaces liées",
     "errorNameRequired": "Le nom est requis",
-    "errorUrl": "Saisissez une URL valide (avec https://)"
+    "errorUrl": "Saisissez une URL valide (avec https://)",
+    "readOnlyNotice": "Accès en lecture seule — demandez à un PM d’apporter des modifications."
   },
   "envVars": {
     "title": "Variables d’environnement",
@@ -233,6 +234,29 @@
     "errorFileType": "Type de fichier non pris en charge — utilisez un PDF, DOCX, une image ou un ZIP.",
     "errorFileSize": "Le fichier est trop volumineux — la limite est de 10 Mo.",
     "errorUpload": "Impossible de téléverser ce fichier — veuillez réessayer.",
+    "errorGeneric": "Une erreur est survenue — veuillez réessayer."
+  },
+  "people": {
+    "title": "Personnes",
+    "subtitle": "Qui travaille sur ce projet et ce que chacun peut faire.",
+    "openPeople": "Personnes",
+    "add": "Ajouter",
+    "remove": "Retirer",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "collegue@progix.com",
+    "roleLabel": "Rôle",
+    "roleFor": "Rôle de {name}",
+    "removeMember": "Retirer {name}",
+    "confirmRemove": "Retirer {name} de ce projet ?",
+    "rolePm": "PM",
+    "roleDeveloper": "Développeur",
+    "roleVideoEditor": "Monteur vidéo",
+    "roleViewer": "Observateur",
+    "errorEmail": "Saisissez un e-mail valide",
+    "errorNoAccount": "Aucun compte progixHub n’a encore cet e-mail.",
+    "errorLastPm": "Un projet doit garder au moins un PM — désignez d’abord un autre PM.",
+    "errorNotAuthorized": "Seul un PM peut gérer les personnes.",
+    "errorInvalidRole": "Ce rôle n’est pas valide.",
     "errorGeneric": "Une erreur est survenue — veuillez réessayer."
   },
   "errors": {
