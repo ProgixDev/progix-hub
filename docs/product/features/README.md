@@ -35,11 +35,12 @@ Key components, store, actions; anything non-obvious.
 
 ## Index
 
-| Feature                      | Status          | Doc                                          |
-| ---------------------------- | --------------- | -------------------------------------------- |
-| Sign-in & project registry   | live            | [auth-and-projects.md](auth-and-projects.md) |
-| Secure environment variables | live            | [env-vars.md](env-vars.md)                   |
-| Documents per project        | live            | [documents.md](documents.md)                 |
-| Settings (language & theme)  | live            | [settings.md](settings.md)                   |
-| Client portal                | live            | [client-portal.md](client-portal.md)         |
-| Task list (demo)             | removed at init | [task-list.md](task-list.md)                 |
+| Feature                      | Status          | Doc                                                  |
+| ---------------------------- | --------------- | ---------------------------------------------------- |
+| Sign-in & project registry   | live            | [auth-and-projects.md](auth-and-projects.md)         |
+| Secure environment variables | live            | [env-vars.md](env-vars.md)                           |
+| Documents per project        | live            | [documents.md](documents.md)                         |
+| Settings (language & theme)  | live            | [settings.md](settings.md)                           |
+| Client portal                | live            | [client-portal.md](client-portal.md)                 |
+| Mobile responsive + PWA      | live            | [mobile-responsive-pwa.md](mobile-responsive-pwa.md) |
+| Task list (demo)             | removed at init | [task-list.md](task-list.md)                         |

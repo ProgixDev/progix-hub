@@ -34,8 +34,8 @@ Ordered, checkboxed. `[P]` = parallel-safe. Tick on commit.
 
 - [x] T16 `/review` (frontend + ux/a11y; appsec light — no data change) · fix P0/P1
 - [x] T17 `/feature-report 007`
-- [ ] T18 Open PR; merge; deploy `vercel --prod`; verify on a real phone width
-- [ ] T19 `/update-docs` — feature doc, CUJ note (verified mobile too), specs index → shipped
+- [x] T18 Open PR; merge; deploy `vercel --prod`; verify on a real phone width
+- [x] T19 `/update-docs` — feature doc, CUJ note (verified mobile too), specs index → shipped
 
 ## AC coverage
 

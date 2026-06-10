@@ -1,6 +1,6 @@
 # Critical User Journeys (CUJs)
 
-The journeys that must never break. Each CUJ has: an owner, an e2e spec in `e2e/`, and labeled screenshots captured by `pnpm e2e:shots`. CI runs all of them on every PR; `/verify-ui` re-runs the ones a change touches.
+The journeys that must never break. Each CUJ has: an owner, an e2e spec in `e2e/`, and labeled screenshots captured by `pnpm e2e:shots`. CI runs all of them on every PR; `/verify-ui` re-runs the ones a change touches. Since spec 007 the journeys are verified at **desktop and mobile** widths — the `mobile` Playwright project (Pixel 5) re-checks responsiveness, the nav drawer, and PWA installability (`e2e/mobile.spec.ts`).
 
 Adding or changing a CUJ is a product decision — PR must be approved by the product owner.
 
