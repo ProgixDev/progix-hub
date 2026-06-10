@@ -35,8 +35,8 @@ Ordered, executable, checkboxed. `[P]` = parallel-safe (different files). Keep t
 
 ## Phase 4 — review & ship
 
-- [ ] T19 `/review` (frontend-architect + a11y + i18n-fallback + appsec on the action/`updateUser`) · fix P0/P1
-- [ ] T20 `/feature-report 005`
+- [x] T19 `/review` (4 lenses) · done: appsec/frontend/qa APPROVE; UX REQUEST CHANGES → fixed 4 P1s (nav active, radiogroup keyboard, light contrast, light feature-screen coverage) + global-error.tsx (commit 09e1f3c); P2s logged as follow-ups
+- [x] T20 `/feature-report 005` · done: `docs/reports/005-settings.md` (AC→evidence, all 7 pass) + curated screenshots
 - [ ] T21 Open PR; merge; deploy `vercel --prod`
 - [ ] T22 `/update-docs` — feature doc, register CUJ-05, specs index → shipped, `docs/conventions/copy.md` “externalize copy” rule, styling note “no longer dark-only”
 
