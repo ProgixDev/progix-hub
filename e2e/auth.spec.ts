@@ -35,6 +35,16 @@ test("AC-9: member portal redirects signed-out; /share answers without an accoun
   await expect(page.getByRole("heading", { name: /no longer active/i })).toBeVisible();
 });
 
+// Spec 007 — the PWA assets must be reachable without auth (the OS fetches them cookie-less
+// when installing), i.e. the middleware must NOT redirect them to sign-in.
+test("PWA manifest + icons are public (not gated)", async ({ page }) => {
+  const manifest = await page.request.get("/manifest.webmanifest");
+  expect(manifest.ok()).toBe(true);
+  expect((await manifest.json()).name).toBe("progixHub");
+  expect((await page.request.get("/apple-icon")).ok()).toBe(true);
+  expect((await page.request.get("/icon.svg")).ok()).toBe(true);
+});
+
 // AC-2 (UI) — a non-member is told they don't have access (decision is unit-tested too).
 test("@cuj AC-2: access-denied message renders for a non-member", async ({ page }) => {
   await page.goto("/sign-in?error=access_denied");
