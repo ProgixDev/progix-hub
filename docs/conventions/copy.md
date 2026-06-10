@@ -19,6 +19,6 @@ User-facing text is product surface, not string literals. These rules are partia
 
 ## Mechanics
 
-- All user-visible strings live in components/feature files (not buried in libs) so the typography checker and future i18n extraction can find them.
-- Dates/numbers via `Intl.*` formatters in `src/lib/format.ts` — never hand-rolled.
+- The app is bilingual (EN/FR, [ADR-0009](../architecture/decisions/0009-i18n-and-theming.md)): user-facing copy is **externalized to `src/messages/{en,fr}.json`** and rendered via `useTranslations`/`getTranslations` — never hardcode a user-visible string in a component. Add the key to both catalogs (English is the per-key fallback). User-authored content (project names, env values, document text) is **not** translated.
+- Dates/numbers via `Intl.*` formatters in `src/lib/format.ts` — never hand-rolled; pass the active locale (`useLocale()` / `getLocale()`).
 - Writing or reviewing copy? The `/review` UX persona checks against this file.
