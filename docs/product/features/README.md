@@ -41,4 +41,5 @@ Key components, store, actions; anything non-obvious.
 | Secure environment variables | live            | [env-vars.md](env-vars.md)                   |
 | Documents per project        | live            | [documents.md](documents.md)                 |
 | Settings (language & theme)  | live            | [settings.md](settings.md)                   |
+| Client portal                | live            | [client-portal.md](client-portal.md)         |
 | Task list (demo)             | removed at init | [task-list.md](task-list.md)                 |
