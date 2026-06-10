@@ -189,21 +189,24 @@ function MemberCommentForm({ cardId, projectId }: { cardId: string; projectId: s
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-2.5 flex items-center gap-2">
-      <input
-        name="body"
-        placeholder={t("commentPlaceholder")}
-        required
-        className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 w-full rounded-md border px-2.5 text-[12.5px] outline-none"
-      />
-      <button type="submit" disabled={pending} className={btn}>
-        {pending ? t("sending") : t("send")}
-      </button>
+    <div className="mt-2.5">
+      <form onSubmit={onSubmit} className="flex items-center gap-2">
+        <input
+          name="body"
+          aria-label={t("commentPlaceholder")}
+          placeholder={t("commentPlaceholder")}
+          required
+          className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 w-full rounded-md border px-2.5 text-[12.5px] outline-none"
+        />
+        <button type="submit" disabled={pending} className={btn}>
+          {pending ? t("sending") : t("send")}
+        </button>
+      </form>
       {error && (
-        <p role="alert" className="text-red-text text-[11px]">
+        <p role="alert" className="text-red-text mt-1 text-[11px]">
           {error}
         </p>
       )}
-    </form>
+    </div>
   );
 }

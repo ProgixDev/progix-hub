@@ -4,11 +4,30 @@ import { shot } from "./utils/shot";
 // CUJ-06 — Share the portal (spec 006). The member side runs with the seeded session; the
 // client side runs in a FRESH anonymous context (no storage state) — exactly like a real
 // client opening the share link without an account.
+// Best-effort: archive the project this spec creates so it doesn't accumulate on the shared
+// dev/prod DB (other member specs follow the same discipline). Archived projects drop out of
+// the portfolio's default view.
+let createdProjectName = "";
+test.afterEach(async ({ page }) => {
+  if (!createdProjectName) return;
+  try {
+    await page.goto("/");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: createdProjectName, exact: true })
+      .click();
+    await page.getByRole("button", { name: "Archive" }).first().click();
+  } catch {
+    // ignore — cleanup is best-effort
+  }
+});
+
 test("@cuj CUJ-06: member builds the portal + share link; client views, comments, proposes; member triages; rotate kills the old link", async ({
   page,
   browser,
 }) => {
   const projectName = `E2E Portal ${Date.now()}`;
+  createdProjectName = projectName;
 
   // Member: create a project and open its portal.
   await page.goto("/");

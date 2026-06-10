@@ -120,6 +120,14 @@ function PortalModal({
       >
         <div className="border-line flex items-center justify-between border-b px-5 py-4">
           <h2 className="text-text text-[15px] font-semibold">{heading}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={tCommon("cancel")}
+            className="text-text-3 hover:text-text -mr-1 rounded-md px-1.5 text-[18px] leading-none transition-colors"
+          >
+            ×
+          </button>
         </div>
 
         <div className="flex flex-col gap-4 p-5">

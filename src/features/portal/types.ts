@@ -64,7 +64,13 @@ export type PublicPortal = {
   })[];
 };
 
-/** Client attachments: 10 MB, same whitelist as documents (bucket re-enforces both). */
+/**
+ * Client attachments: 10 MB, same whitelist as documents (bucket re-enforces both).
+ * `image/svg+xml` is allowed ONLY because every download is served with
+ * `Content-Disposition: attachment` (`createSignedUrl(..., { download: true })`), so an
+ * uploaded SVG can never render-and-run-script inline. If that download flag is ever
+ * dropped, remove SVG from this list and the bucket whitelist (ADR-0010).
+ */
 export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 export const ATTACHMENT_MIME: Record<string, string> = {
   "application/pdf": "PDF",

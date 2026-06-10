@@ -59,7 +59,7 @@ export async function createPortalBlockAction(
     name: parsed.data.name,
     position: count ?? 0,
   });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }
@@ -88,7 +88,7 @@ export async function updatePortalBlockAction(
     .from("portal_blocks")
     .update({ name: parsed.data.name })
     .match({ id, project_id: projectId });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }
@@ -108,7 +108,7 @@ export async function archivePortalBlockAction(
     .from("portal_blocks")
     .update({ archived_at: new Date().toISOString() })
     .match({ id, project_id: projectId });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }
@@ -142,7 +142,7 @@ export async function createPortalCardAction(
     origin: "team",
     created_by: member.id,
   });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }
@@ -174,7 +174,7 @@ export async function updatePortalCardAction(
     .from("portal_cards")
     .update(parsed.data)
     .match({ id, project_id: projectId });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }
@@ -194,7 +194,7 @@ export async function archivePortalCardAction(
     .from("portal_cards")
     .update({ archived_at: new Date().toISOString() })
     .match({ id, project_id: projectId });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }
@@ -232,7 +232,7 @@ export async function addMemberCommentAction(
     body: parsed.data.body,
     created_by: member.id,
   });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }
@@ -258,7 +258,7 @@ export async function createShareLinkAction(projectId: string): Promise<ShareLin
     .update({ revoked_at: new Date().toISOString() })
     .eq("project_id", projectId)
     .is("revoked_at", null);
-  if (revokeError) return { ok: false, error: revokeError.message };
+  if (revokeError) return { ok: false, error: t("portal.errorGeneric") };
 
   const { error } = await supabase.from("portal_share_links").insert({
     project_id: projectId,
@@ -266,7 +266,7 @@ export async function createShareLinkAction(projectId: string): Promise<ShareLin
     created_by: member.id,
     created_by_email: member.email,
   });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true, token };
 }
@@ -285,7 +285,7 @@ export async function revokeShareLinkAction(projectId: string): Promise<ActionRe
     .update({ revoked_at: new Date().toISOString() })
     .eq("project_id", projectId)
     .is("revoked_at", null);
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: t("portal.errorGeneric") };
   revalidatePath(portalPath(projectId));
   return { ok: true };
 }

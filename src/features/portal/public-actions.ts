@@ -159,6 +159,17 @@ export async function submitPortalAttachmentAction(
     .maybeSingle();
   if (!link) return { ok: false, error: t("errorLinkInactive") };
 
+  // Rate-gate BEFORE the (expensive, ≤10 MB) upload — not just at the metadata RPC — so a
+  // valid-token client can't burn Storage bandwidth/quota with uploads the RPC would reject.
+  const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
+  const { count: recentWrites } = await admin
+    .from("portal_attachments")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", link.project_id)
+    .eq("author_kind", "client")
+    .gt("created_at", oneMinuteAgo);
+  if ((recentWrites ?? 0) >= 10) return { ok: false, error: t("errorRateLimited") };
+
   const path = `${link.project_id}/${randomUUID()}/${safeFileName(file.name)}`;
   const uploaded = await admin.storage
     .from("portal-attachments")

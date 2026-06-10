@@ -251,6 +251,7 @@ function PublicCard({
         />
         <input
           name="author_name"
+          aria-label={t("yourName")}
           suppressHydrationWarning
           value={name}
           onChange={(e) => onName(e.target.value)}
@@ -260,6 +261,7 @@ function PublicCard({
         />
         <input
           name="body"
+          aria-label={t("commentPlaceholder")}
           placeholder={t("commentPlaceholder")}
           required
           className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 min-w-40 flex-1 rounded-md border px-2.5 text-[12.5px] outline-none"
@@ -354,6 +356,7 @@ function ProposeForm({
       <div className="flex flex-wrap gap-2">
         <input
           name="author_name"
+          aria-label={t("yourName")}
           suppressHydrationWarning
           value={name}
           onChange={(e) => onName(e.target.value)}
@@ -361,7 +364,12 @@ function ProposeForm({
           required
           className={`${inputCls} max-w-48`}
         />
-        <select name="block_id" defaultValue="" className={`${inputCls} max-w-56`}>
+        <select
+          name="block_id"
+          aria-label={t("fieldBlock")}
+          defaultValue=""
+          className={`${inputCls} max-w-56`}
+        >
           <option value="">{t("anyBlock")}</option>
           {blocks.map((block) => (
             <option key={block.id} value={block.id}>
@@ -370,9 +378,16 @@ function ProposeForm({
           ))}
         </select>
       </div>
-      <input name="title" placeholder={t("fieldTitle")} required className={inputCls} />
+      <input
+        name="title"
+        aria-label={t("fieldTitle")}
+        placeholder={t("fieldTitle")}
+        required
+        className={inputCls}
+      />
       <textarea
         name="description"
+        aria-label={t("fieldDescription")}
         placeholder={t("fieldDescription")}
         rows={3}
         className={inputCls}

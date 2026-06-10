@@ -123,20 +123,45 @@ describe("attachment upload (AC-5)", () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 
+  it("rejects an oversized file before any upload (AC-5)", async () => {
+    const rpc = mockRpc();
+    const big = new File([new Uint8Array(10 * 1024 * 1024 + 1)], "huge.pdf", {
+      type: "application/pdf",
+    });
+    const fd = new FormData();
+    fd.set("file", big);
+    fd.set("author_name", "Eve");
+    const res = await submitPortalAttachmentAction(token, cardId, fd);
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error).toMatch(/too large/i);
+    expect(mockCreateAdmin).not.toHaveBeenCalled();
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  // A chainable query mock: the share-link lookup ends in `.maybeSingle()` (returns the link);
+  // the pre-upload rate count is a chain that awaits to `{ count }`.
+  function adminMock(opts: {
+    count: number;
+    upload: ReturnType<typeof vi.fn>;
+    remove: ReturnType<typeof vi.fn>;
+  }) {
+    const project = "44444444-4444-4444-8444-444444444444";
+    const chain: Record<string, unknown> = {
+      maybeSingle: vi.fn().mockResolvedValue({ data: { project_id: project } }),
+      then: (resolve: (value: { count: number }) => unknown) => resolve({ count: opts.count }),
+    };
+    for (const method of ["select", "eq", "is", "gt"]) chain[method] = vi.fn(() => chain);
+    return {
+      from: vi.fn(() => chain),
+      storage: { from: vi.fn(() => ({ upload: opts.upload, remove: opts.remove })) },
+    } as unknown as ReturnType<typeof createAdminClient>;
+  }
+
   it("uploads via the admin client only AFTER the token resolves, then records via RPC", async () => {
     const rpc = mockRpc();
     const upload = vi.fn().mockResolvedValue({ error: null });
     const remove = vi.fn().mockResolvedValue({ error: null });
-    const maybeSingle = vi
-      .fn()
-      .mockResolvedValue({ data: { project_id: "44444444-4444-4444-8444-444444444444" } });
-    const is = vi.fn(() => ({ maybeSingle }));
-    const eq = vi.fn(() => ({ is }));
-    const select = vi.fn(() => ({ eq }));
-    mockCreateAdmin.mockReturnValue({
-      from: vi.fn(() => ({ select })),
-      storage: { from: vi.fn(() => ({ upload, remove })) },
-    } as unknown as ReturnType<typeof createAdminClient>);
+    mockCreateAdmin.mockReturnValue(adminMock({ count: 0, upload, remove }));
 
     const fd = new FormData();
     fd.set("file", new File(["%PDF-1.4"], "spec.pdf", { type: "application/pdf" }));
@@ -158,16 +183,7 @@ describe("attachment upload (AC-5)", () => {
     mockRpc({ message: "portal_cap_reached" });
     const upload = vi.fn().mockResolvedValue({ error: null });
     const remove = vi.fn().mockResolvedValue({ error: null });
-    const maybeSingle = vi
-      .fn()
-      .mockResolvedValue({ data: { project_id: "44444444-4444-4444-8444-444444444444" } });
-    const is = vi.fn(() => ({ maybeSingle }));
-    const eq = vi.fn(() => ({ is }));
-    const select = vi.fn(() => ({ eq }));
-    mockCreateAdmin.mockReturnValue({
-      from: vi.fn(() => ({ select })),
-      storage: { from: vi.fn(() => ({ upload, remove })) },
-    } as unknown as ReturnType<typeof createAdminClient>);
+    mockCreateAdmin.mockReturnValue(adminMock({ count: 0, upload, remove }));
 
     const fd = new FormData();
     fd.set("file", new File(["%PDF-1.4"], "spec.pdf", { type: "application/pdf" }));
