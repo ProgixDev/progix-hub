@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Wordmark } from "@/components/brand/logo";
 import { GridIcon, PlusIcon, SearchIcon, SettingsIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
@@ -132,14 +132,49 @@ export function Sidebar({
   onClose: () => void;
 }) {
   const t = useTranslations("nav");
+  const panelRef = useRef<HTMLElement>(null);
 
+  // Modal drawer a11y (spec 007 review): lock body scroll, move focus into the drawer,
+  // trap Tab within it, close on Escape, and restore focus to the opener on close.
   useEffect(() => {
     if (!open) return;
+    const opener = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+
+    const focusables = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((el) => el.offsetParent !== null);
+
+    focusables()[0]?.focus();
+
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
+
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+      opener?.focus?.();
+    };
   }, [open, onClose]);
 
   return (
@@ -165,11 +200,14 @@ export function Sidebar({
           )}
         />
         <aside
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("menu")}
           className={cn(
             "bg-bg-sidebar border-line absolute inset-y-0 left-0 flex w-72 max-w-[82vw] flex-col border-r shadow-2xl transition-transform duration-200",
             open ? "translate-x-0" : "-translate-x-full",
           )}
-          aria-label={t("projects")}
         >
           {/* Mounted only while open so the nav + recent list aren't duplicated in the DOM
               (the static desktop aside is the canonical copy). */}
@@ -179,7 +217,7 @@ export function Sidebar({
                 type="button"
                 onClick={onClose}
                 aria-label={t("closeMenu")}
-                className="text-text-2 hover:bg-bg-3 hover:text-text absolute top-3 right-3 z-10 flex size-8 items-center justify-center rounded-md text-[18px] leading-none transition-colors"
+                className="text-text-2 hover:bg-bg-3 hover:text-text absolute top-2.5 right-2.5 z-10 flex size-9 items-center justify-center rounded-md text-[20px] leading-none transition-colors"
               >
                 ×
               </button>

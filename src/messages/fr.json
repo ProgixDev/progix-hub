@@ -20,7 +20,8 @@
     "recent": "Récents",
     "newProject": "Nouveau projet",
     "openMenu": "Ouvrir le menu",
-    "closeMenu": "Fermer le menu"
+    "closeMenu": "Fermer le menu",
+    "menu": "Menu"
   },
   "topbar": {
     "commands": "Commandes",
