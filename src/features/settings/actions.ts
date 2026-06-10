@@ -44,14 +44,23 @@ export async function updateSettingsAction(input: {
   }
   if (patch.locale === undefined && patch.theme === undefined) return { ok: true };
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({ data: patch });
-  if (error) return { ok: false, error: t("settings.saveError") };
-
+  // The cookie is the authoritative per-device store — set it FIRST and unconditionally, so a
+  // preference always persists even if the cross-device metadata write below races (rapid
+  // consecutive toggles rotate the Supabase auth cookie, which can make a second write fail).
   const cookieStore = await cookies();
   const options = { maxAge: ONE_YEAR, path: "/", sameSite: "lax" as const };
   if (patch.locale) cookieStore.set(LOCALE_COOKIE, patch.locale, options);
   if (patch.theme) cookieStore.set(THEME_COOKIE, patch.theme, options);
+
+  // Durable, cross-device store (rides the JWT) — best effort; the cookie already persisted.
+  // Never let a transient auth-session error (e.g. a rotation race on rapid toggles) fail
+  // the action: the per-device cookie is authoritative and is already set.
+  try {
+    const supabase = await createClient();
+    await supabase.auth.updateUser({ data: patch });
+  } catch {
+    // ignore — cross-device sync will catch up on the next successful write
+  }
 
   revalidatePath("/", "layout");
   return { ok: true };
