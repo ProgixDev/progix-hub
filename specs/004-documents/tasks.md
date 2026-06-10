@@ -32,8 +32,8 @@ Ordered, executable, checkboxed. `[P]` = parallel-safe. Each names files + a don
 
 ## Phase 4 — review & ship
 
-- [ ] T16 `/review` (appsec mandatory: upload validation, storage RLS, signed URLs, XSS) · fix P0/P1
-- [ ] T17 `/feature-report 004`
+- [x] T16 `/review` (appsec mandatory: upload validation, storage RLS, signed URLs, XSS) · fix P0/P1 · done: 5-lens board; fixed P0 link-href XSS + uploader gap + a11y/hardening (commit a11722f); `pnpm verify` + e2e + integration green
+- [x] T17 `/feature-report 004` · done: `docs/reports/004-documents.md` + curated `doc-*` screenshots; AC→evidence table, all 9 pass
 - [ ] T18 Open PR; merge; deploy `vercel --prod`
 - [ ] T19 `/update-docs` — feature doc, register CUJ-04, specs index → shipped, ADR-0008 already Accepted
 
