@@ -22,6 +22,19 @@ test("AC-7: signed-out visitor is redirected from /settings", async ({ page }) =
   await expect(page).toHaveURL(/\/sign-in/);
 });
 
+// Spec 006 AC-9 — the member portal page is gated, while /share stays public (no redirect,
+// just the friendly inactive screen for a token that doesn't resolve).
+test("AC-9: member portal redirects signed-out; /share answers without an account", async ({
+  page,
+}) => {
+  await page.goto("/projects/11111111-1111-1111-1111-111111111111/portal");
+  await expect(page).toHaveURL(/\/sign-in/);
+
+  await page.goto(`/share/${"x".repeat(43)}`);
+  await expect(page).not.toHaveURL(/\/sign-in/);
+  await expect(page.getByRole("heading", { name: /no longer active/i })).toBeVisible();
+});
+
 // AC-2 (UI) — a non-member is told they don't have access (decision is unit-tested too).
 test("@cuj AC-2: access-denied message renders for a non-member", async ({ page }) => {
   await page.goto("/sign-in?error=access_denied");
