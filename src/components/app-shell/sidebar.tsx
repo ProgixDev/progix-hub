@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/brand/logo";
 import { GridIcon, PlusIcon, SearchIcon, SettingsIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
@@ -20,9 +21,16 @@ const toneDot: Record<RecentProject["tone"], string> = {
   neutral: "bg-text-3",
 };
 
+const navActive = "border-line-blue bg-blue-tint text-text border";
+const navIdle =
+  "nav-proj border border-transparent hover:bg-bg-2 text-text-1 hover:text-text transition-colors";
+
 export function Sidebar({ recent }: { recent: RecentProject[] }) {
   const t = useTranslations("nav");
   const tCommon = useTranslations("common");
+  const pathname = usePathname();
+  const projectsActive = pathname === "/" || pathname.startsWith("/projects");
+  const settingsActive = pathname.startsWith("/settings");
   return (
     <aside className="bg-bg-sidebar border-line flex h-dvh w-60 flex-none flex-col border-r">
       <div className="px-4 pt-4 pb-3">
@@ -50,15 +58,22 @@ export function Sidebar({ recent }: { recent: RecentProject[] }) {
       <nav className="flex flex-col gap-0.5 px-3">
         <Link
           href="/"
-          aria-current="page"
-          className="border-line-blue bg-blue-tint text-text flex h-9 items-center gap-2.5 rounded-md border px-3 text-[13.5px] font-medium"
+          aria-current={projectsActive ? "page" : undefined}
+          className={cn(
+            "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+            projectsActive ? navActive : navIdle,
+          )}
         >
           <GridIcon className="size-[18px]" />
           {t("projects")}
         </Link>
         <Link
           href="/settings"
-          className="nav-proj hover:bg-bg-2 text-text-1 hover:text-text flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium transition-colors"
+          aria-current={settingsActive ? "page" : undefined}
+          className={cn(
+            "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+            settingsActive ? navActive : navIdle,
+          )}
         >
           <SettingsIcon className="size-[18px]" />
           {t("settings")}

@@ -80,6 +80,21 @@ function Segment({
   onChange: (value: string) => void;
   disabled: boolean;
 }) {
+  // Roving focus + arrow-key selection — the WAI-ARIA radiogroup contract.
+  function onKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    const current = options.findIndex((o) => o.value === value);
+    let next = current;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown")
+      next = (current + 1) % options.length;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp")
+      next = (current - 1 + options.length) % options.length;
+    else return;
+    event.preventDefault();
+    onChange(options[next]!.value);
+    const radios = event.currentTarget.querySelectorAll<HTMLElement>('[role="radio"]');
+    radios[next]?.focus();
+  }
+
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="max-w-sm">
@@ -89,6 +104,7 @@ function Segment({
       <div
         role="radiogroup"
         aria-label={label}
+        onKeyDown={onKeyDown}
         className="border-line-1 bg-bg-2 inline-flex flex-none rounded-lg border p-1"
       >
         {options.map((option) => {
@@ -99,10 +115,11 @@ function Segment({
               type="button"
               role="radio"
               aria-checked={active}
+              tabIndex={active ? 0 : -1}
               disabled={disabled}
               onClick={() => onChange(option.value)}
               className={`h-8 rounded-md px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60 ${
-                active ? "bg-blue text-primary-foreground" : "text-text-2 hover:text-text"
+                active ? "bg-blue text-primary-foreground" : "text-text-1 hover:text-text"
               }`}
             >
               {option.label}

@@ -68,6 +68,16 @@ test("@cuj CUJ-05: member switches language to French and theme to light, and it
   expect(body).toContain('lang="fr"');
   expect(body).toContain('data-theme="light"');
 
+  // AC-3 coverage on feature screens: the light palette + French apply app-wide, not just
+  // on Settings. Capture the portfolio and a project detail (env-vars + documents sections).
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await shot(page, "portfolio-light-fr");
+  await page.getByRole("main").getByRole("link", { name: projectName }).click();
+  await expect(page.getByRole("heading", { name: projectName })).toBeVisible();
+  await shot(page, "project-light-fr");
+  await page.goto("/settings");
+
   // Toggle back to English + Dark and confirm the chrome reverts (also the cleanup path).
   await page.getByRole("radio", { name: "English" }).click();
   await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();

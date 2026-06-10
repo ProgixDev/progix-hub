@@ -37,4 +37,17 @@ describe("SettingsControls (AC-1 / AC-3)", () => {
     await user.click(screen.getByRole("radio", { name: "Français" }));
     expect(mockAction).toHaveBeenCalledWith({ locale: "fr" });
   });
+
+  it("is keyboard-operable: only the checked radio is tabbable and arrows move selection", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<SettingsControls current={{ locale: "en", theme: "dark" }} />);
+    const english = screen.getByRole("radio", { name: "English" });
+    const french = screen.getByRole("radio", { name: "Français" });
+    // Roving tabindex: checked = 0, unchecked = -1.
+    expect(english.getAttribute("tabindex")).toBe("0");
+    expect(french.getAttribute("tabindex")).toBe("-1");
+    english.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(mockAction).toHaveBeenCalledWith({ locale: "fr" });
+  });
 });
