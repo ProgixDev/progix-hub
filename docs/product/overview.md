@@ -33,7 +33,7 @@ Full intent and acceptance criteria: [prd.md](prd.md). Stack & data layer: [ADR-
 
 ## Current feature map
 
-Shipped: **sign-in & project registry** (002, [auth-and-projects.md](features/auth-and-projects.md)) and **secure environment variables** (003, [env-vars.md](features/env-vars.md)). Living per-feature docs: [features/](features/README.md). Journeys that must never break: [critical-user-journeys.md](critical-user-journeys.md).
+Shipped: **sign-in & project registry** (002, [auth-and-projects.md](features/auth-and-projects.md)), **secure environment variables** (003, [env-vars.md](features/env-vars.md)), **documents** (004, [documents.md](features/documents.md)), and **settings — language & theme** (005, [settings.md](features/settings.md); the app is bilingual EN/FR and supports light/dark). Living per-feature docs: [features/](features/README.md). Journeys that must never break: [critical-user-journeys.md](critical-user-journeys.md).
 
 ## Glossary
 

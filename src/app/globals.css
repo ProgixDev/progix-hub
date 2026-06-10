@@ -10,7 +10,8 @@
  *     Tailwind colors via @theme (e.g. `bg-bg-2`, `text-text-1`, `border-line`).
  *  2. shadcn-compatible semantic tokens (--background, --primary, …) mapped onto the
  *     palette so `components/ui` adopts the theme and `shadcn add` keeps working.
- * The app is dark-only; tokens live on :root.
+ * Dark is the default (tokens on :root); the light theme overrides the raw tokens under
+ * :root[data-theme="light"] and the semantic tokens follow (spec 005 / ADR-0009).
  */
 
 :root {

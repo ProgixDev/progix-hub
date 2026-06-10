@@ -37,8 +37,8 @@ Ordered, executable, checkboxed. `[P]` = parallel-safe (different files). Keep t
 
 - [x] T19 `/review` (4 lenses) · done: appsec/frontend/qa APPROVE; UX REQUEST CHANGES → fixed 4 P1s (nav active, radiogroup keyboard, light contrast, light feature-screen coverage) + global-error.tsx (commit 09e1f3c); P2s logged as follow-ups
 - [x] T20 `/feature-report 005` · done: `docs/reports/005-settings.md` (AC→evidence, all 7 pass) + curated screenshots
-- [ ] T21 Open PR; merge; deploy `vercel --prod`
-- [ ] T22 `/update-docs` — feature doc, register CUJ-05, specs index → shipped, `docs/conventions/copy.md` “externalize copy” rule, styling note “no longer dark-only”
+- [x] T21 Open PR; merge; deploy `vercel --prod` · done: PR #9 squash-merged; deployed to prod (progix-hub.vercel.app, `/api/health` ok; `/settings` 307→sign-in for anon)
+- [x] T22 `/update-docs` — done: `docs/product/features/settings.md`; CUJ-05 registered; specs index → shipped; copy.md externalize-copy rule; styling.md + globals.css + overview.md de-stale’d (light theme, EN/FR)
 
 ## AC coverage (mirror of plan.md — keep ticked in sync)
 

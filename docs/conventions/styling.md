@@ -6,7 +6,7 @@
 - Use tokens, not raw values: `bg-primary text-primary-foreground rounded-lg` — never `bg-[#3b82f6]` outside one-off prototypes. If a value repeats twice, it becomes a token.
 - Class order is enforced by `prettier-plugin-tailwindcss`; don't fight it.
 - Conditional classes via the `cn()` helper (`@/lib/utils`) — never string concatenation.
-- Responsive: mobile-first (`p-4 md:p-6`). Dark mode: `dark:` variants against tokens, not literal colors.
+- Responsive: mobile-first (`p-4 md:p-6`). Theming: dark is the default; light overrides the raw tokens under `:root[data-theme="light"]` and the semantic tokens follow — style against tokens, never literal colors, so both themes adapt for free ([ADR-0009](../architecture/decisions/0009-i18n-and-theming.md)).
 
 ## shadcn/ui = our design system seed
 
