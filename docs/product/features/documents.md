@@ -19,6 +19,7 @@ Inside a project, a signed-in Progix member keeps that project’s reference mat
 
 ## Decisions & gotchas
 
+- 2026-06-10 — **Superseded by roles (008):** the `is_member` RLS above is now per-project. Documents read = any project role (pm/developer/video_editor/viewer); write (insert/update/archive) = **pm/developer/video_editor** (a viewer is read-only). Storage `project-documents` policies mirror this via the path's project id. See [roles-permissions.md](roles-permissions.md).
 - 2026-06-10 — Mutations (`update`/`archive`/`restore`) bind to `(id, project_id)` via `.match(...)`, not just `id`, so a mismatched `projectId` can’t touch another project’s row or leave its cache stale.
 - 2026-06-10 — Storage/RLS invariants (member reads; non-member denied on `documents` + Storage; anon can’t list the private bucket) are covered by **`src/features/documents/security.integration.test.ts`** — `pnpm test:integration`, same disposable-project caveat as 003.
 - Gotcha: the tabs are a hand-rolled WAI-ARIA tablist (`role=tablist/tab/tabpanel`, `aria-controls`, roving arrow/Home/End focus) — keep that wiring if you refactor `documents-section.tsx`.

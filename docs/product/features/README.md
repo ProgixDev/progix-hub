@@ -43,4 +43,5 @@ Key components, store, actions; anything non-obvious.
 | Settings (language & theme)  | live            | [settings.md](settings.md)                           |
 | Client portal                | live            | [client-portal.md](client-portal.md)                 |
 | Mobile responsive + PWA      | live            | [mobile-responsive-pwa.md](mobile-responsive-pwa.md) |
+| Roles & permissions          | live            | [roles-permissions.md](roles-permissions.md)         |
 | Task list (demo)             | removed at init | [task-list.md](task-list.md)                         |

@@ -18,6 +18,7 @@ Inside a project, a signed-in Progix member keeps that project’s environment v
 
 ## Decisions & gotchas
 
+- 2026-06-10 — **Superseded by roles (008):** the `is_member` gate above is now per-project. `env_vars` / `env_var_audit` SELECT and the four DEFINER RPCs require `has_project_access(project, ['pm','developer'])` — a **video editor is denied all env-var access** (can't even list keys) and a **viewer** sees keys but can't reveal/write. The DEFINER-RPC, actor-binding, and append-only-audit invariants are unchanged. See [roles-permissions.md](roles-permissions.md).
 - 2026-06-09 — App-held keyring over Supabase Vault/pgsodium: the `service_role` key leaked once, and Vault keeps key material in the DB; app-held splits the trust domains (ADR-0007).
 - 2026-06-09 — Hardened by an adversarial pre-implementation review (4 P0): AAD row-binding, the keyring (a single key can’t rotate without bricking data), audit actor-binding, and atomic reveal+audit were all added before code.
 - 2026-06-09 — Logos are brand-coloured **monograms** (dependency-free); real `simple-icons` marks are a deferred ADR. Stripe and Supabase both render “S”.

@@ -17,6 +17,7 @@ Each project has a **Portal** the team uses to show a client what’s been built
 
 ## Decisions & gotchas
 
+- 2026-06-10 — **Member side superseded by roles (008):** the member-facing `portal_*` table policies are now per-project — read = any project role, write = **pm/developer/video_editor** (a viewer is read-only). The **external client/anon share-token model is unchanged** (still the four `anon` DEFINER RPCs, zero table grants). See [roles-permissions.md](roles-permissions.md).
 - 2026-06-10 — `image/svg+xml` stays in the whitelist **only because** downloads force attachment disposition (`createSignedUrl(..., { download: true })`), so an SVG can’t run script inline. The invariant is commented in `types.ts`; if that flag is ever dropped, remove SVG.
 - 2026-06-10 — Member-side actions return **generic localized errors**, not raw Postgres messages (no schema leak) — the public actions map RPC raises (`portal_rate_limited`, `portal_invalid_token`, `portal_cap_reached`) to friendly copy.
 - `getMemberAttachmentUrlAction` scopes by `id` alone — correct under the current **flat membership** model; revisit if per-project member scoping ever lands.
