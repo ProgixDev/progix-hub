@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import type { EffectiveRole } from "./roles";
 
 export type MemberUser = {
   id: string;
@@ -7,6 +8,8 @@ export type MemberUser = {
   name: string | null;
   avatarUrl: string | null;
   initials: string;
+  /** Org owner — full access to every project, bypasses per-project roles (spec 008). */
+  isSuperadmin: boolean;
 };
 
 function initialsFrom(name: string | null, email: string | null): string {
@@ -29,7 +32,7 @@ export async function getCurrentUser(): Promise<MemberUser | null> {
   const claims = data?.claims;
   if (error || !claims) return null;
 
-  const appMeta = (claims.app_metadata ?? {}) as { is_member?: boolean };
+  const appMeta = (claims.app_metadata ?? {}) as { is_member?: boolean; is_superadmin?: boolean };
   if (appMeta.is_member !== true) return null;
 
   const userMeta = (claims.user_metadata ?? {}) as {
@@ -47,10 +50,18 @@ export async function getCurrentUser(): Promise<MemberUser | null> {
     name,
     avatarUrl: userMeta.avatar_url ?? null,
     initials: initialsFrom(name, email),
+    isSuperadmin: appMeta.is_superadmin === true,
   };
 }
 
 /** Server guard for pages and actions: the current member, or null. */
 export async function requireMember(): Promise<MemberUser | null> {
   return getCurrentUser();
+}
+
+/** The caller's effective role on a project ('superadmin' | role | null), resolved by the DB. */
+export async function getProjectRole(projectId: string): Promise<EffectiveRole | null> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("my_project_role", { p_project: projectId });
+  return (data as EffectiveRole | null) ?? null;
 }
