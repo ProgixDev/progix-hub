@@ -21,7 +21,7 @@ export default async function SignInPage({
     <main className="bg-bg flex min-h-dvh items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
-          <Wordmark size={22} />
+          <Wordmark size={30} />
         </div>
         <div className="bg-card border-line rounded-xl border p-7">
           <h1 className="text-text text-lg font-semibold">{t("title")}</h1>

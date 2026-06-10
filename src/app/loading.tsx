@@ -1,13 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { LoadingScreen } from "@/components/brand/loading-screen";
 
-export default async function Loading() {
-  const t = await getTranslations("common");
-  return (
-    <div className="bg-bg text-text-2 flex h-dvh items-center justify-center text-[13.5px]">
-      <span className="inline-flex items-center gap-2">
-        <span className="border-line-strong size-4 animate-spin rounded-full border-2 border-t-[var(--blue)]" />
-        {t("loading")}
-      </span>
-    </div>
-  );
+// App-level loading screen — the animated Progix logo. Deeper routes keep their own
+// lightweight spinners; this branded splash shows on initial entry.
+export default function Loading() {
+  return <LoadingScreen />;
 }
