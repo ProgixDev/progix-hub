@@ -1,0 +1,42 @@
+# Tasks 008 — Roles & permissions
+
+Ordered, checkboxed. `[P]` = parallel-safe. Tick on commit. The migration is the heart — get the role-sets exactly right.
+
+## Phase 0 — the data layer (the whole enforcement model)
+
+- [ ] T0 Branch `feat/008-roles-permissions` (exists); ADR-0011 written + indexed · done: `pnpm check:docs` green
+- [ ] T1 Migration `0006_roles.sql` part A: `project_members` table + RLS (members SELECT own-project rows); helpers `is_superadmin()`, `has_project_access(project, roles[])`, `my_project_role(project)`; `AFTER INSERT` trigger on `projects` → creator = PM · done: applied via MCP
+- [ ] T2 Migration part B: **rewrite RLS** — projects (SELECT all-roles / UPDATE pm), env*vars + env_var_audit (SELECT pm/developer/viewer), documents (SELECT all / write pm-dev-video), portal*\* (SELECT all / write pm-dev-video), project_members; storage policies (project-documents + portal-attachments) → path-project role checks · done: advisors clean
+- [ ] T3 Migration part C: env-var RPCs (create/update/delete/reveal) gate `has_project_access(project,['pm','developer'])`; People RPCs `set_project_member(project,email,role)` + `remove_project_member(project,user)` (PM/superadmin + **last-PM guard**), email→user via auth.users, anon no execute · done: applied
+- [ ] T4 Migration part D: **backfill** — every existing project’s `created_by` → `pm` row; Achref (`achrefarabi414@gmail.com`) → `app_metadata.is_superadmin=true` · done: verified on live data (Achref superadmin, projects have a PM)
+
+## Phase 1 — server auth helpers
+
+- [ ] T5 `src/lib/auth/session.ts`: add `isSuperadmin` to `MemberUser`/claims read · done: typecheck
+- [ ] T6 `src/lib/auth/roles.ts` (server-only): `getProjectRole(projectId)` (RPC `my_project_role`) + `capabilities(role)` → `{ manageProject, managePeople, seeSecrets, writeContent, read }` + `roles.test.ts` (matrix) · done: green
+
+## Phase 2 — People slice + UI gating
+
+- [ ] T7 `src/features/people/`: `types.ts` (role enum + zod), `data.ts` (list project members + emails via a SECURITY DEFINER read or admin join), `actions.ts` (`setProjectMemberAction`/`removeProjectMemberAction` → RPC) + `actions.test.ts` (authz, last-PM, bad email) · done: green
+- [ ] T8 `people` components: `people-panel.tsx` (member list + role badges), `add-member-form.tsx` (email + role select), per-row role select + remove; gated to PM/superadmin · done: `people-panel.test.tsx`
+- [ ] T9 `src/app/projects/[id]/page.tsx`: compute role; render People panel for PM/superadmin; **hide the env-vars section for video_editor**; pass capability flags to env-vars/documents/portal sections · done: sections gate correctly
+- [ ] T10 [P] Gate mutation buttons by capability in env-vars / documents / portal / project-detail components (hide add/edit/reveal/delete/archive for viewers & forbidden roles) · done: viewer sees read-only
+- [ ] T11 i18n: `people` + `roles` namespaces EN+FR · done: parity test green
+
+## Phase 3 — verification
+
+- [ ] T12 Integration `src/features/people/roles.integration.test.ts`: provision a superadmin + a member-per-role on a project; assert the FULL matrix at the DB (AC-1..AC-8 — project-scope, dev-vs-video secrets, viewer read-only, last-PM, backfill trigger) · done: `pnpm test:integration` green
+- [ ] T13 E2E `e2e/roles.spec.ts` (CUJ-07): PM opens People → adds a member + sets a role → the People panel reflects it; (superadmin seeded session covers the rest). `shot()` `people-*` · done: full e2e suite green
+- [ ] T14 `/verify-ui 008` + `pnpm verify` green · done: screenshots eyeballed
+
+## Phase 4 — review & ship
+
+- [ ] T15 `/review` — appsec MANDATORY (RLS rewrite, DEFINER RPCs, last-PM, privilege escalation, storage path checks) + frontend + qa + ux · fix P0/P1
+- [ ] T16 `/feature-report 008`
+- [ ] T17 Open PR; merge; deploy `vercel --prod`; verify Achref still has full access on prod
+- [ ] T18 `/update-docs` — feature doc, CUJ-07, specs index → shipped; note the model in env-vars/documents/portal feature docs; clean E2E test data
+
+## AC coverage
+
+- [ ] AC-1 → T1,T2,T12 · [ ] AC-2 → T2,T12,T13 · [ ] AC-3 → T3,T7,T8,T12,T13 · [ ] AC-4 → T2,T3,T12
+- [ ] AC-5 → T2,T3,T10,T12 · [ ] AC-6 → T1,T4,T12 · [ ] AC-7 → T3,T7,T12 · [ ] AC-8 → T2,T3,T12

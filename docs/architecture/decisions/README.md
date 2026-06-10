@@ -24,3 +24,4 @@ ADRs capture decisions that shape the codebase: what we chose, what we rejected,
 | [0008](0008-rich-text-notes.md)          | Rich-text notes via Markdown (react-markdown + rehype-sanitize)                                                    | Accepted |
 | [0009](0009-i18n-and-theming.md)         | i18n (EN/FR via next-intl, no routing) + light/dark theming, prefs sourced per-user from the JWT                   | Accepted |
 | [0010](0010-client-portal-trust-tier.md) | Token-gated public portal: hashed share links, SECURITY DEFINER RPCs, server-only admin Storage client             | Accepted |
+| [0011](0011-roles-and-permissions.md)    | Roles & permissions: org superadmin (JWT) + per-project roles (PM/dev/video/viewer), enforced in the database      | Accepted |
