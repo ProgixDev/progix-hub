@@ -18,7 +18,9 @@
     "projects": "Projects",
     "settings": "Settings",
     "recent": "Recent",
-    "newProject": "New project"
+    "newProject": "New project",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "topbar": {
     "commands": "Commands",

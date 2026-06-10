@@ -97,7 +97,7 @@ function Segment({
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
-      <div className="max-w-sm">
+      <div className="max-w-sm min-w-0">
         <h2 className="text-text text-[14px] font-medium">{label}</h2>
         <p className="text-text-3 mt-1 text-[12.5px]">{help}</p>
       </div>

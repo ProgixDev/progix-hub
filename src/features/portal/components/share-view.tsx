@@ -36,7 +36,7 @@ export function ShareView({ portal, token }: { portal: PublicPortal; token: stri
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-10">
+    <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-text text-[22px] font-semibold">{portal.project_name}</h1>
@@ -189,7 +189,7 @@ function PublicCard({
   return (
     <li className="bg-bg-1 border-line-1 rounded-xl border px-4 py-3.5">
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-text text-[14px] font-medium">{card.title}</p>
+        <p className="text-text min-w-0 text-[14px] font-medium break-words">{card.title}</p>
         <StatusBadge status={card.status} />
         {card.origin === "client" && (
           <span className="border-line-1 bg-bg-3 text-text-2 rounded-full border px-2 py-0.5 text-[11px]">

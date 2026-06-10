@@ -18,7 +18,7 @@ export default async function SignInPage({
   const failed = Boolean(error) && !denied;
 
   return (
-    <main className="bg-bg flex min-h-dvh items-center justify-center px-6">
+    <main className="bg-bg flex min-h-dvh items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
           <Wordmark size={22} />

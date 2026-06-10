@@ -38,7 +38,7 @@ function DetailInner({ project }: { project: Project }) {
   const [pending, start] = useTransition();
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-6 py-8">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
       <Link
         href="/"
         className="text-text-2 hover:text-text mb-5 inline-flex items-center gap-1 text-[13px]"
@@ -46,13 +46,13 @@ function DetailInner({ project }: { project: Project }) {
         ← {t("back")}
       </Link>
 
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-3">
             <h1 className="text-text truncate text-[24px] font-semibold tracking-tight">
               {project.name}
             </h1>
-            <StatusBadge tone={STATUS_TONE[project.status]}>
+            <StatusBadge tone={STATUS_TONE[project.status]} className="flex-none">
               {t(STATUS_KEY[project.status])}
             </StatusBadge>
           </div>
@@ -94,7 +94,7 @@ function DetailInner({ project }: { project: Project }) {
             >
               <Glyph size={22} />
               <div className="min-w-0">
-                <p className="text-text text-[13px] font-semibold">{label}</p>
+                <p className="text-text truncate text-[13px] font-semibold">{label}</p>
                 <p className="text-text-2 truncate font-mono text-[11px]">{url}</p>
               </div>
             </a>
@@ -107,7 +107,9 @@ function DetailInner({ project }: { project: Project }) {
               className="border-line/60 text-text-3 hover:border-line-blue hover:text-blue-text flex items-center gap-3 rounded-lg border border-dashed px-3.5 py-3 transition-colors"
             >
               <Glyph size={22} />
-              <span className="text-[13px] font-medium">{t("addLink", { service: label })}</span>
+              <span className="min-w-0 truncate text-[13px] font-medium">
+                {t("addLink", { service: label })}
+              </span>
             </button>
           ),
         )}

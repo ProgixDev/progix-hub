@@ -34,6 +34,13 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"], storageState: "e2e/.auth/member.json" },
       dependencies: ["setup"],
     },
+    // Mobile-viewport checks (spec 007): responsiveness, the nav drawer, the PWA manifest.
+    {
+      name: "mobile",
+      testMatch: /mobile\.spec\.ts/,
+      use: { ...devices["Pixel 5"], storageState: "e2e/.auth/member.json" },
+      dependencies: ["setup"],
+    },
   ],
   webServer: {
     command: process.env.CI ? "pnpm start" : "pnpm dev",

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="progixHub">
+  <rect width="512" height="512" rx="112" fill="#0A0D16"/>
+  <rect x="96" y="96" width="320" height="320" rx="80" fill="#101A33" stroke="rgba(76,130,251,0.5)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="44" fill="#4C82FB"/>
+  <circle cx="256" cy="148" r="28" fill="#7CA2FF"/>
+  <circle cx="350" cy="310" r="28" fill="#7CA2FF"/>
+  <circle cx="162" cy="310" r="28" fill="#7CA2FF"/>
+  <path d="M256 188v40M290 282l28 16M222 282l-28 16" stroke="#4C82FB" stroke-width="22" stroke-linecap="round"/>
+</svg>

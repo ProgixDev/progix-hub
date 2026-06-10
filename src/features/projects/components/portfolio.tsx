@@ -43,9 +43,9 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
   const empty = projects.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-6 py-8">
-      <div className="flex items-end justify-between gap-4">
-        <div>
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
           <p className="t-eyebrow">{t("portfolio")}</p>
           <h1 className="text-text mt-1 text-[26px] font-semibold tracking-tight">
             {t("heading")}
@@ -62,7 +62,7 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
       </div>
 
       {!empty && (
-        <div className="mt-6 flex items-center gap-1">
+        <div className="mt-6 flex flex-wrap items-center gap-1">
           {FILTER_KEYS.map((f) => (
             <button
               key={f.key}
