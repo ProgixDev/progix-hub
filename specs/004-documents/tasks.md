@@ -34,10 +34,10 @@ Ordered, executable, checkboxed. `[P]` = parallel-safe. Each names files + a don
 
 - [x] T16 `/review` (appsec mandatory: upload validation, storage RLS, signed URLs, XSS) · fix P0/P1 · done: 5-lens board; fixed P0 link-href XSS + uploader gap + a11y/hardening (commit a11722f); `pnpm verify` + e2e + integration green
 - [x] T17 `/feature-report 004` · done: `docs/reports/004-documents.md` + curated `doc-*` screenshots; AC→evidence table, all 9 pass
-- [ ] T18 Open PR; merge; deploy `vercel --prod`
-- [ ] T19 `/update-docs` — feature doc, register CUJ-04, specs index → shipped, ADR-0008 already Accepted
+- [x] T18 Open PR; merge; deploy `vercel --prod` · done: PR #7 squash-merged to main; deployed to prod (progix-hub.vercel.app, READY; `/api/health` ok)
+- [x] T19 `/update-docs` — feature doc, register CUJ-04, specs index → shipped, ADR-0008 already Accepted · done: `docs/product/features/documents.md` + indices updated; `pnpm check:docs` green
 
 ## AC coverage
 
-- [ ] AC-1 → T4,T8,T13 · [ ] AC-2 → T8,T13 · [ ] AC-3 → T9,T13 · [ ] AC-4 → T5,T6,T13 · [ ] AC-5 → T4,T5,T8,T13
-- [ ] AC-6 → T2,T3,T8,T13,T14 · [ ] AC-7 → T8,T13 · [ ] AC-8 → T8,T13 · [ ] AC-9 → T10,T13
+- [x] AC-1 → T4,T8,T13 · [x] AC-2 → T8,T13 · [x] AC-3 → T9,T13 · [x] AC-4 → T5,T6,T13 · [x] AC-5 → T4,T5,T8,T13
+- [x] AC-6 → T2,T3,T8,T13,T14 · [x] AC-7 → T8,T13 · [x] AC-8 → T8,T13 · [x] AC-9 → T10,T13
