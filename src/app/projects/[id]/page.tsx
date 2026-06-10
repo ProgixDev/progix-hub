@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import {
@@ -21,7 +23,7 @@ function toRecent(projects: Project[]): RecentProject[] {
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [user, project, projects, envVars, audit, documents, archivedDocs] = await Promise.all([
+  const [user, project, projects, envVars, audit, documents, archivedDocs, t] = await Promise.all([
     getCurrentUser(),
     getProject(id),
     listProjects(),
@@ -29,6 +31,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     listEnvVarAudit(id),
     listProjectDocuments(id),
     listArchivedProjectDocuments(id),
+    getTranslations("portal"),
   ]);
 
   if (!project) notFound();
@@ -40,6 +43,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectDetail project={project} />
+      <div className="mx-auto w-full max-w-5xl px-6 pb-2">
+        <Link
+          href={`/projects/${id}/portal`}
+          className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text inline-flex h-9 items-center gap-2 rounded-md border px-3 text-[13px] font-medium transition-colors"
+        >
+          {t("openPortal")} →
+        </Link>
+      </div>
       <EnvVarsSection projectId={id} envVars={envVars} audit={audit} />
       <DocumentsSection projectId={id} documents={documents} archived={archivedDocs} />
     </AppShell>
