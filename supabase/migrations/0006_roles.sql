@@ -78,11 +78,16 @@ grant execute on function public.my_project_role(uuid) to authenticated;
 
 -- ============================== re-key existing RLS ==============================
 
--- projects: any role sees it; only a PM (or superadmin) edits/archives it.
+-- projects: any role sees it; only a PM (or superadmin) edits/archives it. The creator can
+-- always read it back — the PM membership is created by an AFTER trigger that runs after the
+-- insert's RETURNING clause, and created_by is immutable.
 drop policy if exists "members read projects" on public.projects;
 create policy "members read projects" on public.projects
   for select to authenticated
-  using (public.has_project_access(id, array['pm', 'developer', 'video_editor', 'viewer']));
+  using (
+    created_by = auth.uid()
+    or public.has_project_access(id, array['pm', 'developer', 'video_editor', 'viewer'])
+  );
 drop policy if exists "members update projects" on public.projects;
 create policy "members update projects" on public.projects
   for update to authenticated
