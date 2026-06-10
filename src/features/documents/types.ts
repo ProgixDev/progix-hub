@@ -39,10 +39,10 @@ export const ALLOWED_MIME: Record<string, string> = {
 // be a stored-XSS sink once rendered as an <a href>. Pin the scheme to http(s).
 const HTTP_URL = /^https?:\/\//i;
 export const linkInputSchema = z.object({
-  title: z.string().trim().min(1, { error: "Title is required" }).max(300),
+  title: z.string().trim().min(1, { error: "documents.errorTitleRequired" }).max(300),
   url: z
-    .url({ error: "Enter a valid URL (including https://)" })
-    .refine((value) => HTTP_URL.test(value), { error: "Use an http:// or https:// URL" }),
+    .url({ error: "documents.errorUrl" })
+    .refine((value) => HTTP_URL.test(value), { error: "documents.errorUrlScheme" }),
 });
 
 /** True only for safe, renderable link hrefs — defense in depth for the <a> sink. */
@@ -52,8 +52,8 @@ export function isHttpUrl(value: string | null | undefined): value is string {
 export type LinkInput = z.infer<typeof linkInputSchema>;
 
 export const noteInputSchema = z.object({
-  title: z.string().trim().min(1, { error: "Title is required" }).max(300),
-  body: z.string().trim().min(1, { error: "Write something first" }).max(50_000),
+  title: z.string().trim().min(1, { error: "documents.errorTitleRequired" }).max(300),
+  body: z.string().trim().min(1, { error: "documents.errorNoteRequired" }).max(50_000),
 });
 export type NoteInput = z.infer<typeof noteInputSchema>;
 
@@ -62,6 +62,8 @@ export const fileMetaSchema = z.object({
   title: z.string().trim().min(1).max(300),
   file_path: z.string().trim().min(1),
   file_size: z.number().int().positive().max(MAX_FILE_BYTES),
-  file_mime: z.string().refine((m) => m in ALLOWED_MIME, { error: "Unsupported file type" }),
+  file_mime: z
+    .string()
+    .refine((m) => m in ALLOWED_MIME, { error: "documents.errorUnsupportedType" }),
 });
 export type FileMeta = z.infer<typeof fileMetaSchema>;

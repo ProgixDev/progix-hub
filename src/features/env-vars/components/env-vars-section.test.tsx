@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithIntl } from "@/test/intl";
 import type { EnvVarMeta } from "../types";
 import { EnvVarsSection } from "./env-vars-section";
 
@@ -22,7 +23,7 @@ const baseVar: EnvVarMeta = {
 
 describe("EnvVarsSection", () => {
   it("shows an invite empty state and an add button when there are no variables (AC-9)", () => {
-    render(
+    renderWithIntl(
       <EnvVarsSection projectId="22222222-2222-2222-2222-222222222222" envVars={[]} audit={[]} />,
     );
     expect(screen.getByText(/no variables yet/i)).toBeTruthy();
@@ -30,7 +31,7 @@ describe("EnvVarsSection", () => {
   });
 
   it("renders a row with its auto-matched service logo and a masked value (AC-1/AC-2)", () => {
-    render(
+    renderWithIntl(
       <EnvVarsSection
         projectId="22222222-2222-2222-2222-222222222222"
         envVars={[baseVar]}
@@ -44,7 +45,7 @@ describe("EnvVarsSection", () => {
   });
 
   it("renders a neutral default logo for an unknown service", () => {
-    render(
+    renderWithIntl(
       <EnvVarsSection
         projectId="22222222-2222-2222-2222-222222222222"
         envVars={[{ ...baseVar, service: null }]}

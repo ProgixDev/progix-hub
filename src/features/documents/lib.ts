@@ -1,11 +1,12 @@
 import { ALLOWED_MIME, MAX_FILE_BYTES, type DocumentTab, type ProjectDocument } from "./types";
 
-/** Client + server file gate (AC-5): returns an error message, or null if the file is allowed. */
-export function validateFile(file: { size: number; type: string }): string | null {
-  if (!(file.type in ALLOWED_MIME)) {
-    return "Unsupported file type — use PDF, DOCX, an image, or ZIP.";
-  }
-  if (file.size > MAX_FILE_BYTES) return "File is too large — the limit is 50 MB.";
+/** Why a file failed the client gate — the caller maps each code to a translated message (spec 005). */
+export type FileError = "type" | "size";
+
+/** Client + server file gate (AC-5): returns a reason code, or null if the file is allowed. */
+export function validateFile(file: { size: number; type: string }): FileError | null {
+  if (!(file.type in ALLOWED_MIME)) return "type";
+  if (file.size > MAX_FILE_BYTES) return "size";
   return null;
 }
 
@@ -21,6 +22,7 @@ export function formatBytes(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function mimeLabel(mime: string | null): string {
-  return (mime && ALLOWED_MIME[mime]) || "File";
+/** Acronym label for a known MIME type (PDF, DOCX, …), or null — the component renders the fallback. */
+export function mimeLabel(mime: string | null): string | null {
+  return (mime && ALLOWED_MIME[mime]) || null;
 }

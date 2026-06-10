@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { formatDate } from "@/lib/format";
 import {
@@ -24,12 +25,15 @@ export function DocumentRow({
   projectId: string;
   archived?: boolean;
 }) {
+  const t = useTranslations("documents");
+  const tCommon = useTranslations("common");
+  const locale = useLocale();
   const openEdit = useDocumentsStore((s) => s.openEdit);
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function onArchive() {
-    if (!window.confirm(`Archive “${doc.title}”? You can restore it later.`)) return;
+    if (!window.confirm(t("confirmArchive", { title: doc.title }))) return;
     start(async () => {
       const res = await archiveDocumentAction(doc.id, projectId);
       if (!res.ok) setError(res.error);
@@ -55,7 +59,7 @@ export function DocumentRow({
     });
   }
 
-  const date = <time suppressHydrationWarning>{formatDate(new Date(doc.created_at))}</time>;
+  const date = <time suppressHydrationWarning>{formatDate(new Date(doc.created_at), locale)}</time>;
   // Who added it (AC-1/2/3) — stamped at write time, may be null for older rows.
   const by = doc.created_by_email ? <>{doc.created_by_email} · </> : null;
 
@@ -67,7 +71,8 @@ export function DocumentRow({
             <>
               <p className="text-text truncate text-[13px] font-medium">{doc.title}</p>
               <p className="text-text-3 text-[11px]">
-                {mimeLabel(doc.file_mime)} · {formatBytes(doc.file_size)} · {by}
+                {mimeLabel(doc.file_mime) ?? t("fileFallback")} · {formatBytes(doc.file_size)} ·{" "}
+                {by}
                 {date}
               </p>
             </>
@@ -102,7 +107,7 @@ export function DocumentRow({
             </>
           )}
           {error && (
-            <p role="alert" className="text-[11px] text-[#FFB6A2]">
+            <p role="alert" className="text-red-text text-[11px]">
               {error}
             </p>
           )}
@@ -113,36 +118,36 @@ export function DocumentRow({
               type="button"
               className={btn}
               disabled={pending}
-              aria-label={`Restore ${doc.title}`}
+              aria-label={`${tCommon("restore")} ${doc.title}`}
               onClick={onRestore}
             >
-              Restore
+              {tCommon("restore")}
             </button>
           ) : (
             <>
               {doc.kind === "file" && (
                 <button type="button" className={btn} disabled={pending} onClick={onDownload}>
-                  {pending ? "…" : "Download"}
+                  {pending ? "…" : tCommon("download")}
                 </button>
               )}
               {doc.kind !== "file" && (
                 <button
                   type="button"
                   className={btn}
-                  aria-label={`Edit ${doc.title}`}
+                  aria-label={`${tCommon("edit")} ${doc.title}`}
                   onClick={() => openEdit(doc)}
                 >
-                  Edit
+                  {tCommon("edit")}
                 </button>
               )}
               <button
                 type="button"
                 className={btn}
                 disabled={pending}
-                aria-label={`Archive ${doc.title}`}
+                aria-label={`${tCommon("archive")} ${doc.title}`}
                 onClick={onArchive}
               >
-                Archive
+                {tCommon("archive")}
               </button>
             </>
           )}

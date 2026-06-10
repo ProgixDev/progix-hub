@@ -3,6 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/auth/session", () => ({ requireMember: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+// Server actions resolve copy through next-intl (spec 005). Back the translator with the
+// English catalog so the existing English assertions still hold without a request context.
+vi.mock("next-intl/server", async () => {
+  const en = (await import("@/messages/en.json")).default as Record<string, Record<string, string>>;
+  return {
+    getTranslations: async () => (key: string) => {
+      const [ns, k] = key.split(".");
+      return en[ns!]?.[k!] ?? key;
+    },
+  };
+});
 
 import { requireMember } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";

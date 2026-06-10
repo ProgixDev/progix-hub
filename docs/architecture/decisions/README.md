@@ -22,3 +22,4 @@ ADRs capture decisions that shape the codebase: what we chose, what we rejected,
 | [0006](0006-data-layer.md)              | Use Supabase as the data layer (Postgres + Auth + Storage) for progixHub                                           | Proposed |
 | [0007](0007-env-var-encryption.md)      | Encrypt env-var values with an app-held keyring (AES-256-GCM) behind SECURITY DEFINER RPCs                         | Accepted |
 | [0008](0008-rich-text-notes.md)         | Rich-text notes via Markdown (react-markdown + rehype-sanitize)                                                    | Accepted |
+| [0009](0009-i18n-and-theming.md)        | i18n (EN/FR via next-intl, no routing) + light/dark theming, prefs sourced per-user from the JWT                   | Accepted |

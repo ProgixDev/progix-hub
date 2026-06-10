@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useTransition } from "react";
 import { StatusBadge, type BadgeProps } from "@/components/ui/badge";
@@ -9,11 +10,17 @@ import type { Project, ProjectStatus } from "../types";
 import { projectSurfaces } from "./project-card";
 import { ProjectForm } from "./project-form";
 
-const STATUS: Record<ProjectStatus, { tone: NonNullable<BadgeProps["tone"]>; label: string }> = {
-  active: { tone: "green", label: "Active" },
-  at_risk: { tone: "amber", label: "At risk" },
-  archived: { tone: "neutral", label: "Archived" },
+const STATUS_TONE: Record<ProjectStatus, NonNullable<BadgeProps["tone"]>> = {
+  active: "green",
+  at_risk: "amber",
+  archived: "neutral",
 };
+
+const STATUS_KEY = {
+  active: "statusActive",
+  at_risk: "statusAtRisk",
+  archived: "statusArchived",
+} as const satisfies Record<ProjectStatus, string>;
 
 export function ProjectDetail({ project }: { project: Project }) {
   return (
@@ -25,9 +32,10 @@ export function ProjectDetail({ project }: { project: Project }) {
 }
 
 function DetailInner({ project }: { project: Project }) {
+  const t = useTranslations("projects");
+  const tCommon = useTranslations("common");
   const openEdit = useProjectsStore((s) => s.openEdit);
   const [pending, start] = useTransition();
-  const status = STATUS[project.status];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 py-8">
@@ -35,7 +43,7 @@ function DetailInner({ project }: { project: Project }) {
         href="/"
         className="text-text-2 hover:text-text mb-5 inline-flex items-center gap-1 text-[13px]"
       >
-        ← Projects
+        ← {t("back")}
       </Link>
 
       <div className="flex items-start justify-between gap-4">
@@ -44,7 +52,9 @@ function DetailInner({ project }: { project: Project }) {
             <h1 className="text-text truncate text-[24px] font-semibold tracking-tight">
               {project.name}
             </h1>
-            <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+            <StatusBadge tone={STATUS_TONE[project.status]}>
+              {t(STATUS_KEY[project.status])}
+            </StatusBadge>
           </div>
           {project.description && (
             <p className="text-text-2 mt-1.5 max-w-2xl text-[14px]">{project.description}</p>
@@ -56,7 +66,7 @@ function DetailInner({ project }: { project: Project }) {
             onClick={() => openEdit(project)}
             className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
           >
-            Edit
+            {tCommon("edit")}
           </button>
           {project.status !== "archived" && (
             <button
@@ -65,7 +75,7 @@ function DetailInner({ project }: { project: Project }) {
               onClick={() => start(() => archiveProjectAction(project.id).then(() => undefined))}
               className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
             >
-              {pending ? "Archiving…" : "Archive"}
+              {pending ? t("archiving") : t("archive")}
             </button>
           )}
         </div>
@@ -79,7 +89,7 @@ function DetailInner({ project }: { project: Project }) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${label} (opens in a new tab)`}
+              aria-label={`${label} (${t("opensNewTab")})`}
               className="bg-bg-2 border-line-1 hover:border-line-strong flex items-center gap-3 rounded-lg border px-3.5 py-3 transition-colors"
             >
               <Glyph size={22} />
@@ -93,11 +103,11 @@ function DetailInner({ project }: { project: Project }) {
               key={key}
               type="button"
               onClick={() => openEdit(project)}
-              aria-label={`Add ${label} link`}
+              aria-label={t("addLink", { service: label })}
               className="border-line/60 text-text-3 hover:border-line-blue hover:text-blue-text flex items-center gap-3 rounded-lg border border-dashed px-3.5 py-3 transition-colors"
             >
               <Glyph size={22} />
-              <span className="text-[13px] font-medium">Add {label}</span>
+              <span className="text-[13px] font-medium">{t("addLink", { service: label })}</span>
             </button>
           ),
         )}

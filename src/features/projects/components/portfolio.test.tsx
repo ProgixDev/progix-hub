@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithIntl } from "@/test/intl";
 import type { Project } from "../types";
 
 // project-form imports the server-action module; mock it so this client test doesn't
@@ -27,12 +28,12 @@ const project: Project = {
 
 describe("ProjectsPortfolio (AC-3)", () => {
   it("shows the empty state when there are no projects", () => {
-    render(<ProjectsPortfolio projects={[]} />);
+    renderWithIntl(<ProjectsPortfolio projects={[]} />);
     expect(screen.getByRole("heading", { name: "No projects yet" })).toBeInTheDocument();
   });
 
   it("renders project cards when there are projects", () => {
-    render(<ProjectsPortfolio projects={[project]} />);
+    renderWithIntl(<ProjectsPortfolio projects={[project]} />);
     expect(screen.getByRole("heading", { name: "Projects" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Atlas Commerce" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "No projects yet" })).toBeNull();

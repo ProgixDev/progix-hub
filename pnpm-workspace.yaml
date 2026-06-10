@@ -1,5 +1,7 @@
 # pnpm config (single-app repo — this file carries pnpm settings, not workspaces).
 # Build scripts are opt-in by design (supply-chain hygiene): only the deps below may run them.
 allowBuilds:
+  "@parcel/watcher": true # next-intl transitive — native file watcher (dev HMR of messages)
+  "@swc/core": true # next-intl transitive — SWC native bindings
   sharp: true
   unrs-resolver: true

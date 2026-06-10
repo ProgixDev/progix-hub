@@ -16,6 +16,12 @@ test("AC-1: signed-out visitor is redirected from a project URL", async ({ page 
   await expect(page).toHaveURL(/\/sign-in/);
 });
 
+// Spec 005 AC-7 — Settings is behind the same membership gate as everything else.
+test("AC-7: signed-out visitor is redirected from /settings", async ({ page }) => {
+  await page.goto("/settings");
+  await expect(page).toHaveURL(/\/sign-in/);
+});
+
 // AC-2 (UI) — a non-member is told they don't have access (decision is unit-tested too).
 test("@cuj AC-2: access-denied message renders for a non-member", async ({ page }) => {
   await page.goto("/sign-in?error=access_denied");

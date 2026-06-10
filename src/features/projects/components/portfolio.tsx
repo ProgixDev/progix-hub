@@ -1,19 +1,26 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { PlusIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import { ProjectsStoreProvider, useProjectsStore } from "../provider";
 import { filterProjects, statusCounts } from "../lib";
-import type { Project, StatusFilter } from "../types";
+import type { Project, ProjectStatus, StatusFilter } from "../types";
 import { ProjectCard } from "./project-card";
 import { ProjectForm } from "./project-form";
 
-const FILTERS: { key: StatusFilter; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "active", label: "Active" },
-  { key: "at_risk", label: "At risk" },
-  { key: "archived", label: "Archived" },
+const FILTER_KEYS: { key: StatusFilter; labelKey: string }[] = [
+  { key: "all", labelKey: "filterAll" },
+  { key: "active", labelKey: "statusActive" },
+  { key: "at_risk", labelKey: "statusAtRisk" },
+  { key: "archived", labelKey: "statusArchived" },
 ];
+
+const STATUS_KEY = {
+  active: "statusActive",
+  at_risk: "statusAtRisk",
+  archived: "statusArchived",
+} as const satisfies Record<ProjectStatus, string>;
 
 /** The projects portfolio (AC-3). Server passes the real project list in via props. */
 export function ProjectsPortfolio({ projects }: { projects: Project[] }) {
@@ -26,6 +33,7 @@ export function ProjectsPortfolio({ projects }: { projects: Project[] }) {
 }
 
 function PortfolioInner({ projects }: { projects: Project[] }) {
+  const t = useTranslations("projects");
   const filter = useProjectsStore((s) => s.filter);
   const setFilter = useProjectsStore((s) => s.setFilter);
   const openCreate = useProjectsStore((s) => s.openCreate);
@@ -38,8 +46,10 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
     <div className="mx-auto w-full max-w-6xl px-6 py-8">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="t-eyebrow">Portfolio</p>
-          <h1 className="text-text mt-1 text-[26px] font-semibold tracking-tight">Projects</h1>
+          <p className="t-eyebrow">{t("portfolio")}</p>
+          <h1 className="text-text mt-1 text-[26px] font-semibold tracking-tight">
+            {t("heading")}
+          </h1>
         </div>
         <button
           type="button"
@@ -47,13 +57,13 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
           className="bg-blue text-primary-foreground hover:bg-blue-hover flex h-9 items-center gap-2 rounded-md px-3.5 text-[13.5px] font-medium shadow-[0_6px_18px_rgba(76,130,251,0.28)] transition-colors"
         >
           <PlusIcon className="size-4" />
-          New project
+          {t("newProject")}
         </button>
       </div>
 
       {!empty && (
         <div className="mt-6 flex items-center gap-1">
-          {FILTERS.map((f) => (
+          {FILTER_KEYS.map((f) => (
             <button
               key={f.key}
               type="button"
@@ -65,7 +75,7 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
                   : "text-text-2 hover:bg-bg-2 hover:text-text",
               )}
             >
-              {f.label}
+              {t(f.labelKey)}
               <span className="text-text-3 font-mono text-[11px]">{counts[f.key]}</span>
             </button>
           ))}
@@ -81,7 +91,9 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
           ))}
           {visible.length === 0 && (
             <p className="text-text-2 col-span-full py-12 text-center text-[13.5px]">
-              {filter === "all" ? "No projects." : `No ${filter.replace("_", " ")} projects.`}
+              {filter === "all"
+                ? t("noProjects")
+                : t("noFilteredProjects", { status: t(STATUS_KEY[filter]).toLowerCase() })}
             </p>
           )}
         </div>
@@ -91,19 +103,18 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
 }
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
+  const t = useTranslations("projects");
   return (
     <div className="mt-10 flex flex-col items-center rounded-xl border border-dashed border-[var(--line-strong)] py-16 text-center">
-      <h2 className="text-text text-[16px] font-semibold">No projects yet</h2>
-      <p className="text-text-2 mt-1 max-w-sm text-[13.5px]">
-        Create your first project, then link its Notion, Slack, GitHub, and live site.
-      </p>
+      <h2 className="text-text text-[16px] font-semibold">{t("emptyTitle")}</h2>
+      <p className="text-text-2 mt-1 max-w-sm text-[13.5px]">{t("emptyBody")}</p>
       <button
         type="button"
         onClick={onCreate}
         className="bg-blue text-primary-foreground hover:bg-blue-hover mt-5 flex h-9 items-center gap-2 rounded-md px-3.5 text-[13.5px] font-medium transition-colors"
       >
         <PlusIcon className="size-4" />
-        New project
+        {t("newProject")}
       </button>
     </div>
   );

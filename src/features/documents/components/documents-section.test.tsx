@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithIntl } from "@/test/intl";
 import type { ProjectDocument } from "../types";
 import { DocumentsSection } from "./documents-section";
 
@@ -34,24 +35,24 @@ const link: ProjectDocument = {
 
 describe("DocumentsSection", () => {
   it("shows the empty state when there are no documents (AC-9)", () => {
-    render(<DocumentsSection projectId="p" documents={[]} archived={[]} />);
+    renderWithIntl(<DocumentsSection projectId="p" documents={[]} archived={[]} />);
     expect(screen.getByText(/no documents yet/i)).toBeTruthy();
   });
 
   it("renders a link row and the kind tabs (AC-2 / AC-4)", () => {
-    render(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
+    renderWithIntl(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
     expect(screen.getByRole("link", { name: "Figma" })).toBeTruthy();
     expect(screen.getByRole("tab", { name: /Files/ })).toBeTruthy();
     expect(screen.getByRole("tab", { name: /Notes/ })).toBeTruthy();
   });
 
   it("shows the uploader on each row (AC-1/2/3)", () => {
-    render(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
+    renderWithIntl(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
     expect(screen.getByText(/alice@progix\.test/)).toBeTruthy();
   });
 
   it("wires the active tab to its panel (ARIA tabs)", () => {
-    render(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
+    renderWithIntl(<DocumentsSection projectId="p" documents={[link]} archived={[]} />);
     const panel = screen.getByRole("tabpanel");
     const all = screen.getByRole("tab", { name: /All/ });
     expect(all.getAttribute("aria-controls")).toBe(panel.getAttribute("id"));

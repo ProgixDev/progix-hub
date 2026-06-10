@@ -23,8 +23,8 @@ const emptyToUndefined = (v: unknown) => (typeof v === "string" && v.trim() === 
 
 /** Validated add/edit input (AC-1, AC-7): key required, value required, service optional. */
 export const envVarInputSchema = z.object({
-  key: z.string().trim().min(1, { error: "Key is required" }).max(256),
-  value: z.string().min(1, { error: "Value is required" }),
+  key: z.string().trim().min(1, { error: "envVars.errorKeyRequired" }).max(256),
+  value: z.string().min(1, { error: "envVars.errorValueRequired" }),
   service: z.preprocess(emptyToUndefined, z.string().optional()),
 });
 

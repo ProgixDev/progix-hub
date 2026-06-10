@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { createEnvVarAction, updateEnvVarAction, type ActionResult } from "../actions";
 import { detectService, SERVICES } from "../lib";
@@ -41,11 +42,11 @@ function Field({
     <label className="flex flex-col gap-1.5">
       <span className="text-text-1 text-[12.5px] font-medium">
         {label}
-        {required && <span className="text-[#FFB6A2]"> *</span>}
+        {required && <span className="text-red-text"> *</span>}
         {hint && <span className="text-text-3 font-normal"> — {hint}</span>}
       </span>
       {children}
-      {error && <span className="text-[12px] text-[#FFB6A2]">{error}</span>}
+      {error && <span className="text-red-text text-[12px]">{error}</span>}
     </label>
   );
 }
@@ -59,6 +60,8 @@ function EnvVarFormModal({
   editing: EnvVarMeta | null;
   onClose: () => void;
 }) {
+  const t = useTranslations("envVars");
+  const tCommon = useTranslations("common");
   const [pending, start] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -108,7 +111,7 @@ function EnvVarFormModal({
       className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/60 px-4 py-[7vh] backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label={editing ? "Edit variable" : "New variable"}
+      aria-label={editing ? t("editVariable") : t("newVariable")}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -119,18 +122,18 @@ function EnvVarFormModal({
       >
         <div className="border-line flex items-center justify-between border-b px-5 py-4">
           <h2 className="text-text text-[15px] font-semibold">
-            {editing ? "Edit variable" : "New variable"}
+            {editing ? t("editVariable") : t("newVariable")}
           </h2>
         </div>
 
         <div className="flex flex-col gap-4 p-5">
           {formError && (
-            <p className="border-red/30 bg-red-tint rounded-md border px-3 py-2 text-[13px] text-[#FFB6A2]">
+            <p className="border-red/30 bg-red-tint text-red-text rounded-md border px-3 py-2 text-[13px]">
               {formError}
             </p>
           )}
 
-          <Field label="Key" error={errors.key} required>
+          <Field label={t("fieldKey")} error={errors.key} required>
             <input
               name="key"
               value={key}
@@ -144,22 +147,22 @@ function EnvVarFormModal({
           </Field>
 
           <Field
-            label="Value"
+            label={t("fieldValue")}
             error={errors.value}
             required={!editing}
-            hint={editing ? "leave blank to keep the current value" : undefined}
+            hint={editing ? t("hintKeepValue") : undefined}
           >
             <input
               name="value"
               type="password"
               autoComplete="off"
-              placeholder={editing ? "••••••••" : "Paste the secret value"}
+              placeholder={editing ? "••••••••" : t("placeholderValue")}
               className={`${inputCls} font-mono text-[13px]`}
               required={!editing}
             />
           </Field>
 
-          <Field label="Service" hint="for the logo — auto-detected, override if needed">
+          <Field label={t("fieldService")} hint={t("hintLogo")}>
             <select
               value={effectiveService}
               onChange={(e) => {
@@ -168,7 +171,7 @@ function EnvVarFormModal({
               }}
               className={inputCls}
             >
-              <option value="">Other / none</option>
+              <option value="">{t("otherNone")}</option>
               {SERVICES.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.label}
@@ -184,14 +187,14 @@ function EnvVarFormModal({
             onClick={onClose}
             className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
           >
-            Cancel
+            {tCommon("cancel")}
           </button>
           <button
             type="submit"
             disabled={pending}
             className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
           >
-            {pending ? "Saving…" : editing ? "Save changes" : "Add variable"}
+            {pending ? tCommon("saving") : editing ? tCommon("save") : t("addVariable")}
           </button>
         </div>
       </form>
