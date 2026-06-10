@@ -39,4 +39,5 @@ Key components, store, actions; anything non-obvious.
 | ---------------------------- | --------------- | -------------------------------------------- |
 | Sign-in & project registry   | live            | [auth-and-projects.md](auth-and-projects.md) |
 | Secure environment variables | live            | [env-vars.md](env-vars.md)                   |
+| Documents per project        | live            | [documents.md](documents.md)                 |
 | Task list (demo)             | removed at init | [task-list.md](task-list.md)                 |
