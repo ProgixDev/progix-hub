@@ -352,6 +352,8 @@
     "finish": "Finish",
     "working": "Working",
     "paused": "On break",
-    "off": "Off"
+    "off": "Off",
+    "expand": "Open timer",
+    "collapse": "Collapse"
   }
 }
