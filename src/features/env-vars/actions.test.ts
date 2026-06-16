@@ -10,8 +10,6 @@ vi.mock("@/lib/crypto/secrets", () => ({
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-// `getTranslations()` resolves dotted keys against the English catalog, so the action
-// returns the same user-facing strings these tests already assert on (spec 005).
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(async () => (key: string) => {
     const value = key
@@ -27,6 +25,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   createEnvVarAction,
   deleteEnvVarAction,
+  exportEnvFileAction,
+  importEnvVarsAction,
   revealEnvVarValueAction,
   updateEnvVarAction,
 } from "./actions";
@@ -52,9 +52,28 @@ function clientWithRpc(rpc: ReturnType<typeof vi.fn>) {
   } as unknown as Awaited<ReturnType<typeof createClient>>);
 }
 
+function clientForExport(
+  rows: Array<{ id: string; key: string; scope: string }>,
+  reveal: (args: { p_id: string; p_intent: string }) => { data: unknown; error: unknown },
+) {
+  const builder = {
+    select: () => builder,
+    eq: () => builder,
+    order: () => Promise.resolve({ data: rows, error: null }),
+  };
+  const rpc = vi.fn((name: string, args: { p_id: string; p_intent: string }) =>
+    Promise.resolve(name === "reveal_env_var" ? reveal(args) : { data: null, error: null }),
+  );
+  mockCreateClient.mockResolvedValue({
+    from: () => builder,
+    rpc,
+  } as unknown as Awaited<ReturnType<typeof createClient>>);
+  return rpc;
+}
+
 beforeEach(() => vi.clearAllMocks());
 
-describe("env-vars actions — membership gate (AC-6)", () => {
+describe("env-vars actions — membership gate (AC-6 / spec 009 AC-5)", () => {
   it("every action refuses a non-member before touching the database", async () => {
     mockRequireMember.mockResolvedValue(null);
     const rpc = vi.fn();
@@ -65,6 +84,8 @@ describe("env-vars actions — membership gate (AC-6)", () => {
       updateEnvVarAction(envVarId, projectId, { key: "K", value: "v" }),
       deleteEnvVarAction(envVarId, projectId),
       revealEnvVarValueAction(envVarId, "reveal"),
+      importEnvVarsAction(projectId, { items: [{ key: "K", value: "v" }] }),
+      exportEnvFileAction(projectId, "all"),
     ]);
 
     for (const res of results) {
@@ -88,17 +109,23 @@ describe("createEnvVarAction", () => {
     }
   });
 
-  it("encrypts the value before it reaches the RPC (AC-1, AC-5)", async () => {
+  it("encrypts the value and threads the scope to the RPC (AC-1, AC-5, spec 009)", async () => {
     const rpc = vi.fn().mockResolvedValue({ error: null });
     clientWithRpc(rpc);
-    const res = await createEnvVarAction(projectId, { key: "K", value: "v", service: "stripe" });
+    const res = await createEnvVarAction(projectId, {
+      key: "NEXT_PUBLIC_X",
+      value: "v",
+      service: "stripe",
+      scope: "frontend",
+    });
     expect(res.ok).toBe(true);
     expect(rpc).toHaveBeenCalledWith(
       "create_env_var",
       expect.objectContaining({
         p_project_id: projectId,
-        p_key: "K",
+        p_key: "NEXT_PUBLIC_X",
         p_service: "stripe",
+        p_scope: "frontend",
         p_ciphertext: expect.stringContaining("cipher("),
       }),
     );
@@ -133,5 +160,97 @@ describe("revealEnvVarValueAction", () => {
     const res = await revealEnvVarValueAction(envVarId, "reveal");
     expect(res.ok).toBe(false);
     if (!res.ok) expect(res.error).toMatch(/key may have changed/i);
+  });
+});
+
+describe("importEnvVarsAction (spec 009 AC-3)", () => {
+  beforeEach(() => mockRequireMember.mockResolvedValue(member));
+
+  it("creates rows, skips duplicates (23505), and reports failures", async () => {
+    const rpc = vi
+      .fn()
+      .mockResolvedValueOnce({ error: null }) // A → created
+      .mockResolvedValueOnce({ error: { code: "23505", message: "dup" } }) // B → skipped
+      .mockResolvedValueOnce({ error: { code: "XXXXX", message: "boom" } }); // C → failed
+    clientWithRpc(rpc);
+    const res = await importEnvVarsAction(projectId, {
+      items: [
+        { key: "A", value: "1" },
+        { key: "B", value: "2" },
+        { key: "C", value: "3" },
+      ],
+    });
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.created).toEqual(["A"]);
+      expect(res.skipped).toEqual(["B"]);
+      expect(res.failed).toEqual(["C"]);
+    }
+    expect(rpc).toHaveBeenCalledTimes(3);
+    expect(rpc).toHaveBeenCalledWith(
+      "create_env_var",
+      expect.objectContaining({ p_key: "A", p_ciphertext: expect.stringContaining("cipher(") }),
+    );
+  });
+
+  it("rejects an empty or invalid payload without calling the RPC", async () => {
+    const rpc = vi.fn();
+    clientWithRpc(rpc);
+    const res = await importEnvVarsAction(projectId, { items: [] });
+    expect(res.ok).toBe(false);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+});
+
+describe("exportEnvFileAction (spec 009 AC-4, AC-6)", () => {
+  beforeEach(() => mockRequireMember.mockResolvedValue(member));
+
+  it("decrypts each row via the audited export intent and serializes a .env", async () => {
+    const rpc = clientForExport(
+      [
+        { id: "a", key: "SECRET", scope: "backend" },
+        { id: "b", key: "NEXT_PUBLIC_X", scope: "frontend" },
+      ],
+      ({ p_id }) => ({ data: `cipher:${p_id}`, error: null }),
+    );
+    mockDecrypt.mockImplementation((stored: string) => `plain(${stored})`);
+    const res = await exportEnvFileAction(projectId, "all");
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.filename).toBe(".env");
+      // the decrypted value contains parens, so the serializer quotes it (AC-4)
+      expect(res.content).toContain('SECRET="plain(cipher:a)"');
+      expect(res.content).toContain("# Frontend");
+    }
+    // every value was decrypted through the audited 'export' intent
+    expect(rpc).toHaveBeenCalledWith("reveal_env_var", { p_id: "a", p_intent: "export" });
+    expect(rpc).toHaveBeenCalledWith("reveal_env_var", { p_id: "b", p_intent: "export" });
+  });
+
+  it("names backend-only and frontend-only files", async () => {
+    clientForExport([{ id: "a", key: "SECRET", scope: "backend" }], ({ p_id }) => ({
+      data: `cipher:${p_id}`,
+      error: null,
+    }));
+    mockDecrypt.mockImplementation((stored: string) => `plain(${stored})`);
+    const res = await exportEnvFileAction(projectId, "backend");
+    expect(res.ok && res.filename).toBe(".env.backend");
+  });
+
+  it("returns a friendly error when the scope has no variables (AC-6)", async () => {
+    clientForExport([], () => ({ data: null, error: null }));
+    const res = await exportEnvFileAction(projectId, "frontend");
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error).toMatch(/no variables to export/i);
+  });
+
+  it("maps a 42501 (no env-write role) to a friendly not-authorized error", async () => {
+    clientForExport([{ id: "a", key: "SECRET", scope: "backend" }], () => ({
+      data: null,
+      error: { code: "42501", message: "not authorized" },
+    }));
+    const res = await exportEnvFileAction(projectId, "all");
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.error).toMatch(/authorized/i);
   });
 });

@@ -12,7 +12,8 @@
     "loading": "Chargement…",
     "search": "Rechercher…",
     "searchLabel": "Rechercher",
-    "comingSoon": "bientôt"
+    "comingSoon": "bientôt",
+    "close": "Fermer"
   },
   "nav": {
     "projects": "Projets",
@@ -107,7 +108,28 @@
     "errorNoEncryption": "Le chiffrement n’est pas configuré — contactez un administrateur.",
     "errorUnknownVar": "Variable inconnue.",
     "errorNotFound": "Cette variable est introuvable.",
-    "errorDecrypt": "Cette valeur ne peut pas être déchiffrée — la clé de chiffrement a peut-être changé."
+    "errorDecrypt": "Cette valeur ne peut pas être déchiffrée — la clé de chiffrement a peut-être changé.",
+    "fieldScope": "Portée",
+    "hintScope": "où elle est utilisée — détecté automatiquement, modifiable",
+    "scopeBackend": "Backend",
+    "scopeFrontend": "Frontend",
+    "import": "Importer",
+    "importTitle": "Importer un .env",
+    "importDropzone": "Déposez des fichiers .env ici",
+    "importChoose": "Choisir des fichiers",
+    "importPaste": "Ou collez le contenu .env",
+    "importEmpty": "Déposez un fichier ou collez ci-dessus pour prévisualiser les variables.",
+    "importColInclude": "Inclure",
+    "importColKey": "Clé",
+    "importExists": "Existe déjà",
+    "importNoneSelected": "Sélectionnez au moins une variable à importer.",
+    "importSubmit": "Importer {count}",
+    "importSummary": "Créées : {created}, ignorées : {skipped}, échouées : {failed}.",
+    "export": "Exporter",
+    "exportAll": "Toutes",
+    "errorImportInvalid": "Impossible de lire ces variables — vérifiez le format.",
+    "errorExportEmpty": "Aucune variable à exporter pour cette portée.",
+    "actionExported": "a exporté"
   },
   "documents": {
     "title": "Documents",

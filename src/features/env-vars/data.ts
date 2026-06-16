@@ -7,7 +7,7 @@ export async function listProjectEnvVars(projectId: string): Promise<EnvVarMeta[
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("env_vars")
-    .select("id, project_id, key, service, created_at, updated_at")
+    .select("id, project_id, key, service, scope, created_at, updated_at")
     .eq("project_id", projectId)
     .order("key", { ascending: true });
   if (error) throw new Error(error.message);
