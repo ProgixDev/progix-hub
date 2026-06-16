@@ -62,6 +62,12 @@ describe("fetchOrgCommits (spec 012 AC-6 — fail soft)", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("returns [] without a request for a malformed login (defense in depth)", async () => {
+    process.env.GITHUB_TOKEN = "t";
+    expect(await fetchOrgCommits("bad login!; org:evil", 2026)).toEqual([]);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("returns [] on a non-200 response", async () => {
     process.env.GITHUB_TOKEN = "t";
     fetchMock.mockResolvedValue({ ok: false, status: 403 });

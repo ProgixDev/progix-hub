@@ -4,6 +4,9 @@ import type { OrgCommit } from "./types";
 // features/auth/membership.ts; features can't import each other, so the constant is repeated).
 const ORG_LOGIN = process.env.PROGIX_GITHUB_ORG ?? "ProgixDev";
 const MAX_COMMITS = 30;
+// GitHub usernames: alphanumeric + single hyphens, ≤39 chars. We only ever search for a value that
+// matches this, so a malformed/spoofed github_login can't shape the search query (defense in depth).
+const GITHUB_LOGIN_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
 
 type RawSearchCommits = {
   items?: {
@@ -49,7 +52,7 @@ export async function fetchOrgCommits(
   year: number = new Date().getFullYear(),
 ): Promise<OrgCommit[]> {
   const token = process.env.GITHUB_TOKEN;
-  if (!login || !token) return [];
+  if (!login || !token || !GITHUB_LOGIN_RE.test(login)) return [];
   const q = `org:${ORG_LOGIN} author:${login} author-date:>=${startOfYear(year)}`;
   const url =
     `https://api.github.com/search/commits?q=${encodeURIComponent(q)}` +
