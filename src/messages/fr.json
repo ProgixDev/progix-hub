@@ -39,7 +39,8 @@
     "emailLabel": "E-mail",
     "passwordLabel": "Mot de passe",
     "signInEmail": "Se connecter par e-mail",
-    "emailSignInError": "Cet e-mail ou ce mot de passe est incorrect."
+    "emailSignInError": "Cet e-mail ou ce mot de passe est incorrect.",
+    "profile": "Profil"
   },
   "signIn": {
     "title": "Se connecter",

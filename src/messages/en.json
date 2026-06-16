@@ -39,7 +39,8 @@
     "emailLabel": "Email",
     "passwordLabel": "Password",
     "signInEmail": "Sign in with email",
-    "emailSignInError": "That email or password is incorrect."
+    "emailSignInError": "That email or password is incorrect.",
+    "profile": "Profile"
   },
   "signIn": {
     "title": "Sign in",
