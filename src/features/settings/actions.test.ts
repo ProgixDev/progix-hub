@@ -23,6 +23,7 @@ const member = {
   initials: "M",
   isSuperadmin: false,
   isLead: false,
+  isGlobalPm: false,
 };
 const cookieSet = vi.fn();
 

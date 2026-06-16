@@ -8,10 +8,16 @@ import { type ContributionCalendar, type OrgCommit, type OrgMember, standingOf }
 
 const STANDING_KEY = {
   superadmin: "standingSuperadmin",
+  global_pm: "standingGlobalPm",
   lead: "standingLead",
   member: "standingMember",
 } as const;
-const STANDING_TONE = { superadmin: "blue", lead: "amber", member: "neutral" } as const;
+const STANDING_TONE = {
+  superadmin: "blue",
+  global_pm: "green",
+  lead: "amber",
+  member: "neutral",
+} as const;
 
 /**
  * A member's org profile + their org-scoped GitHub activity (spec 011 AC-3, spec 012 AC-3/AC-5).

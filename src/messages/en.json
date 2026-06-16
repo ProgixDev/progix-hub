@@ -340,7 +340,10 @@
     "connecting": "Connecting…",
     "connectPrompt": "Link your GitHub to show your activity here.",
     "connectError": "Couldn’t start the GitHub connection — please try again.",
-    "linkConflict": "That GitHub account is already linked to another member."
+    "linkConflict": "That GitHub account is already linked to another member.",
+    "standingGlobalPm": "Global PM",
+    "makeGlobalPm": "Make global PM",
+    "removeGlobalPm": "Remove global PM"
   },
   "clock": {
     "start": "Start working",

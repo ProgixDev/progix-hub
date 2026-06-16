@@ -6,14 +6,18 @@ export type OrgMember = {
   github_login: string | null;
   is_superadmin: boolean;
   is_lead: boolean;
+  is_global_pm: boolean;
   created_at: string;
 };
 
-/** Org standing derived from the flags — superadmin outranks lead outranks member. */
-export type OrgStanding = "superadmin" | "lead" | "member";
+/** Org standing derived from the flags — superadmin > global PM > lead > member (spec 014). */
+export type OrgStanding = "superadmin" | "global_pm" | "lead" | "member";
 
-export function standingOf(member: Pick<OrgMember, "is_superadmin" | "is_lead">): OrgStanding {
+export function standingOf(
+  member: Pick<OrgMember, "is_superadmin" | "is_lead" | "is_global_pm">,
+): OrgStanding {
   if (member.is_superadmin) return "superadmin";
+  if (member.is_global_pm) return "global_pm";
   if (member.is_lead) return "lead";
   return "member";
 }

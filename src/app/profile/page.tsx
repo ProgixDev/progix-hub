@@ -41,6 +41,7 @@ export default async function ProfilePage({
     github_login: null,
     is_superadmin: user.isSuperadmin,
     is_lead: user.isLead,
+    is_global_pm: user.isGlobalPm,
     created_at: "",
   };
 

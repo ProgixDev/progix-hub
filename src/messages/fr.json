@@ -340,7 +340,10 @@
     "connecting": "Connexion…",
     "connectPrompt": "Liez votre GitHub pour afficher votre activité ici.",
     "connectError": "Impossible de démarrer la connexion GitHub — veuillez réessayer.",
-    "linkConflict": "Ce compte GitHub est déjà lié à un autre membre."
+    "linkConflict": "Ce compte GitHub est déjà lié à un autre membre.",
+    "standingGlobalPm": "PM global",
+    "makeGlobalPm": "Promouvoir PM global",
+    "removeGlobalPm": "Retirer PM global"
   },
   "clock": {
     "start": "Commencer",
