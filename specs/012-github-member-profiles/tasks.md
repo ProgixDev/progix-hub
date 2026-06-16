@@ -10,7 +10,7 @@ Much already exists (GitHub OAuth sign-in, `MemberProfile`, `ContributionGraph`,
 
 ## Phase 1 — core behavior
 
-- [ ] T1 Migration `supabase/migrations/0012_github_profiles.sql`: re-create `list_org_members` so visibility is **any `is_member`** (drop the superadmin/lead/PM gate); keep ordering + columns. Add a comment block (spec 012). · done: SQL applies on a branch, a non-PM member can call it (AC-4)
+- [x] T1 Migration `supabase/migrations/0012_github_profiles.sql`: re-create `list_org_members` so visibility is **any `is_member`** (drop the superadmin/lead/PM gate); keep ordering + columns. Add a comment block (spec 012). · done: SQL applies on a branch, a non-PM member can call it (AC-4)
 - [ ] T2 `members/data.ts`: add `canViewOrgMembers()` → true for any signed-in member, false signed-out; keep `canManageOrgMembers` for lead-promotion gating · done: unit covers both (AC-4)
 - [ ] T3 `members/commits.ts`: pure `parseCommits(raw)` (newest-first, fields: sha, message, repo, url, date) + `fetchOrgCommits(login)` (Search API, `GITHUB_TOKEN`, org + author + `author-date:>=<jan1 of current year>`, capped 30, fail-soft → `[]`) · done: `commits.test.ts` green incl. empty/error/no-token (AC-5, AC-6)
 - [ ] T4 [P] `members/components/commit-list.tsx`: render commits (repo · message · date · link) + empty/unavailable state · done: renders all states from props
