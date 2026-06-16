@@ -3,7 +3,8 @@
 // "server-only") — import them only from Server Components / route handlers.
 export { listOrgMembers, getOrgMember, canViewOrgMembers } from "./data";
 export { fetchOrgContributions } from "./github";
+export { fetchOrgCommits } from "./commits";
 export { MembersDirectory } from "./components/members-directory";
 export { MemberProfile } from "./components/member-profile";
 export { setMemberLeadAction } from "./actions";
-export type { OrgMember, ContributionCalendar } from "./types";
+export type { OrgMember, ContributionCalendar, OrgCommit } from "./types";

@@ -1,8 +1,10 @@
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { CommitList } from "./commit-list";
+import { ConnectGitHubButton } from "./connect-github-button";
 import { ContributionGraph } from "./contribution-graph";
-import { type ContributionCalendar, type OrgMember, standingOf } from "../types";
+import { type ContributionCalendar, type OrgCommit, type OrgMember, standingOf } from "../types";
 
 const STANDING_KEY = {
   superadmin: "standingSuperadmin",
@@ -11,16 +13,27 @@ const STANDING_KEY = {
 } as const;
 const STANDING_TONE = { superadmin: "blue", lead: "amber", member: "neutral" } as const;
 
-/** A member's org profile + their org-scoped GitHub activity (spec 011 AC-3). */
+/**
+ * A member's org profile + their org-scoped GitHub activity (spec 011 AC-3, spec 012 AC-3/AC-5).
+ * On the viewer's own profile (`isOwnProfile`) an unlinked GitHub shows a Connect button instead
+ * of "no GitHub", and `linkConflict` surfaces the already-linked error (AC-7).
+ */
 export function MemberProfile({
   member,
   calendar,
+  commits,
+  isOwnProfile = false,
+  linkConflict = false,
 }: {
   member: OrgMember;
   calendar: ContributionCalendar | null;
+  commits: OrgCommit[];
+  isOwnProfile?: boolean;
+  linkConflict?: boolean;
 }) {
   const t = useTranslations("members");
   const standing = standingOf(member);
+  const showConnect = isOwnProfile && !member.github_login;
   return (
     <section className="mx-auto w-full max-w-3xl px-4 pb-12 sm:px-6">
       <Link href="/members" className="text-text-2 hover:text-text text-[12.5px]">
@@ -44,6 +57,16 @@ export function MemberProfile({
             <span className="text-text-3">{t("noGithub")}</span>
           )}
         </p>
+        {showConnect && (
+          <div className="mt-3">
+            {linkConflict && (
+              <p role="alert" className="text-red-text mb-2 text-[12px]">
+                {t("linkConflict")}
+              </p>
+            )}
+            <ConnectGitHubButton />
+          </div>
+        )}
       </div>
 
       <div className="mt-5">
@@ -51,6 +74,13 @@ export function MemberProfile({
           {t("activityTitle")}
         </h3>
         <ContributionGraph calendar={calendar} />
+      </div>
+
+      <div className="mt-5">
+        <h3 className="text-text-2 mb-2 text-[12px] font-semibold tracking-wide uppercase">
+          {t("commitsTitle")}
+        </h3>
+        <CommitList commits={commits} />
       </div>
     </section>
   );
