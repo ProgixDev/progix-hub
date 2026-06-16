@@ -27,16 +27,17 @@ ship → /update-docs                           status: shipped; learnings disti
 
 ## Index
 
-| #                                        | Spec                        | Status    |
-| ---------------------------------------- | --------------------------- | --------- |
-| [001](001-task-list/spec.md)             | Task list demo feature      | abandoned |
-| [002](002-auth-and-projects/spec.md)     | Sign-in & project registry  | shipped   |
-| [003](003-secure-env-vars/spec.md)       | Secure env vars per project | shipped   |
-| [004](004-documents/spec.md)             | Documents per project       | shipped   |
-| [005](005-settings/spec.md)              | Settings — language & theme | shipped   |
-| [006](006-client-portal/spec.md)         | Client portal               | shipped   |
-| [007](007-mobile-responsive-pwa/spec.md) | Mobile responsive + PWA     | shipped   |
-| [008](008-roles-permissions/spec.md)     | Roles & permissions         | shipped   |
-| [009](009-env-import-export/spec.md)     | Env import/export & scope   | active    |
-| [010](010-pm-login-superadmin/spec.md)   | PM login & superadmin       | active    |
-| [011](011-org-members/spec.md)           | Org members, lead & GitHub  | active    |
+| #                                         | Spec                        | Status    |
+| ----------------------------------------- | --------------------------- | --------- |
+| [001](001-task-list/spec.md)              | Task list demo feature      | abandoned |
+| [002](002-auth-and-projects/spec.md)      | Sign-in & project registry  | shipped   |
+| [003](003-secure-env-vars/spec.md)        | Secure env vars per project | shipped   |
+| [004](004-documents/spec.md)              | Documents per project       | shipped   |
+| [005](005-settings/spec.md)               | Settings — language & theme | shipped   |
+| [006](006-client-portal/spec.md)          | Client portal               | shipped   |
+| [007](007-mobile-responsive-pwa/spec.md)  | Mobile responsive + PWA     | shipped   |
+| [008](008-roles-permissions/spec.md)      | Roles & permissions         | shipped   |
+| [009](009-env-import-export/spec.md)      | Env import/export & scope   | active    |
+| [010](010-pm-login-superadmin/spec.md)    | PM login & superadmin       | active    |
+| [011](011-org-members/spec.md)            | Org members, lead & GitHub  | active    |
+| [012](012-github-member-profiles/spec.md) | GitHub profiles & sign-in   | active    |
