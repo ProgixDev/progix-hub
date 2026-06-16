@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import {
-  canManageOrgMembers,
+  canViewOrgMembers,
   fetchOrgContributions,
   getOrgMember,
   MemberProfile,
@@ -23,7 +23,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
-  if (!(await canManageOrgMembers())) redirect("/");
+  if (!(await canViewOrgMembers())) redirect("/");
 
   const member = await getOrgMember(id);
   if (!member) notFound();

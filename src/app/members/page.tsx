@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
-import { canManageOrgMembers, listOrgMembers, MembersDirectory } from "@/features/members";
+import { canViewOrgMembers, listOrgMembers, MembersDirectory } from "@/features/members";
 import { listProjects, type Project } from "@/features/projects";
 import { getCurrentUser } from "@/lib/auth/session";
 
@@ -18,7 +18,7 @@ function toRecent(projects: Project[]): RecentProject[] {
 export default async function MembersPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
-  if (!(await canManageOrgMembers())) redirect("/");
+  if (!(await canViewOrgMembers())) redirect("/");
 
   const [members, projects, t] = await Promise.all([
     listOrgMembers(),
