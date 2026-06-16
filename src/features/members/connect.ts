@@ -25,3 +25,19 @@ export function isIdentityAlreadyLinked(
     msg.includes("identity is already")
   );
 }
+
+type IdentityLike = { provider?: string; identity_data?: Record<string, unknown> | null };
+
+/**
+ * The GitHub username from a user's linked identities (spec 012 AC-1) — GitHub populates
+ * `user_name`/`preferred_username` in the identity data. Returns null when no GitHub identity is
+ * linked, so the callback only stamps a real login.
+ */
+export function githubLoginFromIdentities(
+  identities: IdentityLike[] | null | undefined,
+): string | null {
+  const gh = (identities ?? []).find((i) => i.provider === "github");
+  const data = gh?.identity_data ?? {};
+  const login = data["user_name"] ?? data["preferred_username"];
+  return typeof login === "string" && login.length > 0 ? login : null;
+}

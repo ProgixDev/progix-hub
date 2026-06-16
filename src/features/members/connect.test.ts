@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isIdentityAlreadyLinked, linkCallbackUrl } from "./connect";
+import { githubLoginFromIdentities, isIdentityAlreadyLinked, linkCallbackUrl } from "./connect";
 
 describe("linkCallbackUrl (spec 012 AC-1)", () => {
   it("points GitHub back at the shared callback, tagged as a link flow", () => {
@@ -25,5 +25,29 @@ describe("isIdentityAlreadyLinked (spec 012 AC-7)", () => {
     expect(isIdentityAlreadyLinked({ code: "validation_failed", message: "bad request" })).toBe(
       false,
     );
+  });
+});
+
+describe("githubLoginFromIdentities (spec 012 AC-1)", () => {
+  it("reads the GitHub username from the linked identity", () => {
+    expect(
+      githubLoginFromIdentities([
+        { provider: "email", identity_data: { email: "a@b.c" } },
+        { provider: "github", identity_data: { user_name: "octocat" } },
+      ]),
+    ).toBe("octocat");
+  });
+
+  it("falls back to preferred_username", () => {
+    expect(
+      githubLoginFromIdentities([
+        { provider: "github", identity_data: { preferred_username: "mona" } },
+      ]),
+    ).toBe("mona");
+  });
+
+  it("returns null when no GitHub identity is linked", () => {
+    expect(githubLoginFromIdentities([{ provider: "email", identity_data: {} }])).toBeNull();
+    expect(githubLoginFromIdentities(null)).toBeNull();
   });
 });
