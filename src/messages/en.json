@@ -12,7 +12,8 @@
     "loading": "Loading…",
     "search": "Search…",
     "searchLabel": "Search",
-    "comingSoon": "soon"
+    "comingSoon": "soon",
+    "close": "Close"
   },
   "nav": {
     "projects": "Projects",
@@ -107,7 +108,28 @@
     "errorNoEncryption": "Encryption isn’t configured — contact an admin.",
     "errorUnknownVar": "Unknown variable.",
     "errorNotFound": "That variable could not be found.",
-    "errorDecrypt": "This value can’t be decrypted — the encryption key may have changed."
+    "errorDecrypt": "This value can’t be decrypted — the encryption key may have changed.",
+    "fieldScope": "Scope",
+    "hintScope": "where it’s used — auto-detected, override if needed",
+    "scopeBackend": "Backend",
+    "scopeFrontend": "Frontend",
+    "import": "Import",
+    "importTitle": "Import .env",
+    "importDropzone": "Drop .env files here",
+    "importChoose": "Choose files",
+    "importPaste": "Or paste .env contents",
+    "importEmpty": "Drop a file or paste above to preview variables.",
+    "importColInclude": "Include",
+    "importColKey": "Key",
+    "importExists": "Already exists",
+    "importNoneSelected": "Select at least one variable to import.",
+    "importSubmit": "Import {count}",
+    "importSummary": "Created {created}, skipped {skipped}, failed {failed}.",
+    "export": "Export",
+    "exportAll": "All",
+    "errorImportInvalid": "Couldn’t read those variables — check the format.",
+    "errorExportEmpty": "No variables to export for that scope.",
+    "actionExported": "exported"
   },
   "documents": {
     "title": "Documents",

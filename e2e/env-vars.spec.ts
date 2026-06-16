@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { shot } from "./utils/shot";
 
@@ -88,4 +89,52 @@ test("@cuj CUJ-03: member adds, reveals, copies, edits, and deletes an env var",
   await expect(page.getByText(/deleted/i).first()).toBeVisible();
   await expect(page.getByText(key).first()).toBeVisible();
   await shot(page, "env-audit");
+});
+
+// CUJ-03 (spec 009) — bulk import with auto-scope + grouped list, then export a scoped .env.
+test("@cuj CUJ-03: member imports a .env and exports a scoped .env", async ({ page }) => {
+  const projectName = `E2E Env IO ${Date.now()}`;
+  await page.goto("/");
+  await page.getByRole("main").getByRole("button", { name: "New project" }).first().click();
+  const projectDialog = page.getByRole("dialog", { name: /new project/i });
+  await projectDialog.getByLabel("Name").fill(projectName);
+  await projectDialog.getByRole("button", { name: "Create project" }).click();
+  await page.getByRole("main").getByRole("link", { name: projectName, exact: true }).click();
+  await expect(page.getByRole("heading", { name: projectName })).toBeVisible();
+
+  // Open the import dialog, upload a frontend-hinted file and paste a backend var.
+  await page.getByRole("button", { name: /^Import$/ }).click();
+  const dialog = page.getByRole("dialog", { name: /import \.env/i });
+  await dialog.locator('input[type="file"]').setInputFiles({
+    name: ".env.frontend",
+    mimeType: "text/plain",
+    buffer: Buffer.from("API_BASE=https://api.example.com\n"),
+  });
+  await dialog.getByLabel(/paste/i).fill("DB_SECRET=shh_backend_value");
+
+  // AC-1: scope is auto-detected — the frontend file hints frontend, the pasted var is backend.
+  await expect(dialog.getByLabel("Scope API_BASE")).toHaveValue("frontend");
+  await expect(dialog.getByLabel("Scope DB_SECRET")).toHaveValue("backend");
+  await shot(page, "env-import-preview");
+
+  await dialog.getByRole("button", { name: /^Import/ }).click();
+  await dialog.getByRole("button", { name: /^Close/ }).click();
+
+  // The list now groups under Backend and Frontend headings.
+  await expect(page.getByRole("heading", { name: "Backend" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Frontend" })).toBeVisible();
+  await expect(page.getByText("API_BASE")).toBeVisible();
+  await expect(page.getByText("DB_SECRET")).toBeVisible();
+  await shot(page, "env-import-grouped");
+
+  // AC-4: export the backend scope and assert the downloaded .env contents.
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByText(/^Export$/).click();
+  await page.getByRole("button", { name: "Backend" }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe(".env.backend");
+  const path = await download.path();
+  const contents = readFileSync(path, "utf8");
+  expect(contents).toContain("DB_SECRET=shh_backend_value");
+  expect(contents).not.toContain("API_BASE");
 });

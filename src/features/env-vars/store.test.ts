@@ -7,6 +7,7 @@ const sampleVar: EnvVarMeta = {
   project_id: "22222222-2222-2222-2222-222222222222",
   key: "STRIPE_SECRET_KEY",
   service: "stripe",
+  scope: "backend",
   created_at: "2026-06-09T00:00:00Z",
   updated_at: "2026-06-09T00:00:00Z",
 };
@@ -24,6 +25,15 @@ describe("env-vars store", () => {
     const store = createEnvVarsStore();
     store.getState().openEdit(sampleVar);
     expect(store.getState().modal).toEqual({ mode: "edit", envVar: sampleVar });
+  });
+
+  it("opens and closes the import dialog (spec 009)", () => {
+    const store = createEnvVarsStore();
+    expect(store.getState().importOpen).toBe(false);
+    store.getState().openImport();
+    expect(store.getState().importOpen).toBe(true);
+    store.getState().closeImport();
+    expect(store.getState().importOpen).toBe(false);
   });
 
   it("reveals and hides a value without leaking it across ids", () => {

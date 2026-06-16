@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
+import { Badge } from "@/components/ui/badge";
 import { deleteEnvVarAction, revealEnvVarValueAction } from "../actions";
 import { useEnvVarsStore } from "../provider";
 import type { EnvVarMeta } from "../types";
@@ -59,7 +60,14 @@ export function EnvVarRow({
     <li className="bg-bg-2 border-line-1 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border px-3.5 py-2.5">
       <ServiceLogo service={envVar.service} />
       <div className="min-w-0 flex-1">
-        <p className="text-text font-mono text-[13px] font-medium break-all">{envVar.key}</p>
+        <p className="flex items-center gap-2">
+          <span className="text-text font-mono text-[13px] font-medium break-all">
+            {envVar.key}
+          </span>
+          <Badge tone={envVar.scope === "frontend" ? "blue" : "neutral"} data-scope={envVar.scope}>
+            {envVar.scope === "frontend" ? t("scopeFrontend") : t("scopeBackend")}
+          </Badge>
+        </p>
         <p className="text-text-2 truncate font-mono text-[12px]" aria-label="value">
           {revealed ?? "••••••••••••"}
         </p>

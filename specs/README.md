@@ -37,3 +37,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [006](006-client-portal/spec.md)         | Client portal               | shipped   |
 | [007](007-mobile-responsive-pwa/spec.md) | Mobile responsive + PWA     | shipped   |
 | [008](008-roles-permissions/spec.md)     | Roles & permissions         | shipped   |
+| [009](009-env-import-export/spec.md)     | Env import/export & scope   | active    |

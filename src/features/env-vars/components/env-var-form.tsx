@@ -3,9 +3,9 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { createEnvVarAction, updateEnvVarAction, type ActionResult } from "../actions";
-import { detectService, SERVICES } from "../lib";
+import { detectScope, detectService, SERVICES } from "../lib";
 import { useEnvVarsStore } from "../provider";
-import type { EnvVarMeta } from "../types";
+import { ENV_SCOPES, type EnvScope, type EnvVarMeta } from "../types";
 
 const inputCls =
   "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
@@ -68,10 +68,19 @@ function EnvVarFormModal({
   const [key, setKey] = useState(editing?.key ?? "");
   const [service, setService] = useState<string>(editing?.service ?? "");
   const [serviceTouched, setServiceTouched] = useState(Boolean(editing?.service));
+  const [scope, setScope] = useState<EnvScope>(editing?.scope ?? "backend");
+  const [scopeTouched, setScopeTouched] = useState(Boolean(editing));
 
-  // Auto-detect the service from the key until the user overrides it (AC-1/AC-2).
-  const detected = useMemo(() => detectService(key), [key]);
-  const effectiveService = serviceTouched ? service : (detected ?? "");
+  // Auto-detect the service + scope from the key until the user overrides them (AC-1/AC-2).
+  const detectedService = useMemo(() => detectService(key), [key]);
+  const detectedScope = useMemo(() => detectScope(key), [key]);
+  const effectiveService = serviceTouched ? service : (detectedService ?? "");
+  const effectiveScope = scopeTouched ? scope : detectedScope;
+
+  const scopeLabel: Record<EnvScope, string> = {
+    backend: t("scopeBackend"),
+    frontend: t("scopeFrontend"),
+  };
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
@@ -92,6 +101,7 @@ function EnvVarFormModal({
       key: fd.get("key"),
       value: fd.get("value"),
       service: effectiveService,
+      scope: effectiveScope,
     };
     start(async () => {
       const res: ActionResult = editing
@@ -160,6 +170,24 @@ function EnvVarFormModal({
               className={`${inputCls} font-mono text-[13px]`}
               required={!editing}
             />
+          </Field>
+
+          <Field label={t("fieldScope")} hint={t("hintScope")}>
+            <select
+              value={effectiveScope}
+              onChange={(e) => {
+                setScope(e.target.value as EnvScope);
+                setScopeTouched(true);
+              }}
+              className={inputCls}
+              aria-label={t("fieldScope")}
+            >
+              {ENV_SCOPES.map((s) => (
+                <option key={s} value={s}>
+                  {scopeLabel[s]}
+                </option>
+              ))}
+            </select>
           </Field>
 
           <Field label={t("fieldService")} hint={t("hintLogo")}>

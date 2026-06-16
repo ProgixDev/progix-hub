@@ -3,7 +3,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import { formatDate } from "@/lib/format";
 import { EnvVarsStoreProvider, useEnvVarsStore } from "../provider";
-import type { AuditRow, EnvVarMeta } from "../types";
+import type { AuditRow, EnvScope, EnvVarMeta } from "../types";
+import { EnvExportMenu } from "./env-export-menu";
+import { EnvImportDialog } from "./env-import-dialog";
 import { EnvVarForm } from "./env-var-form";
 import { EnvVarRow } from "./env-var-row";
 
@@ -13,6 +15,7 @@ const ACTION_KEY: Record<AuditRow["action"], string> = {
   delete: "actionDeleted",
   reveal: "actionRevealed",
   copy: "actionCopied",
+  export: "actionExported",
 };
 
 export function EnvVarsSection({
@@ -30,29 +33,69 @@ export function EnvVarsSection({
   return (
     <EnvVarsStoreProvider>
       <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
-        <Header canWrite={canWrite} />
+        <Header canWrite={canWrite} projectId={projectId} />
         {envVars.length === 0 ? (
           <div className="border-line/60 text-text-3 mt-3 rounded-lg border border-dashed px-4 py-10 text-center text-[13px]">
             {t("empty")}
           </div>
         ) : (
-          <ul className="mt-3 space-y-2">
-            {envVars.map((v) => (
-              <EnvVarRow key={v.id} envVar={v} projectId={projectId} canWrite={canWrite} />
-            ))}
-          </ul>
+          <div className="mt-3 space-y-5">
+            <ScopeGroup
+              scope="backend"
+              title={t("scopeBackend")}
+              envVars={envVars}
+              projectId={projectId}
+              canWrite={canWrite}
+            />
+            <ScopeGroup
+              scope="frontend"
+              title={t("scopeFrontend")}
+              envVars={envVars}
+              projectId={projectId}
+              canWrite={canWrite}
+            />
+          </div>
         )}
 
         {audit.length > 0 && <AuditTrail audit={audit} />}
         <EnvVarForm projectId={projectId} />
+        <EnvImportDialog projectId={projectId} existingKeys={envVars.map((v) => v.key)} />
       </section>
     </EnvVarsStoreProvider>
   );
 }
 
-function Header({ canWrite }: { canWrite: boolean }) {
+function ScopeGroup({
+  scope,
+  title,
+  envVars,
+  projectId,
+  canWrite,
+}: {
+  scope: EnvScope;
+  title: string;
+  envVars: EnvVarMeta[];
+  projectId: string;
+  canWrite: boolean;
+}) {
+  const items = envVars.filter((v) => v.scope === scope);
+  if (items.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-text-2 text-[12px] font-semibold tracking-wide uppercase">{title}</h3>
+      <ul className="mt-2 space-y-2">
+        {items.map((v) => (
+          <EnvVarRow key={v.id} envVar={v} projectId={projectId} canWrite={canWrite} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Header({ canWrite, projectId }: { canWrite: boolean; projectId: string }) {
   const t = useTranslations("envVars");
   const openCreate = useEnvVarsStore((s) => s.openCreate);
+  const openImport = useEnvVarsStore((s) => s.openImport);
   const hideAll = useEnvVarsStore((s) => s.hideAll);
   const anyRevealed = useEnvVarsStore((s) => Object.keys(s.revealed).length > 0);
   return (
@@ -72,6 +115,14 @@ function Header({ canWrite }: { canWrite: boolean }) {
               {t("hideAll")}
             </button>
           )}
+          <button
+            type="button"
+            onClick={openImport}
+            className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+          >
+            {t("import")}
+          </button>
+          <EnvExportMenu projectId={projectId} />
           <button
             type="button"
             onClick={openCreate}
