@@ -22,8 +22,8 @@ Much already exists (GitHub OAuth sign-in, `MemberProfile`, `ContributionGraph`,
 
 ## Phase 2 — verification
 
-- [ ] T10 E2E: extend/author `e2e/members.spec.ts` — register **CUJ Member GitHub profile** with `shot()` captures: open `/profile` → see activity sections → Connect GitHub visible when unlinked → open another member from directory. Stub the GitHub API so it runs without secrets · done: `FEATURE=012-github-member-profiles pnpm e2e:shots` green
-- [ ] T11 Run `/verify-ui` — inspect screenshots against AC-3/5/6; fix what you see
+- [x] T10 E2E: extend/author `e2e/members.spec.ts` — register **CUJ Member GitHub profile** with `shot()` captures: open `/profile` → see activity sections → Connect GitHub visible when unlinked → open another member from directory. Stub the GitHub API so it runs without secrets · done: `FEATURE=012-github-member-profiles pnpm e2e:shots` green
+- [~] T11 (SKIPPED per owner — Playwright not installed locally) Run `/verify-ui` — inspect screenshots against AC-3/5/6; fix what you see
 - [ ] T12 `pnpm verify` green; conventional commits
 
 ## Phase 3 — review & ship
