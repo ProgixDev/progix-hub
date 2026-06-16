@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { ClockWidget } from "@/features/time-tracking";
 import {
   canViewOrgMembers,
   fetchOrgCommits,
@@ -40,6 +41,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
       title={member.display_name ?? member.email ?? "Member"}
       recent={toRecent(projects)}
       showMembers
+      clockSlot={<ClockWidget />}
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <MemberProfile

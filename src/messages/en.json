@@ -296,7 +296,8 @@
   "errors": {
     "notAuthorized": "You aren’t authorized to do that.",
     "fixFields": "Please fix the highlighted fields.",
-    "unknownProject": "Unknown project."
+    "unknownProject": "Unknown project.",
+    "tryAgain": "Something went wrong — please try again."
   },
   "team": {
     "title": "Create member account",
@@ -340,5 +341,14 @@
     "connectPrompt": "Link your GitHub to show your activity here.",
     "connectError": "Couldn’t start the GitHub connection — please try again.",
     "linkConflict": "That GitHub account is already linked to another member."
+  },
+  "clock": {
+    "start": "Start working",
+    "pause": "Take a pause",
+    "resume": "Resume",
+    "finish": "Finish",
+    "working": "Working",
+    "paused": "On break",
+    "off": "Off"
   }
 }

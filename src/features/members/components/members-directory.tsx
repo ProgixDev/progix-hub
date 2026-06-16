@@ -13,15 +13,22 @@ const STANDING = {
   member: { key: "standingMember", tone: "neutral" },
 } as const;
 
-/** Org members directory (spec 011). A superadmin can toggle a member's "lead" standing. */
+/** Work status passed in by the page (the members slice can't import the time-tracking feature). */
+export type MemberWorkStatus = { state: "off" | "working" | "paused"; hours: string };
+const DOT = { working: "bg-green", paused: "bg-amber", off: "bg-text-3/40" } as const;
+
+/** Org members directory (spec 011 + 013). Shows each member's live work status; a superadmin can toggle "lead". */
 export function MembersDirectory({
   members,
   canPromote,
+  statuses = {},
 }: {
   members: OrgMember[];
   canPromote: boolean;
+  statuses?: Record<string, MemberWorkStatus>;
 }) {
   const t = useTranslations("members");
+  const tClock = useTranslations("clock");
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -64,9 +71,17 @@ export function MembersDirectory({
                   >
                     {member.display_name ?? member.email}
                   </Link>
-                  {member.email && member.display_name && (
-                    <p className="text-text-3 truncate text-[11.5px]">{member.email}</p>
-                  )}
+                  {(() => {
+                    const s = statuses[member.user_id];
+                    if (!s) return null;
+                    return (
+                      <p className="text-text-3 flex items-center gap-1.5 text-[11.5px]">
+                        <span className={`size-2 rounded-full ${DOT[s.state]}`} aria-hidden />
+                        {tClock(s.state)}
+                        {s.state !== "off" && <span className="font-mono">· {s.hours}</span>}
+                      </p>
+                    );
+                  })()}
                 </div>
                 <div className="flex flex-none items-center gap-2">
                   <Badge tone={STANDING[standing].tone}>{t(STANDING[standing].key)}</Badge>
