@@ -4,6 +4,7 @@ import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import { listProjects, type Project } from "@/features/projects";
 import { SettingsSection } from "@/features/settings";
+import { CreateMemberCard } from "@/features/team";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -32,6 +33,7 @@ export default async function SettingsPage() {
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <SettingsSection />
+      {user.isSuperadmin && <CreateMemberCard />}
     </AppShell>
   );
 }

@@ -33,14 +33,19 @@
     "redirecting": "Redirecting…",
     "account": "Account",
     "signedIn": "Signed in",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "signInEmail": "Sign in with email",
+    "emailSignInError": "That email or password is incorrect."
   },
   "signIn": {
     "title": "Sign in",
     "subtitle": "Internal tool — Progix team only.",
     "limited": "Access is limited to Progix organization members.",
     "accessDenied": "That account isn’t a member of the Progix organization, so it can’t access progixHub.",
-    "somethingWrong": "Something went wrong signing in. Please try again."
+    "somethingWrong": "Something went wrong signing in. Please try again.",
+    "or": "or"
   },
   "appError": {
     "title": "Something went wrong",
@@ -285,5 +290,22 @@
     "notAuthorized": "You aren’t authorized to do that.",
     "fixFields": "Please fix the highlighted fields.",
     "unknownProject": "Unknown project."
+  },
+  "team": {
+    "title": "Create member account",
+    "subtitle": "Add a teammate who can sign in with email and password.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Jordan Lee",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "passwordHint": "at least 10 characters",
+    "submit": "Create account",
+    "success": "Created {email} — they can sign in now.",
+    "errorNameRequired": "Name is required",
+    "errorEmail": "Enter a valid email",
+    "errorPasswordShort": "Use at least 10 characters",
+    "errorPasswordLong": "Use at most 72 characters",
+    "errorDuplicate": "An account with that email already exists.",
+    "errorGeneric": "Couldn’t create the account — please try again."
   }
 }

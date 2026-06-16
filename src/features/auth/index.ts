@@ -4,4 +4,5 @@
 export { signOutAction } from "./actions";
 export { isAllowedMember, fetchOrgMembership, PROGIX_ORG, type OrgMembership } from "./membership";
 export { SignInButton } from "./components/sign-in-button";
+export { EmailSignInForm } from "./components/email-sign-in-form";
 export { UserMenu } from "./components/user-menu";

@@ -38,3 +38,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [007](007-mobile-responsive-pwa/spec.md) | Mobile responsive + PWA     | shipped   |
 | [008](008-roles-permissions/spec.md)     | Roles & permissions         | shipped   |
 | [009](009-env-import-export/spec.md)     | Env import/export & scope   | active    |
+| [010](010-pm-login-superadmin/spec.md)   | PM login & superadmin       | active    |

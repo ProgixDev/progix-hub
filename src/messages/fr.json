@@ -33,14 +33,19 @@
     "redirecting": "Redirection…",
     "account": "Compte",
     "signedIn": "Connecté",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Mot de passe",
+    "signInEmail": "Se connecter par e-mail",
+    "emailSignInError": "Cet e-mail ou ce mot de passe est incorrect."
   },
   "signIn": {
     "title": "Se connecter",
     "subtitle": "Outil interne — réservé à l’équipe Progix.",
     "limited": "L’accès est réservé aux membres de l’organisation Progix.",
     "accessDenied": "Ce compte n’est pas membre de l’organisation Progix ; il ne peut pas accéder à progixHub.",
-    "somethingWrong": "Un problème est survenu lors de la connexion. Veuillez réessayer."
+    "somethingWrong": "Un problème est survenu lors de la connexion. Veuillez réessayer.",
+    "or": "ou"
   },
   "appError": {
     "title": "Une erreur est survenue",
@@ -285,5 +290,22 @@
     "notAuthorized": "Vous n’êtes pas autorisé à effectuer cette action.",
     "fixFields": "Veuillez corriger les champs en surbrillance.",
     "unknownProject": "Projet inconnu."
+  },
+  "team": {
+    "title": "Créer un compte membre",
+    "subtitle": "Ajoutez un coéquipier qui peut se connecter par e-mail et mot de passe.",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Jordan Lee",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Mot de passe",
+    "passwordHint": "au moins 10 caractères",
+    "submit": "Créer le compte",
+    "success": "{email} a été créé — la personne peut se connecter.",
+    "errorNameRequired": "Le nom est requis",
+    "errorEmail": "Saisissez un e-mail valide",
+    "errorPasswordShort": "Utilisez au moins 10 caractères",
+    "errorPasswordLong": "Utilisez au plus 72 caractères",
+    "errorDuplicate": "Un compte avec cet e-mail existe déjà.",
+    "errorGeneric": "Impossible de créer le compte — veuillez réessayer."
   }
 }
