@@ -1,6 +1,6 @@
 # Spec 013 — Work time tracking (clock in / pause / finish)
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** feature
 - **Requested by / owner:** Achref Arabi, founder
 - **Date:** 2026-06-16
