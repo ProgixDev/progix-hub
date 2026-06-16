@@ -17,7 +17,7 @@ export function TopBar({
   const t = useTranslations("topbar");
   const tNav = useTranslations("nav");
   return (
-    <header className="border-line flex h-14 flex-none items-center gap-2 border-b px-3 sm:gap-3 sm:px-5">
+    <header className="border-line flex h-[calc(3.5rem+env(safe-area-inset-top))] flex-none items-center gap-2 border-b px-3 pt-[env(safe-area-inset-top)] sm:gap-3 sm:px-5">
       <button
         type="button"
         onClick={onMenu}

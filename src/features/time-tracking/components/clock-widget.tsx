@@ -70,41 +70,73 @@ export function ClockWidget() {
 
   const working = state === "working";
   return (
-    <div className="border-line-1 bg-bg-2 flex h-9 items-center gap-1 rounded-md border pr-1 pl-2.5">
+    <div className="border-line-1 bg-bg-2 flex h-9 items-center gap-0.5 rounded-md border pr-1 pl-2 sm:gap-1 sm:pl-2.5">
       <span
-        className={`size-2 rounded-full ${working ? "bg-green animate-pulse" : "bg-amber"}`}
+        className={`size-2 flex-none rounded-full ${working ? "bg-green animate-pulse" : "bg-amber"}`}
         aria-hidden
       />
-      <span className="text-text mr-1 font-mono text-[12.5px] tabular-nums" aria-live="off">
+      <span
+        className="text-text mr-0.5 font-mono text-[12px] tabular-nums sm:mr-1 sm:text-[12.5px]"
+        aria-live="off"
+      >
         {elapsed}
       </span>
       {working ? (
         <button
           type="button"
           disabled={pending}
+          aria-label={t("pause")}
           onClick={() => run(pauseWorkAction)}
-          className="text-text-2 hover:bg-bg-3 hover:text-text h-7 rounded px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
+          className="text-text-2 hover:bg-bg-3 hover:text-text flex h-7 items-center gap-1.5 rounded px-1.5 text-[12px] font-medium transition-colors disabled:opacity-60 sm:px-2"
         >
-          {t("pause")}
+          <PauseGlyph />
+          <span className="hidden sm:inline">{t("pause")}</span>
         </button>
       ) : (
         <button
           type="button"
           disabled={pending}
+          aria-label={t("resume")}
           onClick={() => run(resumeWorkAction)}
-          className="text-green hover:bg-bg-3 h-7 rounded px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
+          className="text-green hover:bg-bg-3 flex h-7 items-center gap-1.5 rounded px-1.5 text-[12px] font-medium transition-colors disabled:opacity-60 sm:px-2"
         >
-          {t("resume")}
+          <PlayGlyph />
+          <span className="hidden sm:inline">{t("resume")}</span>
         </button>
       )}
       <button
         type="button"
         disabled={pending}
+        aria-label={t("finish")}
         onClick={() => run(finishWorkAction)}
-        className="text-red-text hover:bg-red-tint h-7 rounded px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
+        className="text-red-text hover:bg-red-tint flex h-7 items-center gap-1.5 rounded px-1.5 text-[12px] font-medium transition-colors disabled:opacity-60 sm:px-2"
       >
-        {t("finish")}
+        <StopGlyph />
+        <span className="hidden sm:inline">{t("finish")}</span>
       </button>
     </div>
+  );
+}
+
+function PauseGlyph() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <rect x="6" y="5" width="4" height="14" rx="1" />
+      <rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  );
+}
+function PlayGlyph() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M7 5l12 7-12 7V5z" />
+    </svg>
+  );
+}
+function StopGlyph() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <rect x="6" y="6" width="12" height="12" rx="1.5" />
+    </svg>
   );
 }
