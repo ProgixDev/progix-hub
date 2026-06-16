@@ -40,4 +40,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [009](009-env-import-export/spec.md)      | Env import/export & scope   | active    |
 | [010](010-pm-login-superadmin/spec.md)    | PM login & superadmin       | active    |
 | [011](011-org-members/spec.md)            | Org members, lead & GitHub  | active    |
-| [012](012-github-member-profiles/spec.md) | GitHub profiles & sign-in   | active    |
+| [012](012-github-member-profiles/spec.md) | GitHub profiles & sign-in   | shipped   |
