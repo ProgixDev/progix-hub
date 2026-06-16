@@ -83,7 +83,9 @@
     "errorUrl": "Enter a valid URL (including https://)",
     "readOnlyNotice": "Read-only access — ask a PM to make changes.",
     "viewGrid": "Grid view",
-    "viewList": "List view"
+    "viewList": "List view",
+    "deleting": "Deleting…",
+    "deleteConfirm": "Permanently delete “{name}” and all its data? This can’t be undone."
   },
   "envVars": {
     "title": "Environment variables",

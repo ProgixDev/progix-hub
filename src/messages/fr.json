@@ -83,7 +83,9 @@
     "errorUrl": "Saisissez une URL valide (avec https://)",
     "readOnlyNotice": "Accès en lecture seule — demandez à un PM d’apporter des modifications.",
     "viewGrid": "Vue grille",
-    "viewList": "Vue liste"
+    "viewList": "Vue liste",
+    "deleting": "Suppression…",
+    "deleteConfirm": "Supprimer définitivement « {name} » et toutes ses données ? Cette action est irréversible."
   },
   "envVars": {
     "title": "Variables d’environnement",
