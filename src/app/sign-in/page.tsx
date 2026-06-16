@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { Wordmark } from "@/components/brand/logo";
-import { SignInButton } from "@/features/auth";
+import { EmailSignInForm, SignInButton } from "@/features/auth";
 import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function SignInPage({
@@ -41,6 +41,14 @@ export default async function SignInPage({
           <div className="mt-5">
             <SignInButton />
           </div>
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="bg-line h-px flex-1" />
+            <span className="text-text-3 text-[12px]">{t("or")}</span>
+            <span className="bg-line h-px flex-1" />
+          </div>
+
+          <EmailSignInForm />
         </div>
         <p className="text-text-3 mt-5 text-center text-[12px]">{t("limited")}</p>
       </div>
