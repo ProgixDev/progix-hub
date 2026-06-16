@@ -16,7 +16,7 @@ Much already exists (GitHub OAuth sign-in, `MemberProfile`, `ContributionGraph`,
 - [x] T4 [P] `members/components/commit-list.tsx`: render commits (repo · message · date · link) + empty/unavailable state · done: renders all states from props
 - [x] T5 `members/components/connect-github-button.tsx` (`"use client"`): calls `supabase.auth.linkIdentity({provider:'github', options:{redirectTo:/auth/callback}})`, loading + error states; shown only when unlinked · done: `connect.test.ts` for the link helper (AC-1)
 - [x] T6 Extend `MemberProfile` to render `CommitList` and (on own profile, when unlinked) `ConnectGitHubButton`; add `members.commits.*` / `connect.*` copy to `en.json` + `fr.json` · done: profile shows commits + connect prompt (AC-3, AC-5)
-- [ ] T7 `app/profile/page.tsx` RSC: require signed-in member (else redirect `/sign-in`); load current member + `fetchOrgContributions` + `fetchOrgCommits`; render `MemberProfile` in own-profile mode · done: `/profile` serves for a member (AC-3)
+- [x] T7 `app/profile/page.tsx` RSC: require signed-in member (else redirect `/sign-in`); load current member + `fetchOrgContributions` + `fetchOrgCommits`; render `MemberProfile` in own-profile mode · done: `/profile` serves for a member (AC-3)
 - [ ] T8 Edit `app/auth/callback/route.ts`: on the link return, stamp `github_login` into user metadata from the linked GitHub identity; map `identity_already_exists` → redirect with a friendly `?error=github_linked`; surface on sign-in/profile · done: callback unit/helper test maps conflict (AC-1, AC-7)
 - [ ] T9 [P] Surface a "GitHub activity" / profile entry: add `/profile` to the user menu (and sidebar if members link present) · done: signed-in user can reach `/profile` from chrome
 

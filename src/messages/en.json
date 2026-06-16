@@ -23,7 +23,8 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "menu": "Menu",
-    "members": "Members"
+    "members": "Members",
+    "profile": "Profile"
   },
   "topbar": {
     "commands": "Commands",
