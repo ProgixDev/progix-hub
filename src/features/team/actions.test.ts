@@ -26,6 +26,7 @@ const superadmin = {
   avatarUrl: null,
   initials: "B",
   isSuperadmin: true,
+  isLead: false,
 };
 const plainMember = { ...superadmin, isSuperadmin: false };
 

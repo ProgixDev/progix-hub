@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Wordmark } from "@/components/brand/logo";
-import { GridIcon, PlusIcon, SearchIcon, SettingsIcon } from "@/components/ui/icons";
+import { GridIcon, PlusIcon, SearchIcon, SettingsIcon, UsersIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 
 export type RecentProject = {
@@ -27,12 +27,21 @@ const navIdle =
   "nav-proj border border-transparent hover:bg-bg-2 text-text-1 hover:text-text transition-colors";
 
 /** The sidebar's inner content — shared by the desktop aside and the mobile drawer. */
-function SidebarNav({ recent, onNavigate }: { recent: RecentProject[]; onNavigate?: () => void }) {
+function SidebarNav({
+  recent,
+  onNavigate,
+  showMembers,
+}: {
+  recent: RecentProject[];
+  onNavigate?: () => void;
+  showMembers?: boolean;
+}) {
   const t = useTranslations("nav");
   const tCommon = useTranslations("common");
   const pathname = usePathname();
   const projectsActive = pathname === "/" || pathname.startsWith("/projects");
   const settingsActive = pathname.startsWith("/settings");
+  const membersActive = pathname.startsWith("/members");
   return (
     <>
       <div className="px-4 pt-4 pb-3">
@@ -70,6 +79,20 @@ function SidebarNav({ recent, onNavigate }: { recent: RecentProject[]; onNavigat
           <GridIcon className="size-[18px]" />
           {t("projects")}
         </Link>
+        {showMembers && (
+          <Link
+            href="/members"
+            onClick={onNavigate}
+            aria-current={membersActive ? "page" : undefined}
+            className={cn(
+              "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+              membersActive ? navActive : navIdle,
+            )}
+          >
+            <UsersIcon className="size-[18px]" />
+            {t("members")}
+          </Link>
+        )}
         <Link
           href="/settings"
           onClick={onNavigate}
@@ -126,10 +149,12 @@ export function Sidebar({
   recent,
   open,
   onClose,
+  showMembers,
 }: {
   recent: RecentProject[];
   open: boolean;
   onClose: () => void;
+  showMembers?: boolean;
 }) {
   const t = useTranslations("nav");
   const panelRef = useRef<HTMLElement>(null);
@@ -181,7 +206,7 @@ export function Sidebar({
     <>
       {/* Desktop — unchanged */}
       <aside className="bg-bg-sidebar border-line hidden h-dvh w-60 flex-none flex-col border-r md:flex">
-        <SidebarNav recent={recent} />
+        <SidebarNav recent={recent} showMembers={showMembers} />
       </aside>
 
       {/* Mobile drawer */}
@@ -221,7 +246,7 @@ export function Sidebar({
               >
                 ×
               </button>
-              <SidebarNav recent={recent} onNavigate={onClose} />
+              <SidebarNav recent={recent} onNavigate={onClose} showMembers={showMembers} />
             </>
           )}
         </aside>

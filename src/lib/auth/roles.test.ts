@@ -39,3 +39,13 @@ describe("capabilities (ADR-0011 matrix)", () => {
     expect(capabilities(null).read).toBe(false);
   });
 });
+
+describe("capabilities — lead (spec 011)", () => {
+  it("lead is read-only: sees projects but writes/manages nothing", () => {
+    const c = capabilities("lead");
+    expect(c.read).toBe(true);
+    expect(
+      c.writeEnvVars || c.writeContent || c.manageProject || c.managePeople || c.seeEnvVars,
+    ).toBe(false);
+  });
+});

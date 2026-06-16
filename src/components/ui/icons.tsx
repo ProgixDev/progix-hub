@@ -49,6 +49,17 @@ export function SettingsIcon(props: IconProps) {
   );
 }
 
+export function UsersIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0" />
+      <path d="M16 5.2a3.2 3.2 0 0 1 0 5.9" />
+      <path d="M17.5 14.3A5.5 5.5 0 0 1 20.5 19" />
+    </svg>
+  );
+}
+
 export function CommandIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

@@ -10,6 +10,7 @@ import {
 } from "@/features/documents";
 import { EnvVarsSection, listEnvVarAudit, listProjectEnvVars } from "@/features/env-vars";
 import { getProjectMembers, PeoplePanel } from "@/features/people";
+import { canManageOrgMembers } from "@/features/members";
 import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { capabilities } from "@/lib/auth/roles";
@@ -42,6 +43,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
   // No effective role (e.g. a removed member) ⇒ no access, even if the row were readable (AC-2).
   if (!project || !role) notFound();
+  const showMembers = await canManageOrgMembers();
 
   const tProjects = await getTranslations("projects");
   // A role that grants no writes anywhere is read-only — say so, so vanished controls read as
@@ -53,6 +55,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     <AppShell
       title={project.name}
       recent={toRecent(projects)}
+      showMembers={showMembers}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectDetail project={project} canManage={can.manageProject} />

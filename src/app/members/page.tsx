@@ -1,11 +1,9 @@
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { canManageOrgMembers, listOrgMembers, MembersDirectory } from "@/features/members";
 import { listProjects, type Project } from "@/features/projects";
-import { canManageOrgMembers } from "@/features/members";
-import { SettingsSection } from "@/features/settings";
-import { CreateMemberCard } from "@/features/team";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -17,26 +15,25 @@ function toRecent(projects: Project[]): RecentProject[] {
   }));
 }
 
-export default async function SettingsPage() {
-  const [user, projects, t] = await Promise.all([
-    getCurrentUser(),
+export default async function MembersPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/sign-in");
+  if (!(await canManageOrgMembers())) redirect("/");
+
+  const [members, projects, t] = await Promise.all([
+    listOrgMembers(),
     listProjects(),
     getTranslations("nav"),
   ]);
 
-  // Defense in depth — the middleware already gates this route to members (AC-7).
-  if (!user) redirect("/sign-in");
-  const showMembers = await canManageOrgMembers();
-
   return (
     <AppShell
-      title={t("settings")}
+      title={t("members")}
       recent={toRecent(projects)}
-      showMembers={showMembers}
+      showMembers
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
-      <SettingsSection />
-      {user.isSuperadmin && <CreateMemberCard />}
+      <MembersDirectory members={members} canPromote={user.isSuperadmin} />
     </AppShell>
   );
 }
