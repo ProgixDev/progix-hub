@@ -1,6 +1,6 @@
 # Spec 014 — Global PM org role
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** feature
 - **Requested by / owner:** Achref Arabi, founder
 - **Date:** 2026-06-16

@@ -352,6 +352,8 @@
     "finish": "Terminer",
     "working": "Au travail",
     "paused": "En pause",
-    "off": "Hors ligne"
+    "off": "Hors ligne",
+    "expand": "Ouvrir le minuteur",
+    "collapse": "Réduire"
   }
 }

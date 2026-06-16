@@ -120,9 +120,11 @@ function DetailInner({ project, canManage }: { project: Project; canManage: bool
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${label} (${t("opensNewTab")})`}
-              className="bg-bg-2 border-line-1 hover:border-line-strong flex items-center gap-3 rounded-lg border px-3.5 py-3 transition-colors"
+              className="bg-bg-2 border-line-1 hover:border-line-strong flex min-w-0 items-center gap-3 rounded-lg border px-3.5 py-3 transition-colors"
             >
-              <Glyph size={22} />
+              <span className="flex-none">
+                <Glyph size={22} />
+              </span>
               <div className="min-w-0">
                 <p className="text-text truncate text-[13px] font-semibold">{label}</p>
                 <p className="text-text-2 truncate font-mono text-[11px]">{url}</p>
@@ -134,9 +136,11 @@ function DetailInner({ project, canManage }: { project: Project; canManage: bool
               type="button"
               onClick={() => openEdit(project)}
               aria-label={t("addLink", { service: label })}
-              className="border-line/60 text-text-3 hover:border-line-blue hover:text-blue-text flex items-center gap-3 rounded-lg border border-dashed px-3.5 py-3 transition-colors"
+              className="border-line/60 text-text-3 hover:border-line-blue hover:text-blue-text flex min-w-0 items-center gap-3 rounded-lg border border-dashed px-3.5 py-3 transition-colors"
             >
-              <Glyph size={22} />
+              <span className="flex-none">
+                <Glyph size={22} />
+              </span>
               <span className="min-w-0 truncate text-[13px] font-medium">
                 {t("addLink", { service: label })}
               </span>
