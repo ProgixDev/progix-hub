@@ -23,7 +23,7 @@ Ordered, checkboxed. Tick on commit. `[P]` = parallel-safe. ≤ ~30 min each.
 
 ## Phase 3 — review & ship
 
-- [ ] T10 `/review` (appsec lens: RLS own-row writes, RPC scoping, no time-gaming) ; fix P0/P1
+- [x] T10 `/review` (appsec lens: RLS own-row writes, RPC scoping, no time-gaming) ; fix P0/P1
 - [x] T11 Daily summary wiring: confirm `pg_cron` (or GitHub Action fallback) schedules `close_stale_work_sessions()`; expose `work_daily_summary` to the daily report · done: job scheduled + documented (AC-6)
 - [ ] T12 Open PR (spec+plan linked); after merge `/update-docs` (CUJ row, spec → shipped); apply migration + deploy `vercel --prod`
 

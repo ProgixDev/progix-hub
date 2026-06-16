@@ -25,7 +25,8 @@ async function runTransition(rpc: Transition): Promise<WorkActionResult> {
 
   const supabase = await createClient();
   const { error } = await supabase.rpc(rpc);
-  if (error) return { ok: false, error: error.message };
+  // Map any DB error to a friendly message — never leak constraint names to the client.
+  if (error) return { ok: false, error: t("errors.tryAgain") };
 
   const session = await getMySession();
   revalidatePath("/", "layout");

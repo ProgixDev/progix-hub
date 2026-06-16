@@ -296,7 +296,8 @@
   "errors": {
     "notAuthorized": "You aren’t authorized to do that.",
     "fixFields": "Please fix the highlighted fields.",
-    "unknownProject": "Unknown project."
+    "unknownProject": "Unknown project.",
+    "tryAgain": "Something went wrong — please try again."
   },
   "team": {
     "title": "Create member account",
