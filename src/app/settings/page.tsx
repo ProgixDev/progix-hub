@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { ClockWidget } from "@/features/time-tracking";
 import { listProjects, type Project } from "@/features/projects";
 import { canViewOrgMembers } from "@/features/members";
 import { SettingsSection } from "@/features/settings";
@@ -33,6 +34,7 @@ export default async function SettingsPage() {
       title={t("settings")}
       recent={toRecent(projects)}
       showMembers={showMembers}
+      clockSlot={<ClockWidget />}
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <SettingsSection />

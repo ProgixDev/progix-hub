@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { ClockWidget } from "@/features/time-tracking";
 import { PortalSection, getPortal } from "@/features/portal";
 import { canViewOrgMembers } from "@/features/members";
 import { getProject, listProjects, type Project } from "@/features/projects";
@@ -37,6 +38,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
       title={`${project.name} · ${t("title")}`}
       recent={toRecent(projects)}
       showMembers={showMembers}
+      clockSlot={<ClockWidget />}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <div className="mx-auto w-full max-w-5xl px-6 pt-6">

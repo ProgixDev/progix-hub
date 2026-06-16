@@ -6,10 +6,12 @@ import { ClockIcon, CommandIcon, GridIcon } from "@/components/ui/icons";
 export function TopBar({
   title,
   userSlot,
+  clockSlot,
   onMenu,
 }: {
   title: string;
   userSlot?: React.ReactNode;
+  clockSlot?: React.ReactNode;
   onMenu: () => void;
 }) {
   const t = useTranslations("topbar");
@@ -35,6 +37,7 @@ export function TopBar({
       <span className="text-text min-w-0 truncate text-[13.5px] font-medium">{title}</span>
 
       <div className="ml-auto flex flex-none items-center gap-2">
+        {clockSlot}
         <button
           type="button"
           className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text hidden h-9 items-center gap-2 rounded-md border px-3 text-[12.5px] font-medium transition-colors sm:flex"

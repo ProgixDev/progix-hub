@@ -4,7 +4,7 @@
 export { listOrgMembers, getOrgMember, canViewOrgMembers } from "./data";
 export { fetchOrgContributions } from "./github";
 export { fetchOrgCommits } from "./commits";
-export { MembersDirectory } from "./components/members-directory";
+export { MembersDirectory, type MemberWorkStatus } from "./components/members-directory";
 export { MemberProfile } from "./components/member-profile";
 export { setMemberLeadAction } from "./actions";
 export { githubLoginFromIdentities, isIdentityAlreadyLinked } from "./connect";

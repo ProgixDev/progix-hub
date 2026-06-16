@@ -340,5 +340,14 @@
     "connectPrompt": "Liez votre GitHub pour afficher votre activité ici.",
     "connectError": "Impossible de démarrer la connexion GitHub — veuillez réessayer.",
     "linkConflict": "Ce compte GitHub est déjà lié à un autre membre."
+  },
+  "clock": {
+    "start": "Commencer",
+    "pause": "Faire une pause",
+    "resume": "Reprendre",
+    "finish": "Terminer",
+    "working": "Au travail",
+    "paused": "En pause",
+    "off": "Hors ligne"
   }
 }

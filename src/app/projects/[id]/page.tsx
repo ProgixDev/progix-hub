@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { ClockWidget } from "@/features/time-tracking";
 import {
   DocumentsSection,
   listArchivedProjectDocuments,
@@ -56,6 +57,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       title={project.name}
       recent={toRecent(projects)}
       showMembers={showMembers}
+      clockSlot={<ClockWidget />}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectDetail project={project} canManage={can.manageProject} />

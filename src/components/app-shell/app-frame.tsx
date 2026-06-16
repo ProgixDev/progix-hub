@@ -9,12 +9,14 @@ export function AppFrame({
   title,
   recent,
   userSlot,
+  clockSlot,
   showMembers,
   children,
 }: {
   title: string;
   recent: RecentProject[];
   userSlot?: React.ReactNode;
+  clockSlot?: React.ReactNode;
   showMembers?: boolean;
   children: React.ReactNode;
 }) {
@@ -28,7 +30,12 @@ export function AppFrame({
         showMembers={showMembers}
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar title={title} userSlot={userSlot} onMenu={() => setNavOpen(true)} />
+        <TopBar
+          title={title}
+          userSlot={userSlot}
+          clockSlot={clockSlot}
+          onMenu={() => setNavOpen(true)}
+        />
         <main className="min-h-0 flex-1 overflow-auto">{children}</main>
       </div>
     </div>

@@ -10,17 +10,25 @@ export function AppShell({
   title,
   recent,
   userSlot,
+  clockSlot,
   showMembers,
   children,
 }: {
   title: string;
   recent: RecentProject[];
   userSlot?: React.ReactNode;
+  clockSlot?: React.ReactNode;
   showMembers?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <AppFrame title={title} recent={recent} userSlot={userSlot} showMembers={showMembers}>
+    <AppFrame
+      title={title}
+      recent={recent}
+      userSlot={userSlot}
+      clockSlot={clockSlot}
+      showMembers={showMembers}
+    >
       {children}
     </AppFrame>
   );
