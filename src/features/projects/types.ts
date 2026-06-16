@@ -5,6 +5,9 @@ export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
 export type StatusFilter = "all" | ProjectStatus;
 
+/** How the portfolio is laid out — cards grid or a compact list. */
+export type ProjectView = "grid" | "list";
+
 /** A project row as stored. */
 export type Project = {
   id: string;

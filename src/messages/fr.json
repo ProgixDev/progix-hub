@@ -81,7 +81,9 @@
     "linkedSurfaces": "Surfaces liées",
     "errorNameRequired": "Le nom est requis",
     "errorUrl": "Saisissez une URL valide (avec https://)",
-    "readOnlyNotice": "Accès en lecture seule — demandez à un PM d’apporter des modifications."
+    "readOnlyNotice": "Accès en lecture seule — demandez à un PM d’apporter des modifications.",
+    "viewGrid": "Vue grille",
+    "viewList": "Vue liste"
   },
   "envVars": {
     "title": "Variables d’environnement",

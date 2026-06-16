@@ -81,7 +81,9 @@
     "linkedSurfaces": "Linked surfaces",
     "errorNameRequired": "Name is required",
     "errorUrl": "Enter a valid URL (including https://)",
-    "readOnlyNotice": "Read-only access — ask a PM to make changes."
+    "readOnlyNotice": "Read-only access — ask a PM to make changes.",
+    "viewGrid": "Grid view",
+    "viewList": "List view"
   },
   "envVars": {
     "title": "Environment variables",

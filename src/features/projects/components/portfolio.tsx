@@ -1,13 +1,14 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { PlusIcon } from "@/components/ui/icons";
+import { GridIcon, PlusIcon, RowsIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import { ProjectsStoreProvider, useProjectsStore } from "../provider";
 import { filterProjects, statusCounts } from "../lib";
-import type { Project, ProjectStatus, StatusFilter } from "../types";
+import type { Project, ProjectStatus, ProjectView, StatusFilter } from "../types";
 import { ProjectCard } from "./project-card";
 import { ProjectForm } from "./project-form";
+import { ProjectRow } from "./project-row";
 
 const FILTER_KEYS: { key: StatusFilter; labelKey: string }[] = [
   { key: "all", labelKey: "filterAll" },
@@ -36,6 +37,8 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
   const t = useTranslations("projects");
   const filter = useProjectsStore((s) => s.filter);
   const setFilter = useProjectsStore((s) => s.setFilter);
+  const view = useProjectsStore((s) => s.view);
+  const setView = useProjectsStore((s) => s.setView);
   const openCreate = useProjectsStore((s) => s.openCreate);
 
   const counts = statusCounts(projects);
@@ -62,42 +65,77 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
       </div>
 
       {!empty && (
-        <div className="mt-6 flex flex-wrap items-center gap-1">
-          {FILTER_KEYS.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              onClick={() => setFilter(f.key)}
-              className={cn(
-                "flex h-9 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium transition-colors",
-                filter === f.key
-                  ? "bg-bg-2 text-text"
-                  : "text-text-2 hover:bg-bg-2 hover:text-text",
-              )}
-            >
-              {t(f.labelKey)}
-              <span className="text-text-3 font-mono text-[11px]">{counts[f.key]}</span>
-            </button>
-          ))}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1">
+            {FILTER_KEYS.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => setFilter(f.key)}
+                className={cn(
+                  "flex h-9 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium transition-colors",
+                  filter === f.key
+                    ? "bg-bg-2 text-text"
+                    : "text-text-2 hover:bg-bg-2 hover:text-text",
+                )}
+              >
+                {t(f.labelKey)}
+                <span className="text-text-3 font-mono text-[11px]">{counts[f.key]}</span>
+              </button>
+            ))}
+          </div>
+          <ViewToggle view={view} onChange={setView} />
         </div>
       )}
 
       {empty ? (
         <EmptyState onCreate={openCreate} />
-      ) : (
+      ) : visible.length === 0 ? (
+        <p className="text-text-2 py-12 text-center text-[13.5px]">
+          {filter === "all"
+            ? t("noProjects")
+            : t("noFilteredProjects", { status: t(STATUS_KEY[filter]).toLowerCase() })}
+        </p>
+      ) : view === "grid" ? (
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((p) => (
             <ProjectCard key={p.id} project={p} />
           ))}
-          {visible.length === 0 && (
-            <p className="text-text-2 col-span-full py-12 text-center text-[13.5px]">
-              {filter === "all"
-                ? t("noProjects")
-                : t("noFilteredProjects", { status: t(STATUS_KEY[filter]).toLowerCase() })}
-            </p>
-          )}
+        </div>
+      ) : (
+        <div className="mt-5 flex flex-col gap-2">
+          {visible.map((p) => (
+            <ProjectRow key={p.id} project={p} />
+          ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
+  const t = useTranslations("projects");
+  const options: { value: ProjectView; labelKey: string; Icon: typeof GridIcon }[] = [
+    { value: "grid", labelKey: "viewGrid", Icon: GridIcon },
+    { value: "list", labelKey: "viewList", Icon: RowsIcon },
+  ];
+  return (
+    <div className="border-line-1 flex items-center gap-0.5 rounded-md border p-0.5" role="group">
+      {options.map(({ value, labelKey, Icon }) => (
+        <button
+          key={value}
+          type="button"
+          onClick={() => onChange(value)}
+          aria-label={t(labelKey)}
+          aria-pressed={view === value}
+          className={cn(
+            "flex size-7 items-center justify-center rounded transition-colors",
+            view === value ? "bg-bg-2 text-text" : "text-text-3 hover:text-text",
+          )}
+        >
+          <Icon className="size-4" />
+        </button>
+      ))}
     </div>
   );
 }
