@@ -6,7 +6,7 @@ Much already exists (GitHub OAuth sign-in, `MemberProfile`, `ContributionGraph`,
 
 ## Phase 0 — setup
 
-- [ ] T0 Branch `feat/012-github-member-profiles` (done). Register `GITHUB_TOKEN` + `GITHUB_ORG_ID` in `src/core/env.ts` schema (optional) and `.env.example` with comments · done: `pnpm typecheck` green, vars documented
+- [x] T0 Branch `feat/012-github-member-profiles` (done). Register `GITHUB_TOKEN` + `GITHUB_ORG_ID` in `src/core/env.ts` schema (optional) and `.env.example` with comments · done: `pnpm typecheck` green, vars documented
 
 ## Phase 1 — core behavior
 

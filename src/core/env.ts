@@ -24,6 +24,15 @@ const serverEnvSchema = z.object({
   // NEVER expose these client-side (no NEXT_PUBLIC_ prefix).
   ENV_VAR_ENCRYPTION_KEYS: z.string().min(1).optional(),
   ENV_VAR_ENCRYPTION_ACTIVE_VERSION: z.string().min(1).optional(),
+  // GitHub member-activity integration (spec 012). A single org-read server token + the org's
+  // GraphQL node id drive the contribution graph and commit list for every member — never a
+  // per-user token (spec 012 token-model decision). Optional at parse so builds/CI stay green
+  // before the secret is provisioned; the activity fetchers fail soft (null/[]) when either is
+  // absent, so the profile shows an "unavailable" state rather than breaking. NEVER expose
+  // client-side (no NEXT_PUBLIC_ prefix). `PROGIX_GITHUB_ORG` (read in features/auth/membership.ts)
+  // names the org for the membership gate.
+  GITHUB_TOKEN: z.string().min(1).optional(),
+  GITHUB_ORG_ID: z.string().min(1).optional(),
 });
 
 export const env = serverEnvSchema.parse(process.env);
