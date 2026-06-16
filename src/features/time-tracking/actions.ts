@@ -32,10 +32,18 @@ async function runTransition(rpc: Transition): Promise<WorkActionResult> {
   return { ok: true, session };
 }
 
-export const startWorkAction = (): Promise<WorkActionResult> => runTransition("work_start");
-export const pauseWorkAction = (): Promise<WorkActionResult> => runTransition("work_pause");
-export const resumeWorkAction = (): Promise<WorkActionResult> => runTransition("work_resume");
-export const finishWorkAction = (): Promise<WorkActionResult> => runTransition("work_finish");
+export async function startWorkAction(): Promise<WorkActionResult> {
+  return runTransition("work_start");
+}
+export async function pauseWorkAction(): Promise<WorkActionResult> {
+  return runTransition("work_pause");
+}
+export async function resumeWorkAction(): Promise<WorkActionResult> {
+  return runTransition("work_resume");
+}
+export async function finishWorkAction(): Promise<WorkActionResult> {
+  return runTransition("work_finish");
+}
 
 /** Load the current member's open session for the header widget's initial render. */
 export async function loadMySessionAction(): Promise<WorkSession | null> {

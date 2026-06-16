@@ -18,8 +18,8 @@ Ordered, checkboxed. Tick on commit. `[P]` = parallel-safe. ≤ ~30 min each.
 
 ## Phase 2 — verification
 
-- [ ] T8 E2E `e2e/time.spec.ts` (CUJ): Start → timer → Pause → Resume → Finish; assert header reflects state · done: spec written (screenshots deferred — Playwright not installed)
-- [ ] T9 `pnpm verify` green; conventional commits
+- [x] T8 E2E `e2e/time.spec.ts` (CUJ): Start → timer → Pause → Resume → Finish; assert header reflects state · done: spec written (screenshots deferred — Playwright not installed)
+- [x] T9 `pnpm verify` green; conventional commits
 
 ## Phase 3 — review & ship
 

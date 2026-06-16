@@ -30,7 +30,7 @@ export default defineConfig({
     // Signed-in journeys reuse the seeded member session.
     {
       name: "member",
-      testMatch: /(home|projects|env-vars|documents|settings|portal|roles|members)\.spec\.ts/,
+      testMatch: /(home|projects|env-vars|documents|settings|portal|roles|members|time)\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], storageState: "e2e/.auth/member.json" },
       dependencies: ["setup"],
     },
