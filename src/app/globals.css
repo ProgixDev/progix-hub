@@ -175,6 +175,23 @@
     border-color: var(--color-border);
     outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
   }
+  /* Keep iOS from auto-inflating text after an orientation change, and stop the
+     focus-zoom on small controls below. */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  /* iOS Safari zooms the viewport when a focused form control has a font-size
+     under 16px — the #1 "feels broken on mobile" cause. Our dense 13–14px text
+     utilities trip it, so force ≥16px on phone-width controls (the !important is
+     needed to beat those utilities). Desktop (≥640px) is untouched. */
+  @media (max-width: 639px) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
