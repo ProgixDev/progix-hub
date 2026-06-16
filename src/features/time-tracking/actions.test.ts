@@ -30,6 +30,7 @@ const member = {
   initials: "D",
   isSuperadmin: false,
   isLead: false,
+  isGlobalPm: false,
 };
 
 function client(rpcResult: { error: unknown }, sessionRow: unknown) {

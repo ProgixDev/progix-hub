@@ -29,6 +29,7 @@ const member = {
   initials: "PM",
   isSuperadmin: false,
   isLead: false,
+  isGlobalPm: false,
 };
 
 /** A supabase stub whose projects.delete()…select() resolves to the given result. */

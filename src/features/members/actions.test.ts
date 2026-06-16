@@ -15,7 +15,7 @@ vi.mock("next-intl/server", () => ({
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { setMemberLeadAction } from "./actions";
+import { setGlobalPmAction, setMemberLeadAction } from "./actions";
 
 const mockGetCurrentUser = vi.mocked(getCurrentUser);
 const mockCreateAdminClient = vi.mocked(createAdminClient);
@@ -28,6 +28,7 @@ const superadmin = {
   initials: "B",
   isSuperadmin: true,
   isLead: false,
+  isGlobalPm: false,
 };
 const targetId = "22222222-2222-4222-8222-222222222222";
 
@@ -85,6 +86,43 @@ describe("setMemberLeadAction (spec 011 AC-2 / AC-5)", () => {
     expect(res.ok).toBe(true);
     expect(updateUser).toHaveBeenCalledWith(targetId, {
       app_metadata: { is_member: true, is_lead: true },
+    });
+  });
+});
+
+describe("setGlobalPmAction (spec 014 AC-2 / AC-4)", () => {
+  it("refuses a non-superadmin before touching the admin client", async () => {
+    mockGetCurrentUser.mockResolvedValue({ ...superadmin, isSuperadmin: false });
+    adminWith(vi.fn());
+    const res = await setGlobalPmAction({ userId: targetId, makeGlobalPm: true });
+    expect(res.ok).toBe(false);
+    expect(mockCreateAdminClient).not.toHaveBeenCalled();
+  });
+
+  it("refuses targeting a superadmin", async () => {
+    mockGetCurrentUser.mockResolvedValue(superadmin);
+    const { updateUser } = adminWith(
+      vi.fn().mockResolvedValue({
+        data: { user: { app_metadata: { is_superadmin: true } } },
+        error: null,
+      }),
+    );
+    const res = await setGlobalPmAction({ userId: targetId, makeGlobalPm: true });
+    expect(res.ok).toBe(false);
+    expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  it("sets is_global_pm on a normal member (happy path)", async () => {
+    mockGetCurrentUser.mockResolvedValue(superadmin);
+    const { updateUser } = adminWith(
+      vi
+        .fn()
+        .mockResolvedValue({ data: { user: { app_metadata: { is_member: true } } }, error: null }),
+    );
+    const res = await setGlobalPmAction({ userId: targetId, makeGlobalPm: true });
+    expect(res.ok).toBe(true);
+    expect(updateUser).toHaveBeenCalledWith(targetId, {
+      app_metadata: { is_member: true, is_global_pm: true },
     });
   });
 });

@@ -12,6 +12,8 @@ export type MemberUser = {
   isSuperadmin: boolean;
   /** Org lead — read-only visibility into every project (spec 011). */
   isLead: boolean;
+  /** Org global PM — PM-level access to every project, incl. future ones (spec 014). */
+  isGlobalPm: boolean;
 };
 
 function initialsFrom(name: string | null, email: string | null): string {
@@ -38,6 +40,7 @@ export async function getCurrentUser(): Promise<MemberUser | null> {
     is_member?: boolean;
     is_superadmin?: boolean;
     is_lead?: boolean;
+    is_global_pm?: boolean;
   };
   if (appMeta.is_member !== true) return null;
 
@@ -58,6 +61,7 @@ export async function getCurrentUser(): Promise<MemberUser | null> {
     initials: initialsFrom(name, email),
     isSuperadmin: appMeta.is_superadmin === true,
     isLead: appMeta.is_lead === true,
+    isGlobalPm: appMeta.is_global_pm === true,
   };
 }
 

@@ -17,6 +17,7 @@ const member = {
   initials: "D",
   isSuperadmin: false,
   isLead: false,
+  isGlobalPm: false,
 };
 
 describe("canViewOrgMembers (spec 012 AC-4)", () => {

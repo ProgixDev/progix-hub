@@ -13,6 +13,7 @@ const base: OrgMember = {
   github_login: "devone",
   is_superadmin: false,
   is_lead: false,
+  is_global_pm: false,
   created_at: "2026-06-01T00:00:00Z",
 };
 const boss: OrgMember = {

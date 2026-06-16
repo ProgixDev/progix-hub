@@ -4,11 +4,12 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
-import { setMemberLeadAction } from "../actions";
+import { setGlobalPmAction, setMemberLeadAction } from "../actions";
 import { type OrgMember, standingOf } from "../types";
 
 const STANDING = {
   superadmin: { key: "standingSuperadmin", tone: "blue" },
+  global_pm: { key: "standingGlobalPm", tone: "green" },
   lead: { key: "standingLead", tone: "amber" },
   member: { key: "standingMember", tone: "neutral" },
 } as const;
@@ -36,6 +37,17 @@ export function MembersDirectory({
     setError(null);
     start(async () => {
       const res = await setMemberLeadAction({ userId: member.user_id, makeLead: !member.is_lead });
+      if (!res.ok) setError(res.error);
+    });
+  }
+
+  function toggleGlobalPm(member: OrgMember) {
+    setError(null);
+    start(async () => {
+      const res = await setGlobalPmAction({
+        userId: member.user_id,
+        makeGlobalPm: !member.is_global_pm,
+      });
       if (!res.ok) setError(res.error);
     });
   }
@@ -83,17 +95,27 @@ export function MembersDirectory({
                     );
                   })()}
                 </div>
-                <div className="flex flex-none items-center gap-2">
+                <div className="flex flex-none flex-wrap items-center justify-end gap-2">
                   <Badge tone={STANDING[standing].tone}>{t(STANDING[standing].key)}</Badge>
                   {canPromote && !member.is_superadmin && (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() => toggleLead(member)}
-                      className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
-                    >
-                      {member.is_lead ? t("removeLead") : t("makeLead")}
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() => toggleGlobalPm(member)}
+                        className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                      >
+                        {member.is_global_pm ? t("removeGlobalPm") : t("makeGlobalPm")}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() => toggleLead(member)}
+                        className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                      >
+                        {member.is_lead ? t("removeLead") : t("makeLead")}
+                      </button>
+                    </>
                   )}
                 </div>
               </li>

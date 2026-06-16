@@ -27,6 +27,7 @@ const superadmin = {
   initials: "B",
   isSuperadmin: true,
   isLead: false,
+  isGlobalPm: false,
 };
 const plainMember = { ...superadmin, isSuperadmin: false };
 
