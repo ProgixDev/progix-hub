@@ -1,7 +1,7 @@
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import { ProjectsPortfolio, listProjects, type Project } from "@/features/projects";
-import { canManageOrgMembers } from "@/features/members";
+import { canViewOrgMembers } from "@/features/members";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -15,7 +15,7 @@ function toRecent(projects: Project[]): RecentProject[] {
 
 export default async function Home() {
   const [user, projects] = await Promise.all([getCurrentUser(), listProjects()]);
-  const showMembers = await canManageOrgMembers();
+  const showMembers = await canViewOrgMembers();
 
   return (
     <AppShell

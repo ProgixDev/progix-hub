@@ -83,7 +83,7 @@ export async function updateProjectAction(id: string, input: unknown): Promise<A
   return { ok: true };
 }
 
-/** Archive a project (AC-5) — reversible; there is no hard delete. */
+/** Archive a project (AC-5) — reversible. Prefer this; the hard delete below is irreversible. */
 export async function archiveProjectAction(id: string): Promise<ActionResult> {
   const t = await getTranslations();
   const member = await requireMember();
@@ -97,5 +97,26 @@ export async function archiveProjectAction(id: string): Promise<ActionResult> {
 
   revalidatePath("/");
   revalidatePath(`/projects/${id}`);
+  return { ok: true };
+}
+
+/**
+ * Permanently delete a project and all its data (env vars, documents, portal, members cascade).
+ * Irreversible. Authorized to the project's PM / superadmins; RLS (migration 0013) is the backstop,
+ * so a non-PM delete affects no rows — we detect that and report it rather than pretend success.
+ */
+export async function deleteProjectAction(id: string): Promise<ActionResult> {
+  const t = await getTranslations();
+  const member = await requireMember();
+  if (!member) return { ok: false, error: t("errors.notAuthorized") };
+
+  if (!z.uuid().safeParse(id).success) return { ok: false, error: t("errors.unknownProject") };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("projects").delete().eq("id", id).select("id");
+  if (error) return { ok: false, error: error.message };
+  if (!data || data.length === 0) return { ok: false, error: t("errors.notAuthorized") };
+
+  revalidatePath("/");
   return { ok: true };
 }

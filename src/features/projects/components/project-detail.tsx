@@ -2,9 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { StatusBadge, type BadgeProps } from "@/components/ui/badge";
-import { archiveProjectAction } from "../actions";
+import { TrashIcon } from "@/components/ui/icons";
+import { archiveProjectAction, deleteProjectAction } from "../actions";
 import { ProjectsStoreProvider, useProjectsStore } from "../provider";
 import type { Project, ProjectStatus } from "../types";
 import { projectSurfaces } from "./project-card";
@@ -40,8 +42,19 @@ export function ProjectDetail({
 function DetailInner({ project, canManage }: { project: Project; canManage: boolean }) {
   const t = useTranslations("projects");
   const tCommon = useTranslations("common");
+  const router = useRouter();
   const openEdit = useProjectsStore((s) => s.openEdit);
   const [pending, start] = useTransition();
+  const [deleting, startDelete] = useTransition();
+
+  function onDelete() {
+    if (!window.confirm(t("deleteConfirm", { name: project.name }))) return;
+    startDelete(() =>
+      deleteProjectAction(project.id).then((res) => {
+        if (res.ok) router.push("/");
+      }),
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
@@ -85,6 +98,15 @@ function DetailInner({ project, canManage }: { project: Project; canManage: bool
                 {pending ? t("archiving") : t("archive")}
               </button>
             )}
+            <button
+              type="button"
+              disabled={deleting}
+              onClick={onDelete}
+              className="border-line-1 text-red-text hover:bg-red-tint flex h-9 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+            >
+              <TrashIcon className="size-4" />
+              {deleting ? t("deleting") : tCommon("delete")}
+            </button>
           </div>
         )}
       </div>

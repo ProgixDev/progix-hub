@@ -21,3 +21,12 @@ export function standingOf(member: Pick<OrgMember, "is_superadmin" | "is_lead">)
 export type ContributionLevel = 0 | 1 | 2 | 3 | 4;
 export type ContributionDay = { date: string; count: number; level: ContributionLevel };
 export type ContributionCalendar = { total: number; weeks: ContributionDay[][] };
+
+/** One commit a member authored in an org repo (spec 012 AC-5). `message` is the subject line. */
+export type OrgCommit = {
+  sha: string;
+  message: string;
+  repo: string;
+  url: string;
+  date: string;
+};

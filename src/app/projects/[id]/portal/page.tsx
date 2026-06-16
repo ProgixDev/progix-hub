@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import { PortalSection, getPortal } from "@/features/portal";
-import { canManageOrgMembers } from "@/features/members";
+import { canViewOrgMembers } from "@/features/members";
 import { getProject, listProjects, type Project } from "@/features/projects";
 import { capabilities } from "@/lib/auth/roles";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
@@ -29,7 +29,7 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
     getTranslations("portal"),
   ]);
   if (!project) notFound();
-  const showMembers = await canManageOrgMembers();
+  const showMembers = await canViewOrgMembers();
   const canWrite = capabilities(role).writeContent;
 
   return (

@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import { listProjects, type Project } from "@/features/projects";
-import { canManageOrgMembers } from "@/features/members";
+import { canViewOrgMembers } from "@/features/members";
 import { SettingsSection } from "@/features/settings";
 import { CreateMemberCard } from "@/features/team";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -26,7 +26,7 @@ export default async function SettingsPage() {
 
   // Defense in depth — the middleware already gates this route to members (AC-7).
   if (!user) redirect("/sign-in");
-  const showMembers = await canManageOrgMembers();
+  const showMembers = await canViewOrgMembers();
 
   return (
     <AppShell

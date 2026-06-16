@@ -2,7 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import {
-  canManageOrgMembers,
+  canViewOrgMembers,
+  fetchOrgCommits,
   fetchOrgContributions,
   getOrgMember,
   MemberProfile,
@@ -23,13 +24,14 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
-  if (!(await canManageOrgMembers())) redirect("/");
+  if (!(await canViewOrgMembers())) redirect("/");
 
   const member = await getOrgMember(id);
   if (!member) notFound();
 
-  const [calendar, projects] = await Promise.all([
+  const [calendar, commits, projects] = await Promise.all([
     fetchOrgContributions(member.github_login),
+    fetchOrgCommits(member.github_login),
     listProjects(),
   ]);
 
@@ -40,7 +42,12 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
       showMembers
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
-      <MemberProfile member={member} calendar={calendar} />
+      <MemberProfile
+        member={member}
+        calendar={calendar}
+        commits={commits}
+        isOwnProfile={member.user_id === user.id}
+      />
     </AppShell>
   );
 }

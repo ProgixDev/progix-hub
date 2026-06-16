@@ -17,16 +17,12 @@ export async function getOrgMember(userId: string): Promise<OrgMember | null> {
   return members.find((m) => m.user_id === userId) ?? null;
 }
 
-/** Whether the current user may see the Members area: a superadmin, a lead, or a PM (AC-1). */
-export async function canManageOrgMembers(): Promise<boolean> {
-  const user = await getCurrentUser();
-  if (!user) return false;
-  if (user.isSuperadmin || user.isLead) return true;
-  const supabase = await createClient();
-  const { count } = await supabase
-    .from("project_members")
-    .select("project_id", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("role", "pm");
-  return (count ?? 0) > 0;
+/**
+ * Whether the current viewer may see the Members area (spec 012 AC-4): any signed-in org member.
+ * `getCurrentUser()` already returns null for signed-out or non-member sessions, so membership is
+ * the whole check. Promoting a member to lead stays superadmin-only (enforced in the directory +
+ * the set-lead action), independent of viewing.
+ */
+export async function canViewOrgMembers(): Promise<boolean> {
+  return (await getCurrentUser()) !== null;
 }

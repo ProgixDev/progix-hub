@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useState } from "react";
 import { signOutAction } from "../actions";
 
@@ -43,6 +44,13 @@ export function UserMenu({
               {email && <p className="text-text-2 truncate text-[12px]">{email}</p>}
             </div>
             <div className="bg-line my-1 h-px" />
+            <Link
+              href="/profile"
+              onClick={() => setOpen(false)}
+              className="text-text-1 hover:bg-bg-3 hover:text-text flex h-9 w-full items-center rounded-md px-2.5 text-[13px] transition-colors"
+            >
+              {t("profile")}
+            </Link>
             <form action={signOutAction}>
               <button
                 type="submit"

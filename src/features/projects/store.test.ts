@@ -20,10 +20,19 @@ function project(overrides: Partial<Project>): Project {
 }
 
 describe("projects store", () => {
-  it("defaults to the all filter, modal closed", () => {
+  it("defaults to the all filter, grid view, modal closed", () => {
     const s = createProjectsStore().getState();
     expect(s.filter).toBe("all");
+    expect(s.view).toBe("grid");
     expect(s.modal.mode).toBe("closed");
+  });
+
+  it("switches the layout view", () => {
+    const store = createProjectsStore();
+    store.getState().setView("list");
+    expect(store.getState().view).toBe("list");
+    store.getState().setView("grid");
+    expect(store.getState().view).toBe("grid");
   });
 
   it("opens create and edit modals and closes them", () => {

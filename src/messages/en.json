@@ -23,7 +23,8 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "menu": "Menu",
-    "members": "Members"
+    "members": "Members",
+    "profile": "Profile"
   },
   "topbar": {
     "commands": "Commands",
@@ -38,7 +39,8 @@
     "emailLabel": "Email",
     "passwordLabel": "Password",
     "signInEmail": "Sign in with email",
-    "emailSignInError": "That email or password is incorrect."
+    "emailSignInError": "That email or password is incorrect.",
+    "profile": "Profile"
   },
   "signIn": {
     "title": "Sign in",
@@ -79,7 +81,11 @@
     "linkedSurfaces": "Linked surfaces",
     "errorNameRequired": "Name is required",
     "errorUrl": "Enter a valid URL (including https://)",
-    "readOnlyNotice": "Read-only access — ask a PM to make changes."
+    "readOnlyNotice": "Read-only access — ask a PM to make changes.",
+    "viewGrid": "Grid view",
+    "viewList": "List view",
+    "deleting": "Deleting…",
+    "deleteConfirm": "Permanently delete “{name}” and all its data? This can’t be undone."
   },
   "envVars": {
     "title": "Environment variables",
@@ -326,6 +332,13 @@
     "contributionsTotal": "{count} contributions in the org this year",
     "errorSelf": "You can’t change your own role.",
     "errorSuperadmin": "Superadmins are above org roles and can’t be changed here.",
-    "errorGeneric": "Something went wrong — please try again."
+    "errorGeneric": "Something went wrong — please try again.",
+    "commitsTitle": "Recent commits",
+    "commitsUnavailable": "No recent commits to show.",
+    "connectGithub": "Connect GitHub",
+    "connecting": "Connecting…",
+    "connectPrompt": "Link your GitHub to show your activity here.",
+    "connectError": "Couldn’t start the GitHub connection — please try again.",
+    "linkConflict": "That GitHub account is already linked to another member."
   }
 }
