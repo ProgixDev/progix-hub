@@ -218,7 +218,8 @@ describe("exportEnvFileAction (spec 009 AC-4, AC-6)", () => {
     expect(res.ok).toBe(true);
     if (res.ok) {
       expect(res.filename).toBe(".env");
-      expect(res.content).toContain("SECRET=plain(cipher:a)");
+      // the decrypted value contains parens, so the serializer quotes it (AC-4)
+      expect(res.content).toContain('SECRET="plain(cipher:a)"');
       expect(res.content).toContain("# Frontend");
     }
     // every value was decrypted through the audited 'export' intent
