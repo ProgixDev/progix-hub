@@ -22,7 +22,8 @@
     "newProject": "New project",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "menu": "Menu"
+    "menu": "Menu",
+    "members": "Members"
   },
   "topbar": {
     "commands": "Commands",
@@ -307,5 +308,24 @@
     "errorPasswordLong": "Use at most 72 characters",
     "errorDuplicate": "An account with that email already exists.",
     "errorGeneric": "Couldn’t create the account — please try again."
+  },
+  "members": {
+    "title": "Members",
+    "subtitle": "Everyone in the Progix org and what they can do.",
+    "empty": "No members yet.",
+    "standingSuperadmin": "Superadmin",
+    "standingLead": "Lead",
+    "standingMember": "Member",
+    "makeLead": "Make lead",
+    "removeLead": "Remove lead",
+    "back": "Back to members",
+    "githubLabel": "GitHub",
+    "noGithub": "No GitHub linked",
+    "activityTitle": "GitHub activity",
+    "activityUnavailable": "GitHub activity isn’t available for this member yet.",
+    "contributionsTotal": "{count} contributions in the org this year",
+    "errorSelf": "You can’t change your own role.",
+    "errorSuperadmin": "Superadmins are above org roles and can’t be changed here.",
+    "errorGeneric": "Something went wrong — please try again."
   }
 }

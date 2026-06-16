@@ -22,7 +22,8 @@
     "newProject": "Nouveau projet",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
-    "menu": "Menu"
+    "menu": "Menu",
+    "members": "Membres"
   },
   "topbar": {
     "commands": "Commandes",
@@ -307,5 +308,24 @@
     "errorPasswordLong": "Utilisez au plus 72 caractères",
     "errorDuplicate": "Un compte avec cet e-mail existe déjà.",
     "errorGeneric": "Impossible de créer le compte — veuillez réessayer."
+  },
+  "members": {
+    "title": "Membres",
+    "subtitle": "Toute l’équipe Progix et ce que chacun peut faire.",
+    "empty": "Aucun membre pour l’instant.",
+    "standingSuperadmin": "Superadmin",
+    "standingLead": "Lead",
+    "standingMember": "Membre",
+    "makeLead": "Promouvoir lead",
+    "removeLead": "Retirer le rôle lead",
+    "back": "Retour aux membres",
+    "githubLabel": "GitHub",
+    "noGithub": "Aucun GitHub lié",
+    "activityTitle": "Activité GitHub",
+    "activityUnavailable": "L’activité GitHub n’est pas encore disponible pour ce membre.",
+    "contributionsTotal": "{count} contributions dans l’org cette année",
+    "errorSelf": "Vous ne pouvez pas modifier votre propre rôle.",
+    "errorSuperadmin": "Les superadmins sont au-dessus des rôles d’org et ne peuvent pas être modifiés ici.",
+    "errorGeneric": "Une erreur s’est produite — veuillez réessayer."
   }
 }

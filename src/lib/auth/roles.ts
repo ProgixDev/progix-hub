@@ -2,7 +2,7 @@
 // enforces the same matrix. Server-side role resolution lives in `session.ts` (server-only).
 export const PROJECT_ROLES = ["pm", "developer", "video_editor", "viewer"] as const;
 export type ProjectRole = (typeof PROJECT_ROLES)[number];
-export type EffectiveRole = "superadmin" | ProjectRole;
+export type EffectiveRole = "superadmin" | "lead" | ProjectRole;
 
 /** What a role may do on a project (spec 008 / ADR-0011 capability matrix). The DB enforces
  * the same matrix; these flags only let the UI hide what a role can't do. */
@@ -36,6 +36,9 @@ export function capabilities(role: EffectiveRole | null): Capabilities {
         writeEnvVars: true,
         writeContent: true,
       };
+    case "lead":
+      // Org-wide reader: sees every project, but changes nothing (managed at org level).
+      return { ...NONE, read: true };
     case "developer":
       return { ...NONE, read: true, seeEnvVars: true, writeEnvVars: true, writeContent: true };
     case "video_editor":

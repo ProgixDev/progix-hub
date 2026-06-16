@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import { PortalSection, getPortal } from "@/features/portal";
+import { canManageOrgMembers } from "@/features/members";
 import { getProject, listProjects, type Project } from "@/features/projects";
 import { capabilities } from "@/lib/auth/roles";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
@@ -28,12 +29,14 @@ export default async function ProjectPortalPage({ params }: { params: Promise<{ 
     getTranslations("portal"),
   ]);
   if (!project) notFound();
+  const showMembers = await canManageOrgMembers();
   const canWrite = capabilities(role).writeContent;
 
   return (
     <AppShell
       title={`${project.name} · ${t("title")}`}
       recent={toRecent(projects)}
+      showMembers={showMembers}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <div className="mx-auto w-full max-w-5xl px-6 pt-6">

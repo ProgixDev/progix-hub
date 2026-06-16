@@ -10,6 +10,8 @@ export type MemberUser = {
   initials: string;
   /** Org owner — full access to every project, bypasses per-project roles (spec 008). */
   isSuperadmin: boolean;
+  /** Org lead — read-only visibility into every project (spec 011). */
+  isLead: boolean;
 };
 
 function initialsFrom(name: string | null, email: string | null): string {
@@ -32,7 +34,11 @@ export async function getCurrentUser(): Promise<MemberUser | null> {
   const claims = data?.claims;
   if (error || !claims) return null;
 
-  const appMeta = (claims.app_metadata ?? {}) as { is_member?: boolean; is_superadmin?: boolean };
+  const appMeta = (claims.app_metadata ?? {}) as {
+    is_member?: boolean;
+    is_superadmin?: boolean;
+    is_lead?: boolean;
+  };
   if (appMeta.is_member !== true) return null;
 
   const userMeta = (claims.user_metadata ?? {}) as {
@@ -51,6 +57,7 @@ export async function getCurrentUser(): Promise<MemberUser | null> {
     avatarUrl: userMeta.avatar_url ?? null,
     initials: initialsFrom(name, email),
     isSuperadmin: appMeta.is_superadmin === true,
+    isLead: appMeta.is_lead === true,
   };
 }
 

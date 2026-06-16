@@ -9,17 +9,24 @@ export function AppFrame({
   title,
   recent,
   userSlot,
+  showMembers,
   children,
 }: {
   title: string;
   recent: RecentProject[];
   userSlot?: React.ReactNode;
+  showMembers?: boolean;
   children: React.ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
   return (
     <div className="bg-bg flex h-dvh overflow-hidden">
-      <Sidebar recent={recent} open={navOpen} onClose={() => setNavOpen(false)} />
+      <Sidebar
+        recent={recent}
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+        showMembers={showMembers}
+      />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar title={title} userSlot={userSlot} onMenu={() => setNavOpen(true)} />
         <main className="min-h-0 flex-1 overflow-auto">{children}</main>

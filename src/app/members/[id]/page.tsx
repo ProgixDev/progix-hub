@@ -1,11 +1,13 @@
-import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { notFound, redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import {
+  canManageOrgMembers,
+  fetchOrgContributions,
+  getOrgMember,
+  MemberProfile,
+} from "@/features/members";
 import { listProjects, type Project } from "@/features/projects";
-import { canManageOrgMembers } from "@/features/members";
-import { SettingsSection } from "@/features/settings";
-import { CreateMemberCard } from "@/features/team";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -17,26 +19,28 @@ function toRecent(projects: Project[]): RecentProject[] {
   }));
 }
 
-export default async function SettingsPage() {
-  const [user, projects, t] = await Promise.all([
-    getCurrentUser(),
-    listProjects(),
-    getTranslations("nav"),
-  ]);
-
-  // Defense in depth — the middleware already gates this route to members (AC-7).
+export default async function MemberPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
-  const showMembers = await canManageOrgMembers();
+  if (!(await canManageOrgMembers())) redirect("/");
+
+  const member = await getOrgMember(id);
+  if (!member) notFound();
+
+  const [calendar, projects] = await Promise.all([
+    fetchOrgContributions(member.github_login),
+    listProjects(),
+  ]);
 
   return (
     <AppShell
-      title={t("settings")}
+      title={member.display_name ?? member.email ?? "Member"}
       recent={toRecent(projects)}
-      showMembers={showMembers}
+      showMembers
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
-      <SettingsSection />
-      {user.isSuperadmin && <CreateMemberCard />}
+      <MemberProfile member={member} calendar={calendar} />
     </AppShell>
   );
 }

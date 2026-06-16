@@ -39,3 +39,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [008](008-roles-permissions/spec.md)     | Roles & permissions         | shipped   |
 | [009](009-env-import-export/spec.md)     | Env import/export & scope   | active    |
 | [010](010-pm-login-superadmin/spec.md)   | PM login & superadmin       | active    |
+| [011](011-org-members/spec.md)           | Org members, lead & GitHub  | active    |
