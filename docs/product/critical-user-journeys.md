@@ -27,3 +27,4 @@ Adding or changing a CUJ is a product decision — PR must be approved by the pr
 - Each step in a journey asserts something the _user_ can see (text, role, state) — not implementation details.
 - Screenshot names are stable (`<cuj>-<step>`), so reports and reviews can diff them release over release.
 - When a CUJ changes intentionally, update the spec, this table, and the screenshots in the same PR — `/update-docs` walks you through it.
+  | CUJ-13 | Post a daily report | A member clicks Daily report in the top bar → picks a project → writes or loads a `.md` update → posts it; the project page lists the report rendered as formatted markdown, team-only | _manual (e2e follow-up)_ | `reports-*` |

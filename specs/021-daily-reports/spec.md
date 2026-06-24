@@ -1,6 +1,6 @@
 # Spec 021 — Daily reports
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** feature
 - **Owner:** Achref Arabi, founder · **Date:** 2026-06-24
 - **Slice:** new `src/features/reports`; a top-bar trigger slot; a reports section on the project page; migration (`project_reports`). Reads `listProjects`.
