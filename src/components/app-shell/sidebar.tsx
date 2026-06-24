@@ -136,7 +136,7 @@ function SidebarNav({
               <Link
                 href={`/projects/${p.id}`}
                 onClick={onNavigate}
-                className="nav-proj hover:bg-bg-2 text-text-1 hover:text-text flex h-9 items-center gap-2.5 rounded-md px-3 text-[13px] transition-colors"
+                className="nav-proj hover:bg-bg-2 text-text-1 hover:text-text flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13px] transition-colors"
               >
                 <span className="bg-bg-3 border-line-1 text-text-2 flex size-5 flex-none items-center justify-center rounded-[5px] border font-mono text-[9px] font-medium">
                   {p.initials}
@@ -263,7 +263,7 @@ export function Sidebar({
                 type="button"
                 onClick={onClose}
                 aria-label={t("closeMenu")}
-                className="text-text-2 hover:bg-bg-3 hover:text-text absolute top-2.5 right-2.5 z-10 flex size-9 items-center justify-center rounded-md text-[20px] leading-none transition-colors"
+                className="text-text-2 hover:bg-bg-3 hover:text-text absolute top-2.5 right-2.5 z-10 flex size-9 items-center justify-center rounded-full text-[20px] leading-none transition-colors"
               >
                 ×
               </button>

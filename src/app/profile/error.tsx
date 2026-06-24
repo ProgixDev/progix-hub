@@ -18,7 +18,7 @@ export default function Error({
       <button
         type="button"
         onClick={reset}
-        className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors"
+        className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all"
       >
         {t("tryAgain")}
       </button>

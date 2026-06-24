@@ -22,7 +22,7 @@ export function TopBar({
         type="button"
         onClick={onMenu}
         aria-label={tNav("openMenu")}
-        className="text-text-2 hover:bg-bg-3 hover:text-text -ml-1 flex size-10 flex-none items-center justify-center rounded-md transition-colors md:hidden"
+        className="text-text-2 hover:bg-bg-3 hover:text-text -ml-1 flex size-10 flex-none items-center justify-center rounded-full transition-colors md:hidden"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
