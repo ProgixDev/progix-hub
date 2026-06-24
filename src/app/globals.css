@@ -1,49 +1,55 @@
 @import "tailwindcss";
 
 /*
- * progixHub design system — dark developer-tool aesthetic (Progix blue on deep navy).
- * Ported from the approved Claude Design (docs/design/mockups/progixhub/styles.css).
- * Tailwind v4 CSS-first config (docs/conventions/styling.md).
+ * progixHub design system — "deep-space fintech" (Progix blue on layered near-black with
+ * atmospheric depth, glass surfaces, glow accents, pill controls). Dark is the default.
  *
  * Two token layers:
- *  1. Raw progix tokens (--bg, --blue, …) — the source palette, also surfaced as
- *     Tailwind colors via @theme (e.g. `bg-bg-2`, `text-text-1`, `border-line`).
- *  2. shadcn-compatible semantic tokens (--background, --primary, …) mapped onto the
- *     palette so `components/ui` adopts the theme and `shadcn add` keeps working.
- * Dark is the default (tokens on :root); the light theme overrides the raw tokens under
- * :root[data-theme="light"] and the semantic tokens follow (spec 005 / ADR-0009).
+ *  1. Raw progix tokens (--bg, --blue, …) — the source palette, surfaced as Tailwind colors
+ *     via @theme (e.g. `bg-bg-2`, `text-text-1`, `border-line`).
+ *  2. shadcn-compatible semantic tokens (--background, --primary, …) mapped onto the palette.
+ * The light theme overrides the raw tokens under :root[data-theme="light"]; semantics follow.
  */
 
 :root {
-  /* Surfaces */
-  --bg: #0a0d16;
-  --bg-1: #0f1320;
-  --bg-2: #151b2b;
-  --bg-3: #1c2334;
-  --bg-inset: #07090f;
-  --bg-sidebar: #0b0e18;
+  /* Surfaces — layered near-black with a faint blue undertone */
+  --bg: #070a13;
+  --bg-1: #0c111d;
+  --bg-2: #121829;
+  --bg-3: #1a2236;
+  --bg-inset: #05070e;
+  --bg-sidebar: #080b15;
+
+  /* Glass — translucent surfaces over the atmosphere (theme-aware) */
+  --glass-bg: rgba(16, 22, 39, 0.62);
+  --glass-bg-strong: rgba(18, 25, 44, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
 
   /* Borders */
   --line: rgba(255, 255, 255, 0.07);
   --line-1: rgba(255, 255, 255, 0.11);
   --line-strong: rgba(255, 255, 255, 0.16);
-  --line-blue: rgba(76, 130, 251, 0.4);
+  --line-blue: rgba(76, 130, 251, 0.42);
 
   /* Text */
-  --text: #e8ecf6;
+  --text: #eaeef8;
   --text-1: #b4bcce;
   --text-2: #79839a;
   --text-3: #515b73;
 
-  /* Progix blue */
+  /* Progix blue — same hue, richer, with glow + gradient */
   --blue: #4c82fb;
+  --blue-bright: #5e93ff;
   --blue-hover: #6a98ff;
   --blue-press: #3a6fe6;
   --blue-deep: #15203e;
   --blue-tint: rgba(76, 130, 251, 0.12);
   --blue-tint-2: rgba(76, 130, 251, 0.2);
-  --blue-ring: rgba(76, 130, 251, 0.45);
+  --blue-ring: rgba(76, 130, 251, 0.5);
+  --blue-glow: rgba(76, 130, 251, 0.45);
   --blue-text: #9db8ff;
+  --grad-blue: linear-gradient(180deg, #5e93ff 0%, #3f74f0 100%);
 
   /* Status */
   --green: #3fb97f;
@@ -52,7 +58,12 @@
   --amber-tint: rgba(224, 165, 59, 0.14);
   --red: #f0613b;
   --red-tint: rgba(240, 97, 59, 0.14);
-  --red-text: #ffb6a2; /* legible error text on --red-tint (was a hardcoded hex everywhere) */
+  --red-text: #ffb6a2;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 16px 48px -12px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 8px 26px -8px var(--blue-glow);
 
   /* shadcn semantic tokens → mapped onto the palette */
   --background: var(--bg);
@@ -74,40 +85,41 @@
   --border: var(--line-1);
   --input: var(--line-1);
   --ring: var(--blue-ring);
-  --radius: 0.5625rem; /* 9px — the design's base radius */
+  --radius: 0.75rem; /* 12px base — softer cards; controls go pill */
 }
 
 /*
- * Light theme (spec 005 / ADR-0009). Overriding only the raw palette tokens is enough —
- * the shadcn semantic tokens above are var() references, so they follow automatically.
- * The brand blue, status hues, and radius are shared; surfaces/text/borders invert.
+ * Light theme (spec 005 / ADR-0009). Overriding the raw palette is enough — the shadcn
+ * semantic tokens are var() references and follow. Glass + elevation invert here too.
  */
 :root[data-theme="light"] {
-  /* Surfaces */
   --bg: #ffffff;
   --bg-1: #f7f8fa;
   --bg-2: #f1f3f7;
   --bg-3: #e7eaf0;
   --bg-inset: #ffffff;
-  --bg-sidebar: #f7f8fa;
+  --bg-sidebar: #f9fafc;
 
-  /* Borders */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(13, 17, 23, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+
   --line: rgba(13, 17, 23, 0.08);
   --line-1: rgba(13, 17, 23, 0.12);
   --line-strong: rgba(13, 17, 23, 0.18);
 
-  /* Text */
   --text: #0d1117;
   --text-1: #36404e;
   --text-2: #5b6675;
   --text-3: #8a94a4;
 
-  /* Blue text needs to darken to stay legible on light surfaces */
   --blue-text: #2c5fd0;
   --blue-deep: #dbe6ff;
-
-  /* Error text: the salmon reads as low-contrast on light — use a deep red */
   --red-text: #b42318;
+
+  --shadow-card: 0 1px 2px rgba(13, 17, 23, 0.06), 0 12px 28px -18px rgba(13, 17, 23, 0.22);
+  --shadow-pop: 0 16px 44px -12px rgba(13, 17, 23, 0.2);
 }
 
 @theme inline {
@@ -127,6 +139,7 @@
   --color-text-2: var(--text-2);
   --color-text-3: var(--text-3);
   --color-blue: var(--blue);
+  --color-blue-bright: var(--blue-bright);
   --color-blue-hover: var(--blue-hover);
   --color-blue-press: var(--blue-press);
   --color-blue-deep: var(--blue-deep);
@@ -161,10 +174,11 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 5px);
+  --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 12px);
 
   --font-sans: var(--font-ibm-sans);
   --font-mono: var(--font-ibm-mono);
@@ -175,16 +189,11 @@
     border-color: var(--color-border);
     outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
   }
-  /* Keep iOS from auto-inflating text after an orientation change, and stop the
-     focus-zoom on small controls below. */
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
-  /* iOS Safari zooms the viewport when a focused form control has a font-size
-     under 16px — the #1 "feels broken on mobile" cause. Our dense 13–14px text
-     utilities trip it, so force ≥16px on phone-width controls (the !important is
-     needed to beat those utilities). Desktop (≥640px) is untouched. */
+  /* iOS Safari zooms when a focused control is < 16px — force ≥16px on phones. */
   @media (max-width: 639px) {
     input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
     textarea,
@@ -198,16 +207,44 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  /* Atmospheric backdrop — soft blue glows fixed behind all content (depth, not noise). */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(1100px 760px at 8% -12%, rgba(76, 130, 251, 0.12), transparent 60%),
+      radial-gradient(840px 680px at 104% -4%, rgba(58, 111, 230, 0.08), transparent 55%),
+      radial-gradient(760px 640px at 50% 118%, rgba(76, 130, 251, 0.05), transparent 60%);
+  }
+  /* Faint grain so flat surfaces read as material, not plastic. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  :root[data-theme="light"] body::before {
+    background:
+      radial-gradient(1100px 760px at 8% -12%, rgba(76, 130, 251, 0.07), transparent 60%),
+      radial-gradient(840px 680px at 104% -4%, rgba(58, 111, 230, 0.05), transparent 55%);
+  }
+  :root[data-theme="light"] body::after {
+    opacity: 0.015;
+  }
   ::selection {
     background: var(--blue-tint-2);
   }
-  /* Visible keyboard focus on every interactive element (a11y baseline). */
   :focus-visible {
     outline: 2px solid var(--blue-ring);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
-  /* Eyebrow label — small mono uppercase, used above page titles */
   .t-eyebrow {
     font-family: var(--font-mono);
     font-size: 11px;
@@ -215,5 +252,49 @@
     text-transform: uppercase;
     color: var(--text-2);
     font-weight: 500;
+  }
+}
+
+@layer components {
+  /* Glass surface — translucent material over the atmosphere with an inner highlight. */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      var(--shadow-card),
+      inset 0 1px 0 var(--glass-highlight);
+  }
+  .glass-strong {
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid var(--glass-border);
+    box-shadow:
+      var(--shadow-pop),
+      inset 0 1px 0 var(--glass-highlight);
+  }
+  /* Primary action — blue gradient with a soft glow; the app's signature button. */
+  .btn-primary {
+    background: var(--grad-blue);
+    color: #fff;
+    box-shadow:
+      var(--shadow-glow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    transition:
+      filter 0.15s ease,
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.07);
+    box-shadow:
+      0 10px 32px -6px var(--blue-glow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+  .btn-primary:active {
+    transform: translateY(0.5px);
+    filter: brightness(0.97);
   }
 }

@@ -3,12 +3,7 @@ import { cn } from "@/lib/utils";
 type DivProps = React.ComponentProps<"div">;
 
 export function Card({ className, ...props }: DivProps) {
-  return (
-    <div
-      className={cn("bg-card text-card-foreground rounded-xl border shadow-sm", className)}
-      {...props}
-    />
-  );
+  return <div className={cn("glass text-card-foreground rounded-2xl", className)} {...props} />;
 }
 
 export function CardHeader({ className, ...props }: DivProps) {

@@ -17,7 +17,7 @@ export function TopBar({
   const t = useTranslations("topbar");
   const tNav = useTranslations("nav");
   return (
-    <header className="border-line flex h-[calc(3.5rem+env(safe-area-inset-top))] flex-none items-center gap-2 border-b px-3 pt-[env(safe-area-inset-top)] sm:gap-3 sm:px-5">
+    <header className="border-line sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] flex-none items-center gap-2 border-b bg-[var(--bg)]/70 px-3 pt-[env(safe-area-inset-top)] backdrop-blur-xl sm:gap-3 sm:px-5">
       <button
         type="button"
         onClick={onMenu}
@@ -40,7 +40,7 @@ export function TopBar({
         {clockSlot}
         <button
           type="button"
-          className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text hidden h-9 items-center gap-2 rounded-md border px-3 text-[12.5px] font-medium transition-colors sm:flex"
+          className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text hidden h-9 items-center gap-2 rounded-full border px-3.5 text-[12.5px] font-medium transition-colors sm:flex"
         >
           <CommandIcon className="size-4" />
           <span className="hidden md:inline">{t("commands")}</span>
@@ -48,7 +48,7 @@ export function TopBar({
         <button
           type="button"
           aria-label={t("recentActivity")}
-          className="text-text-2 hover:bg-bg-3 hover:text-text hidden size-9 items-center justify-center rounded-md transition-colors sm:flex"
+          className="text-text-2 hover:bg-bg-3 hover:text-text hidden size-9 items-center justify-center rounded-full transition-colors sm:flex"
         >
           <ClockIcon className="size-[18px]" />
         </button>
