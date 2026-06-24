@@ -102,8 +102,7 @@ export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener(COMMANDS_EVENT, openMenu);
     };
-    // openMenu/closeMenu are stable (only setState + refs); listeners bind once.
-     
+    // openMenu/closeMenu only touch setState + refs, so binding once is correct.
   }, []);
 
   if (!open) return null;
