@@ -1,6 +1,6 @@
 # Spec 023 — Playground MCP (AI drafts plans)
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** feature · **Owner:** Achref Arabi · **Date:** 2026-06-25
 - **Slice:** `src/lib/mcp` (auth + tools), route `/api/[transport]` (mcp-handler), `src/features/mcp-tokens` (Settings UI + actions), migration `mcp_tokens` + `has_project_access_for`.
 

@@ -51,3 +51,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [020](020-platform-tutorial-link/spec.md) | Link a tutorial to a platform | shipped   |
 | [021](021-daily-reports/spec.md)          | Daily reports (per-project)   | shipped   |
 | [022](022-playground/spec.md)             | Project planning playground   | shipped   |
+| [023](023-playground-mcp/spec.md)         | Playground MCP (AI drafts)    | shipped   |

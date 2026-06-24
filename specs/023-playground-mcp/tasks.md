@@ -8,5 +8,5 @@
 - [x] `src/features/mcp-tokens` — create/revoke actions + data + Settings card (endpoint + mint/revoke)
 - [x] Verify: 401 without token; real MCP client lists tools + bulk_create_plan → 3 phases/6 tasks/2 links rendered in playground
 - [x] appsec review
-- [ ] Ship: PR → CI → merge → deploy → docs closeout
+- [x] Ship: PR #59 → CI → merge → deploy → docs closeout
 - [ ] Follow-up: OAuth auth, live-reflect (Realtime postgres_changes), update/delete/move tools
