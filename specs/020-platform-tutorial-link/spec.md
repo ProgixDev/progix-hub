@@ -1,6 +1,6 @@
 # Spec 020 — Link a tutorial to a platform
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** enhancement
 - **Requested by / owner:** Achref Arabi, founder
 - **Date:** 2026-06-24

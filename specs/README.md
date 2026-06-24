@@ -48,4 +48,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [017](017-client-onboarding/spec.md)      | Client onboarding (Setup)     | shipped   |
 | [018](018-client-dossier/spec.md)         | Client dossier (team-only)    | shipped   |
 | [019](019-tutorial-uploads/spec.md)       | Tutorial file uploads         | shipped   |
-| [020](020-platform-tutorial-link/spec.md) | Link a tutorial to a platform | active    |
+| [020](020-platform-tutorial-link/spec.md) | Link a tutorial to a platform | shipped   |
