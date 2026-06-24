@@ -23,6 +23,9 @@ export type PlanItem = {
   color: string | null;
 };
 
+/** A dependency arrow: source is a prerequisite of target ("source → target"). */
+export type PlanLink = { id: string; source_id: string; target_id: string };
+
 export type Lens = "canvas" | "board";
 
 /** Assignee option (a project member). */

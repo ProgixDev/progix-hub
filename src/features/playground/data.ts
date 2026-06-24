@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { MemberOption, PlanItem } from "./types";
+import type { MemberOption, PlanItem, PlanLink } from "./types";
 
 export const PLAN_COLS =
   "id,project_id,type,title,body,status,assignee,estimate_hours,parent_id,pos_x,pos_y,width,height,board_order,color";
@@ -15,6 +15,17 @@ export async function listPlanItems(projectId: string): Promise<PlanItem[]> {
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);
   return (data ?? []) as PlanItem[];
+}
+
+/** Dependency arrows for a project (RLS gates to project members). */
+export async function listPlanLinks(projectId: string): Promise<PlanLink[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("plan_links")
+    .select("id,source_id,target_id")
+    .eq("project_id", projectId);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as PlanLink[];
 }
 
 /** Project members, as assignee options (via the access-checked RPC). */

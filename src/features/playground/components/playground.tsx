@@ -6,7 +6,7 @@ import { Wordmark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { createPlanItemAction } from "../actions";
 import { PlaygroundStoreProvider, usePlaygroundStore } from "../provider";
-import type { ItemType, MemberOption, PlanItem } from "../types";
+import type { ItemType, MemberOption, PlanItem, PlanLink } from "../types";
 import { Board } from "./board";
 import { Canvas } from "./canvas";
 import { Inspector } from "./inspector";
@@ -16,16 +16,18 @@ export function Playground({
   projectName,
   backHref,
   items,
+  links,
   assignees,
 }: {
   projectId: string;
   projectName: string;
   backHref: string;
   items: PlanItem[];
+  links: PlanLink[];
   assignees: MemberOption[];
 }) {
   return (
-    <PlaygroundStoreProvider items={items}>
+    <PlaygroundStoreProvider items={items} links={links}>
       <Shell
         projectId={projectId}
         projectName={projectName}
@@ -143,7 +145,7 @@ function Shell({
       </header>
 
       <div className="relative flex min-h-0 flex-1">
-        {lens === "canvas" ? <Canvas /> : <Board />}
+        {lens === "canvas" ? <Canvas projectId={projectId} /> : <Board />}
         <Inspector assignees={assignees} />
 
         {/* zoom reset (canvas only) */}
