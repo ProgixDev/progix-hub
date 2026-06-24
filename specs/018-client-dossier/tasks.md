@@ -14,7 +14,7 @@ Ordered, checkboxed. Tick on commit. ≤ ~30 min each.
 ## Phase 2 — verify & ship
 
 - [x] T7 `pnpm verify` green
-- [ ] T8 `/review` (appsec: RLS project-only, no anon/client leak, validation); fix P0/P1
+- [x] T8 `/review` (appsec: RLS project-only, no anon/client leak, validation); fix P0/P1
 - [ ] T9 PR; merge; deploy; `/update-docs` (spec shipped)
 
 ## AC coverage
