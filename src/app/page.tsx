@@ -1,5 +1,6 @@
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { DailyReportButton } from "@/features/reports";
 import { ClockWidget } from "@/features/time-tracking";
 import { ProjectsPortfolio, listProjects, type Project } from "@/features/projects";
 import { canViewOrgMembers } from "@/features/members";
@@ -24,6 +25,7 @@ export default async function Home() {
       recent={toRecent(projects)}
       showMembers={showMembers}
       clockSlot={<ClockWidget />}
+      reportSlot={<DailyReportButton />}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectsPortfolio projects={projects} />

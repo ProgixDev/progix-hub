@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { DailyReportButton, ReportsSection, listProjectReports } from "@/features/reports";
 import { ClockWidget } from "@/features/time-tracking";
 import {
   DocumentsSection,
@@ -50,6 +51,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const platforms = can.manageProject ? await listPlatforms() : [];
   // Team-only client dossier — visible to any member with access to the project (spec 018).
   const dossier = await getClientDossier(id);
+  // Team-only daily reports for this project (spec 021).
+  const reports = await listProjectReports(id);
 
   // No effective role (e.g. a removed member) ⇒ no access, even if the row were readable (AC-2).
   if (!project || !role) notFound();
@@ -67,6 +70,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       recent={toRecent(projects)}
       showMembers={showMembers}
       clockSlot={<ClockWidget />}
+      reportSlot={<DailyReportButton />}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectDetail project={project} canManage={can.manageProject} />
@@ -118,6 +122,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         archived={archivedDocs}
         canWrite={can.writeContent}
       />
+      <ReportsSection reports={reports} />
     </AppShell>
   );
 }

@@ -492,5 +492,20 @@
     "title": "Commands",
     "placeholder": "Search commands…",
     "empty": "No matching command"
+  },
+  "reports": {
+    "button": "Daily report",
+    "title": "Post a daily report",
+    "subtitle": "Pick a project and drop in a markdown update — visible to that project’s team.",
+    "fieldProject": "Project",
+    "fieldContent": "Report (markdown)",
+    "loadFile": "Load .md file",
+    "save": "Post report",
+    "contentHint": "## What shipped\n- …\n\n## In progress\n- …",
+    "noProjects": "No projects available",
+    "errorEmpty": "Choose a project and write the report",
+    "sectionTitle": "Daily reports",
+    "sectionSubtitle": "Markdown updates posted by the team for this project.",
+    "none": "No reports yet."
   }
 }

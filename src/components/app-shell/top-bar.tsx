@@ -8,11 +8,13 @@ export function TopBar({
   title,
   userSlot,
   clockSlot,
+  reportSlot,
   onMenu,
 }: {
   title: string;
   userSlot?: React.ReactNode;
   clockSlot?: React.ReactNode;
+  reportSlot?: React.ReactNode;
   onMenu: () => void;
 }) {
   const t = useTranslations("topbar");
@@ -38,6 +40,7 @@ export function TopBar({
       <span className="text-text min-w-0 truncate text-[13.5px] font-medium">{title}</span>
 
       <div className="ml-auto flex flex-none items-center gap-2">
+        {reportSlot}
         {clockSlot}
         <button
           type="button"

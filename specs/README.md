@@ -49,3 +49,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [018](018-client-dossier/spec.md)         | Client dossier (team-only)    | shipped   |
 | [019](019-tutorial-uploads/spec.md)       | Tutorial file uploads         | shipped   |
 | [020](020-platform-tutorial-link/spec.md) | Link a tutorial to a platform | shipped   |
+| [021](021-daily-reports/spec.md)          | Daily reports (per-project)   | active    |
