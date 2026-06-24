@@ -54,8 +54,9 @@ export function usePlaygroundPresence({
   useEffect(() => {
     const supabase = createClient();
     const color = colorFor(me.id);
+    // Private channel — gated to project members by RLS on realtime.messages (migration 0031).
     const channel = supabase.channel(`playground:${projectId}`, {
-      config: { presence: { key: me.id } },
+      config: { private: true, presence: { key: me.id } },
     });
     channelRef.current = channel;
 
@@ -100,8 +101,13 @@ export function usePlaygroundPresence({
           const state = await getPlanStateAction(projectId);
           if (state) syncPlan(state.items, state.links);
         }, 250);
-      })
-      .subscribe((status) => {
+      });
+
+    // Private channels require the auth token on the realtime socket for both read AND write
+    // (presence/broadcast). Set it from the session, then subscribe.
+    void supabase.auth.getSession().then(({ data }) => {
+      supabase.realtime.setAuth(data.session?.access_token);
+      channel.subscribe((status) => {
         if (status === "SUBSCRIBED") {
           void channel.track({
             name: me.name,
@@ -111,6 +117,7 @@ export function usePlaygroundPresence({
           });
         }
       });
+    });
 
     // Broadcast a "dirty" ping on local edits; re-track presence when the local selection changes.
     let lastRev = store.getState().localRev;
