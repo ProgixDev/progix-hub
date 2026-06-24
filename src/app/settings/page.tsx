@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
 import { ClockWidget } from "@/features/time-tracking";
@@ -19,10 +20,11 @@ function toRecent(projects: Project[]): RecentProject[] {
 }
 
 export default async function SettingsPage() {
-  const [user, projects, t] = await Promise.all([
+  const [user, projects, t, tPlatforms] = await Promise.all([
     getCurrentUser(),
     listProjects(),
     getTranslations("nav"),
+    getTranslations("platforms"),
   ]);
 
   // Defense in depth — the middleware already gates this route to members (AC-7).
@@ -38,6 +40,20 @@ export default async function SettingsPage() {
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <SettingsSection />
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+        <Link
+          href="/settings/platforms"
+          className="border-line-1 bg-card hover:border-line-strong flex items-center justify-between gap-3 rounded-xl border px-5 py-4 transition-colors"
+        >
+          <div className="min-w-0">
+            <p className="text-text text-[14px] font-semibold">{tPlatforms("title")}</p>
+            <p className="text-text-3 text-[12.5px]">{tPlatforms("subtitle")}</p>
+          </div>
+          <span className="text-text-3" aria-hidden>
+            →
+          </span>
+        </Link>
+      </div>
       {user.isSuperadmin && <CreateMemberCard />}
     </AppShell>
   );
