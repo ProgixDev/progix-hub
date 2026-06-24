@@ -79,36 +79,46 @@ function DetailInner({ project, canManage }: { project: Project; canManage: bool
             <p className="text-text-2 mt-1.5 max-w-2xl text-[14px]">{project.description}</p>
           )}
         </div>
-        {canManage && (
-          <div className="flex flex-none items-center gap-2">
-            <button
-              type="button"
-              onClick={() => openEdit(project)}
-              className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
-            >
-              {tCommon("edit")}
-            </button>
-            {project.status !== "archived" && (
+        <div className="flex flex-none flex-wrap items-center gap-2">
+          <Link
+            href={`/projects/${project.id}/playground`}
+            className="btn-primary flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium transition-all"
+          >
+            {t("openPlayground")}
+          </Link>
+          {canManage && (
+            <>
               <button
                 type="button"
-                disabled={pending}
-                onClick={() => start(() => archiveProjectAction(project.id).then(() => undefined))}
-                className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+                onClick={() => openEdit(project)}
+                className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3.5 text-[13px] font-medium transition-colors"
               >
-                {pending ? t("archiving") : t("archive")}
+                {tCommon("edit")}
               </button>
-            )}
-            <button
-              type="button"
-              disabled={deleting}
-              onClick={onDelete}
-              className="border-line-1 text-red-text hover:bg-red-tint flex h-9 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
-            >
-              <TrashIcon className="size-4" />
-              {deleting ? t("deleting") : tCommon("delete")}
-            </button>
-          </div>
-        )}
+              {project.status !== "archived" && (
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() =>
+                    start(() => archiveProjectAction(project.id).then(() => undefined))
+                  }
+                  className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60"
+                >
+                  {pending ? t("archiving") : t("archive")}
+                </button>
+              )}
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={onDelete}
+                className="border-line-1 text-red-text hover:bg-red-tint flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60"
+              >
+                <TrashIcon className="size-4" />
+                {deleting ? t("deleting") : tCommon("delete")}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

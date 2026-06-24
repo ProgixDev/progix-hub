@@ -88,7 +88,8 @@
     "viewGrid": "Vue grille",
     "viewList": "Vue liste",
     "deleting": "Suppression…",
-    "deleteConfirm": "Supprimer définitivement « {name} » et toutes ses données ? Cette action est irréversible."
+    "deleteConfirm": "Supprimer définitivement « {name} » et toutes ses données ? Cette action est irréversible.",
+    "openPlayground": "Atelier"
   },
   "envVars": {
     "title": "Variables d’environnement",
