@@ -26,6 +26,14 @@ export type PlanItem = {
 /** A dependency arrow: source is a prerequisite of target ("source → target"). */
 export type PlanLink = { id: string; source_id: string; target_id: string };
 
+/** A saved version of the plan (items + links). The list view omits the heavy `data` blob. */
+export type PlanSnapshot = {
+  id: string;
+  label: string;
+  author_label: string | null;
+  created_at: string;
+};
+
 export type Lens = "canvas" | "board";
 
 /** Assignee option (a project member). */

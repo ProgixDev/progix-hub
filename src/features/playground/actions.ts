@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { PLAN_COLS } from "./data";
-import { ITEM_TYPES, STATUSES, type PlanItem, type PlanLink } from "./types";
+import { listSnapshots, PLAN_COLS } from "./data";
+import { ITEM_TYPES, STATUSES, type PlanItem, type PlanLink, type PlanSnapshot } from "./types";
 
 export type CreateResult = { ok: true; item: PlanItem } | { ok: false };
 export type ActionResult = { ok: true } | { ok: false };
@@ -142,6 +142,150 @@ export async function deleteLinkAction(id: string): Promise<ActionResult> {
   if (!(await getCurrentUser())) return { ok: false };
   const supabase = await createClient();
   const { error } = await supabase.from("plan_links").delete().eq("id", id);
+  if (error) return { ok: false };
+  return { ok: true };
+}
+
+// ---- Snapshots (save-states) -------------------------------------------------
+
+type PlanSnapshotData = { items: PlanItem[]; links: PlanLink[] };
+export type RestoreResult = { ok: true; items: PlanItem[]; links: PlanLink[] } | { ok: false };
+
+// Restore re-inserts from a stored jsonb blob — validate + allow-list the columns explicitly
+// (don't rely on PostgREST rejecting unknown keys), and never trust a project_id from the blob.
+const restoreItemSchema = z
+  .object({
+    id: z.uuid(),
+    type: z.enum(ITEM_TYPES),
+    title: z.string().max(500),
+    body: z.string().nullable(),
+    status: z.enum(STATUSES),
+    assignee: z.uuid().nullable(),
+    estimate_hours: z.number().nullable(),
+    parent_id: z.uuid().nullable(),
+    pos_x: z.number(),
+    pos_y: z.number(),
+    width: z.number().int().nullable(),
+    height: z.number().int().nullable(),
+    board_order: z.number().int(),
+    color: z.string().max(20).nullable(),
+  })
+  .strip();
+const restoreLinkSchema = z
+  .object({ id: z.uuid(), source_id: z.uuid(), target_id: z.uuid() })
+  .strip();
+const snapshotDataSchema = z.object({
+  items: z.array(restoreItemSchema),
+  links: z.array(restoreLinkSchema),
+});
+
+async function readPlan(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  projectId: string,
+): Promise<PlanSnapshotData> {
+  const [itemsRes, linksRes] = await Promise.all([
+    supabase.from("plan_items").select(PLAN_COLS).eq("project_id", projectId),
+    supabase.from("plan_links").select("id,source_id,target_id").eq("project_id", projectId),
+  ]);
+  return {
+    items: (itemsRes.data ?? []) as PlanItem[],
+    links: (linksRes.data ?? []) as PlanLink[],
+  };
+}
+
+/** Save the current plan as a labeled snapshot. */
+export async function createSnapshotAction(
+  projectId: string,
+  label: string,
+): Promise<ActionResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+  const data = await readPlan(supabase, projectId);
+  const { error } = await supabase.from("plan_snapshots").insert({
+    project_id: projectId,
+    label: (label || "Snapshot").slice(0, 120),
+    data,
+    created_by: user!.id,
+    author_label: user!.name || user!.email,
+  });
+  if (error) return { ok: false };
+  return { ok: true };
+}
+
+/** List a project's snapshots (lazy-loaded by the panel). */
+export async function listSnapshotsAction(projectId: string): Promise<PlanSnapshot[]> {
+  if (!(await getCurrentUser())) return [];
+  return listSnapshots(projectId);
+}
+
+/** Replace the live plan with a snapshot, auto-backing-up the current state first. */
+export async function restoreSnapshotAction(
+  projectId: string,
+  snapshotId: string,
+): Promise<RestoreResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  if (!z.uuid().safeParse(snapshotId).success) return { ok: false };
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+
+  // Bind the snapshot to THIS project (not just any project the caller can read).
+  const { data: snap } = await supabase
+    .from("plan_snapshots")
+    .select("data")
+    .eq("id", snapshotId)
+    .eq("project_id", projectId)
+    .single();
+  if (!snap?.data) return { ok: false };
+  const parsed = snapshotDataSchema.safeParse(snap.data);
+  if (!parsed.success) return { ok: false };
+  const itemsOut = parsed.data.items.map((it) => ({ ...it, project_id: projectId }));
+  const linksOut = parsed.data.links.map((l) => ({
+    id: l.id,
+    project_id: projectId,
+    source_id: l.source_id,
+    target_id: l.target_id,
+  }));
+
+  // Safety net: snapshot the current state before replacing it.
+  const current = await readPlan(supabase, projectId);
+  await supabase.from("plan_snapshots").insert({
+    project_id: projectId,
+    label: "Auto-backup before restore",
+    data: current,
+    created_by: user!.id,
+    author_label: user!.name || user!.email,
+  });
+
+  const delLinks = await supabase.from("plan_links").delete().eq("project_id", projectId);
+  const delItems = await supabase.from("plan_items").delete().eq("project_id", projectId);
+  if (delLinks.error || delItems.error) return { ok: false };
+
+  // Phases first so child tasks' parent_id FK resolves within the same insert.
+  const ordered = [...itemsOut].sort(
+    (a, b) => (a.type === "phase" ? 0 : 1) - (b.type === "phase" ? 0 : 1),
+  );
+  if (ordered.length > 0) {
+    const { error } = await supabase.from("plan_items").insert(ordered);
+    if (error) return { ok: false };
+  }
+  if (linksOut.length > 0) {
+    const { error } = await supabase.from("plan_links").insert(linksOut);
+    if (error) return { ok: false };
+  }
+  return {
+    ok: true,
+    items: itemsOut as unknown as PlanItem[],
+    links: parsed.data.links as PlanLink[],
+  };
+}
+
+/** Delete a snapshot. RLS scopes to accessible rows. */
+export async function deleteSnapshotAction(id: string): Promise<ActionResult> {
+  if (!z.uuid().safeParse(id).success) return { ok: false };
+  if (!(await getCurrentUser())) return { ok: false };
+  const supabase = await createClient();
+  const { error } = await supabase.from("plan_snapshots").delete().eq("id", id);
   if (error) return { ok: false };
   return { ok: true };
 }

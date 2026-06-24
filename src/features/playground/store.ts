@@ -23,6 +23,7 @@ export type PlaygroundState = {
   removeItem: (id: string) => void;
   addLink: (link: PlanLink) => void;
   removeLink: (id: string) => void;
+  replaceAll: (items: PlanItem[], links: PlanLink[]) => void;
 };
 
 /** Holds the plan items + links (seeded from the server) + canvas/board UI state. One per mount. */
@@ -70,6 +71,8 @@ export function createPlaygroundStore(initial: PlanItem[], initialLinks: PlanLin
         links: s.links.filter((l) => l.id !== id),
         selectedLinkId: s.selectedLinkId === id ? null : s.selectedLinkId,
       })),
+    replaceAll: (items, links) =>
+      set({ items, links, selectedId: null, selectedLinkId: null, editingId: null }),
   }));
 }
 
