@@ -13,7 +13,7 @@ Ordered, checkboxed. Tick on commit. ≤ ~30 min each.
 ## Phase 2 — verify & ship
 
 - [x] T6 `pnpm verify` green
-- [ ] T7 `/review` (appsec: client page shows only embed+client-visible chosen tutorial; no leak); fix P0/P1
+- [x] T7 `/review` (appsec: client page shows only embed+client-visible chosen tutorial; no leak); fix P0/P1
 - [ ] T8 PR; merge; deploy; `/update-docs` (spec shipped)
 
 ## AC coverage
