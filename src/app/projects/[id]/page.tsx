@@ -12,6 +12,7 @@ import {
 import { EnvVarsSection, listEnvVarAudit, listProjectEnvVars } from "@/features/env-vars";
 import { getProjectMembers, PeoplePanel } from "@/features/people";
 import { canViewOrgMembers } from "@/features/members";
+import { ClientDossierPanel, getClientDossier } from "@/features/client-dossier";
 import { listPlatforms } from "@/features/platforms";
 import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
 import { getProjectSetup, SetupPanel } from "@/features/setup";
@@ -47,6 +48,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   // The client setup page is managed by the project's PM / global PM / superadmin (spec 017).
   const setupData = can.manageProject ? await getProjectSetup(id) : { setup: null, steps: [] };
   const platforms = can.manageProject ? await listPlatforms() : [];
+  // Team-only client dossier — visible to any member with access to the project (spec 018).
+  const dossier = await getClientDossier(id);
 
   // No effective role (e.g. a removed member) ⇒ no access, even if the row were readable (AC-2).
   if (!project || !role) notFound();
@@ -97,6 +100,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           />
         </div>
       )}
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        <ClientDossierPanel projectId={id} dossier={dossier} />
+      </div>
       {can.managePeople && <PeoplePanel projectId={id} members={members} />}
       {can.seeEnvVars && (
         <EnvVarsSection

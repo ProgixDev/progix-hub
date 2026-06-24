@@ -444,5 +444,31 @@
     "gateChecking": "Vérification…",
     "gateSubmit": "Continuer",
     "gateHelp": "Pas de code ? Demandez à votre contact Progix."
+  },
+  "dossier": {
+    "title": "Client",
+    "subtitle": "Contexte réservé à l’équipe — jamais montré au client.",
+    "contactName": "Nom du contact",
+    "contactEmail": "E-mail du contact",
+    "contactPhone": "Téléphone",
+    "company": "Entreprise",
+    "clientRole": "Son rôle",
+    "clientType": "Type de client",
+    "clientTypeHint": "ex. technique, non-technique, business",
+    "itSavviness": "Aisance IT",
+    "savvinessNone": "—",
+    "savviness_1": "a besoin de beaucoup d’aide",
+    "savviness_2": "basique",
+    "savviness_3": "à l’aise",
+    "savviness_4": "solide",
+    "savviness_5": "expert",
+    "temperament": "Tempérament",
+    "temperamentHint": "sa façon de communiquer / son état",
+    "notes": "Notes",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "errorEmail": "Saisissez un e-mail valide",
+    "errorSavviness": "Utilisez une note de 1 à 5"
   }
 }

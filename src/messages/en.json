@@ -444,5 +444,31 @@
     "gateChecking": "Checking…",
     "gateSubmit": "Continue",
     "gateHelp": "Don’t have a passcode? Ask your Progix contact."
+  },
+  "dossier": {
+    "title": "Client",
+    "subtitle": "Team-only context on the client — never shown to them.",
+    "contactName": "Contact name",
+    "contactEmail": "Contact email",
+    "contactPhone": "Phone",
+    "company": "Company",
+    "clientRole": "Their role",
+    "clientType": "Client type",
+    "clientTypeHint": "e.g. technical, non-technical, business",
+    "itSavviness": "IT comfort",
+    "savvinessNone": "—",
+    "savviness_1": "needs lots of help",
+    "savviness_2": "basic",
+    "savviness_3": "comfortable",
+    "savviness_4": "strong",
+    "savviness_5": "expert",
+    "temperament": "Temperament",
+    "temperamentHint": "how they communicate / their state",
+    "notes": "Notes",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "errorEmail": "Enter a valid email",
+    "errorSavviness": "Use a 1–5 rating"
   }
 }
