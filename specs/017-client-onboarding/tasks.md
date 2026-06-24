@@ -19,7 +19,7 @@ Ordered, checkboxed. Tick on commit. `[P]` = parallel-safe. ≤ ~30 min each.
 
 ## Phase 3 — review & ship
 
-- [ ] T10 `/review` (appsec lens: anon RPC leakage, passcode hashing, RLS no-anon, rotate kills token, no nav leak); fix P0/P1
+- [x] T10 `/review` (appsec lens: anon RPC leakage, passcode hashing, RLS no-anon, rotate kills token, no nav leak); fix P0/P1
 - [ ] T11 PR; merge; deploy; `/update-docs` (CUJ + spec shipped)
 
 ## AC coverage

@@ -19,6 +19,9 @@ export async function verifyPasscodeAction(
   const supabase = await createClient();
   const { data } = await supabase.rpc("setup_public_view", { p_token: token, p_passcode: code });
   if (!data) return { ok: false };
+  // Deliberate trade-off: the cookie holds the plaintext passcode (httpOnly/secure/path-scoped) so
+  // the low-friction client gate survives reloads without server-side session state. It's a shared,
+  // rotatable, low-value onboarding code — not a credential to anything else.
   const jar = await cookies();
   jar.set(cookieName(token), code, {
     httpOnly: true,
