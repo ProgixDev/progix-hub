@@ -31,7 +31,7 @@ export default defineConfig({
     {
       name: "member",
       testMatch:
-        /(home|projects|env-vars|documents|settings|portal|roles|members|time|platforms)\.spec\.ts/,
+        /(home|projects|env-vars|documents|settings|portal|roles|members|time|platforms|tutorials)\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], storageState: "e2e/.auth/member.json" },
       dependencies: ["setup"],
     },

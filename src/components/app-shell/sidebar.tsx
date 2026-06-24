@@ -5,7 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Wordmark } from "@/components/brand/logo";
-import { GridIcon, PlusIcon, SearchIcon, SettingsIcon, UsersIcon } from "@/components/ui/icons";
+import {
+  GridIcon,
+  PlusIcon,
+  SearchIcon,
+  SettingsIcon,
+  UsersIcon,
+  VideoIcon,
+} from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 
 export type RecentProject = {
@@ -42,6 +49,7 @@ function SidebarNav({
   const projectsActive = pathname === "/" || pathname.startsWith("/projects");
   const settingsActive = pathname.startsWith("/settings");
   const membersActive = pathname.startsWith("/members");
+  const tutorialsActive = pathname.startsWith("/tutorials");
   return (
     <>
       <div className="px-4 pt-4 pb-3">
@@ -93,6 +101,18 @@ function SidebarNav({
             {t("members")}
           </Link>
         )}
+        <Link
+          href="/tutorials"
+          onClick={onNavigate}
+          aria-current={tutorialsActive ? "page" : undefined}
+          className={cn(
+            "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+            tutorialsActive ? navActive : navIdle,
+          )}
+        >
+          <VideoIcon className="size-[18px]" />
+          {t("tutorials")}
+        </Link>
         <Link
           href="/settings"
           onClick={onNavigate}
