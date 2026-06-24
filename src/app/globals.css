@@ -349,16 +349,54 @@
   }
 }
 
-/* Motion — a single tasteful page-load reveal; respects reduced-motion + skips during e2e. */
+/* Motion — page fades in; card grids stagger up. Respects reduced-motion. */
 @media (prefers-reduced-motion: no-preference) {
   .page-enter {
-    animation: pg-fade-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: pg-fade 0.28s ease both;
+  }
+  .stagger > * {
+    animation: pg-fade-up 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .stagger > *:nth-child(1) {
+    animation-delay: 0.02s;
+  }
+  .stagger > *:nth-child(2) {
+    animation-delay: 0.06s;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 0.1s;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 0.14s;
+  }
+  .stagger > *:nth-child(5) {
+    animation-delay: 0.18s;
+  }
+  .stagger > *:nth-child(6) {
+    animation-delay: 0.22s;
+  }
+  .stagger > *:nth-child(7) {
+    animation-delay: 0.26s;
+  }
+  .stagger > *:nth-child(8) {
+    animation-delay: 0.3s;
+  }
+  .stagger > *:nth-child(n + 9) {
+    animation-delay: 0.34s;
+  }
+}
+@keyframes pg-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 @keyframes pg-fade-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;

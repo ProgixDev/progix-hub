@@ -1,6 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { GridIcon, PlusIcon, RowsIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import { ProjectsStoreProvider, useProjectsStore } from "../provider";
@@ -40,6 +42,16 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
   const view = useProjectsStore((s) => s.view);
   const setView = useProjectsStore((s) => s.setView);
   const openCreate = useProjectsStore((s) => s.openCreate);
+  const router = useRouter();
+  const params = useSearchParams();
+
+  // The sidebar "New project" action navigates to /?new=1 — open the create modal, then clean the URL.
+  useEffect(() => {
+    if (params.get("new") === "1") {
+      openCreate();
+      router.replace("/", { scroll: false });
+    }
+  }, [params, openCreate, router]);
 
   const counts = statusCounts(projects);
   const visible = filterProjects(projects, filter);
@@ -97,13 +109,13 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
             : t("noFilteredProjects", { status: t(STATUS_KEY[filter]).toLowerCase() })}
         </p>
       ) : view === "grid" ? (
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="stagger mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((p) => (
             <ProjectCard key={p.id} project={p} />
           ))}
         </div>
       ) : (
-        <div className="mt-5 flex flex-col gap-2">
+        <div className="stagger mt-5 flex flex-col gap-2">
           {visible.map((p) => (
             <ProjectRow key={p.id} project={p} />
           ))}

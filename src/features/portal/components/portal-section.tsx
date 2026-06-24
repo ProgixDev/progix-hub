@@ -127,7 +127,7 @@ function BlockPanel({
   }
 
   return (
-    <div className="glass rounded-2xl">
+    <div className="card-hover glass rounded-2xl">
       <div className="border-line flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
         <h2 className="text-text text-[14px] font-semibold">
           {block.name} <span className="text-text-3 font-normal">{cards.length}</span>

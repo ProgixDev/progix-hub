@@ -67,7 +67,7 @@ function Inner({
   return (
     <section className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
+        <div className="spotlight min-w-0">
           <p className="t-eyebrow">{t("eyebrow")}</p>
           <h1 className="text-text mt-1 text-[22px] font-semibold tracking-tight">{t("title")}</h1>
           <p className="text-text-3 mt-1 text-[12.5px]">{t("subtitle")}</p>
@@ -95,7 +95,7 @@ function Inner({
           {t("empty")}
         </div>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="stagger grid gap-5 sm:grid-cols-2">
           {tutorials.map((item) => (
             <article key={item.id} className="glass card-hover flex flex-col gap-2 rounded-2xl p-3">
               <TutorialPlayer tutorial={item} videoUrl={videoUrls[item.id]} />
