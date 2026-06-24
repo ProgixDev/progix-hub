@@ -4,6 +4,8 @@
 
 **Client:** Progix (internal) · **Owner:** Progix team · **Status:** active — MVP in progress (2 of 4 features shipped & deployed) · **Updated:** 2026-06-09
 
+> **Epics:** [Client onboarding & platform provisioning](prd-client-onboarding.md) (draft, 2026-06-24).
+
 ## Problem & opportunity
 
 Every Progix project lives across four surfaces — Notion explains it, GitHub tracks it, Slack coordinates it, the repo enforces it — but there is no single internal home that ties those threads to one project. Today the links are scattered across chats and bookmarks, and the things that have no good home at all — a project’s environment variables and its loose documents — end up in local `.env` files, DMs, and people’s heads. When someone joins a project or picks it back up, finding “where is everything for this project” is manual archaeology. progixHub is the internal hub that fixes this: create a project, paste its Notion, Slack, and GitHub links, and keep its env vars and documents in one secured place. It is to Progix projects what GitHub is to repos — the registry everything hangs off.
