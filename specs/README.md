@@ -43,4 +43,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [012](012-github-member-profiles/spec.md) | GitHub profiles & sign-in    | shipped   |
 | [013](013-time-tracking/spec.md)          | Work time tracking           | shipped   |
 | [014](014-global-pm/spec.md)              | Global PM org role           | shipped   |
-| [015](015-platform-registry/spec.md)      | Platform registry (org-wide) | active    |
+| [015](015-platform-registry/spec.md)      | Platform registry (org-wide) | shipped   |
