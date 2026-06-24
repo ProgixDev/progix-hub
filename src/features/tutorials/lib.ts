@@ -77,7 +77,8 @@ export const tutorialInputSchema = z
       if (!val.embed_url || !embedUrlFor(val.embed_url)) {
         ctx.addIssue({ code: "custom", path: ["embed_url"], message: "tutorials.errorLink" });
       }
-    } else if (!val.storage_path) {
+    } else if (!val.storage_path || !/^[0-9a-fA-F-]{36}\/.+/.test(val.storage_path)) {
+      // Must be a `<uuid>/<name>` key written by the upload flow — rejects arbitrary/typo paths.
       ctx.addIssue({ code: "custom", path: ["storage_path"], message: "tutorials.errorFile" });
     }
   });

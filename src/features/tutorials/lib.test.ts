@@ -56,10 +56,11 @@ describe("tutorialInputSchema (spec 016)", () => {
     const r = tutorialInputSchema.safeParse({
       title: "Recorded walkthrough",
       source_type: "upload",
-      storage_path: "abc/clip.mp4",
+      storage_path: "0f8fad5b-d9cb-469f-a165-70867728950e/clip.mp4",
     });
     expect(r.success).toBe(true);
-    if (r.success) expect(r.data.storage_path).toBe("abc/clip.mp4");
+    if (r.success)
+      expect(r.data.storage_path).toBe("0f8fad5b-d9cb-469f-a165-70867728950e/clip.mp4");
   });
 
   it("rejects an upload with no file and an embed with no link (AC-4)", () => {

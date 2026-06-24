@@ -14,7 +14,7 @@ Ordered, checkboxed. Tick on commit. ≤ ~30 min each.
 ## Phase 2 — verify & ship
 
 - [x] T7 `pnpm verify` green; extend `e2e/tutorials.spec.ts` if practical (embed path already covered)
-- [ ] T8 `/review` (appsec: private bucket not anon-readable, signed-URL TTL, admin write, client page unaffected); fix P0/P1
+- [x] T8 `/review` (appsec: private bucket not anon-readable, signed-URL TTL, admin write, client page unaffected); fix P0/P1
 - [ ] T9 PR; merge; deploy; `/update-docs` (spec shipped)
 
 ## AC coverage
