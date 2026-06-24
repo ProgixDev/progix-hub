@@ -25,7 +25,7 @@ Ordered, checkboxed. Tick on commit. `[P]` = parallel-safe. ≤ ~30 min each.
 
 ## Phase 3 — review & ship
 
-- [ ] T12 `/review` (appsec: write gated to superadmin/global-PM at RLS + action; no injection via steps/URLs); fix P0/P1
+- [x] T12 `/review` (appsec: write gated to superadmin/global-PM at RLS + action; no injection via steps/URLs); fix P0/P1
 - [ ] T13 Open PR (spec+plan linked); after merge `/update-docs` (CUJ row, spec → shipped); apply migration + deploy
 
 ## AC coverage
