@@ -20,11 +20,11 @@
   --bg-inset: #05070e;
   --bg-sidebar: #080b15;
 
-  /* Glass — translucent surfaces over the atmosphere (theme-aware) */
-  --glass-bg: rgba(16, 22, 39, 0.62);
-  --glass-bg-strong: rgba(18, 25, 44, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.05);
+  /* Glass — translucent surfaces over the atmosphere (theme-aware); lifted to read elevated */
+  --glass-bg: rgba(24, 32, 54, 0.66);
+  --glass-bg-strong: rgba(26, 35, 60, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.07);
 
   /* Borders */
   --line: rgba(255, 255, 255, 0.07);
@@ -38,18 +38,19 @@
   --text-2: #79839a;
   --text-3: #515b73;
 
-  /* Progix blue — same hue, richer, with glow + gradient */
+  /* Progix blue — same hue, brighter + electric, with strong glow + gradient */
   --blue: #4c82fb;
-  --blue-bright: #5e93ff;
+  --blue-bright: #6aa3ff;
   --blue-hover: #6a98ff;
   --blue-press: #3a6fe6;
   --blue-deep: #15203e;
-  --blue-tint: rgba(76, 130, 251, 0.12);
-  --blue-tint-2: rgba(76, 130, 251, 0.2);
-  --blue-ring: rgba(76, 130, 251, 0.5);
-  --blue-glow: rgba(76, 130, 251, 0.45);
-  --blue-text: #9db8ff;
-  --grad-blue: linear-gradient(180deg, #5e93ff 0%, #3f74f0 100%);
+  --blue-tint: rgba(76, 130, 251, 0.14);
+  --blue-tint-2: rgba(76, 130, 251, 0.22);
+  --blue-ring: rgba(76, 130, 251, 0.55);
+  --blue-glow: rgba(70, 132, 255, 0.6);
+  --blue-spot: rgba(56, 124, 255, 0.55); /* localized spotlight glow */
+  --blue-text: #a9c2ff;
+  --grad-blue: linear-gradient(180deg, #6aa3ff 0%, #3f74f0 100%);
 
   /* Status */
   --green: #3fb97f;
@@ -61,9 +62,9 @@
   --red-text: #ffb6a2;
 
   /* Elevation */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
-  --shadow-pop: 0 16px 48px -12px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 8px 26px -8px var(--blue-glow);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 38px -18px rgba(0, 0, 0, 0.72);
+  --shadow-pop: 0 28px 64px -16px rgba(0, 0, 0, 0.78), 0 2px 10px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 6px 22px -4px var(--blue-glow), 0 0 44px -10px var(--blue-glow);
 
   /* shadcn semantic tokens → mapped onto the palette */
   --background: var(--bg);
@@ -207,7 +208,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* Atmospheric backdrop — soft blue glows fixed behind all content (depth, not noise). */
+  /* Atmospheric backdrop — bold blue spotlights fixed behind all content (Skyway depth). */
   body::before {
     content: "";
     position: fixed;
@@ -215,9 +216,10 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(1100px 760px at 8% -12%, rgba(76, 130, 251, 0.12), transparent 60%),
-      radial-gradient(840px 680px at 104% -4%, rgba(58, 111, 230, 0.08), transparent 55%),
-      radial-gradient(760px 640px at 50% 118%, rgba(76, 130, 251, 0.05), transparent 60%);
+      radial-gradient(820px 520px at 72% -10%, rgba(56, 124, 255, 0.26), transparent 58%),
+      radial-gradient(1200px 820px at 4% -14%, rgba(58, 111, 230, 0.16), transparent 60%),
+      radial-gradient(700px 620px at 100% 102%, rgba(48, 96, 230, 0.12), transparent 55%),
+      radial-gradient(760px 640px at 30% 120%, rgba(76, 130, 251, 0.07), transparent 60%);
   }
   /* Faint grain so flat surfaces read as material, not plastic. */
   body::after {
@@ -256,24 +258,58 @@
 }
 
 @layer components {
-  /* Glass surface — translucent material over the atmosphere with an inner highlight. */
+  /* Glass surface — glossy material with a top sheen, clear edge + inner highlight. */
   .glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(18px) saturate(150%);
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 42%),
+      var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(155%);
+    -webkit-backdrop-filter: blur(20px) saturate(155%);
     border: 1px solid var(--glass-border);
     box-shadow:
       var(--shadow-card),
       inset 0 1px 0 var(--glass-highlight);
   }
   .glass-strong {
-    background: var(--glass-bg-strong);
-    backdrop-filter: blur(22px) saturate(150%);
-    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 38%),
+      var(--glass-bg-strong);
+    backdrop-filter: blur(26px) saturate(160%);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
     border: 1px solid var(--glass-border);
     box-shadow:
       var(--shadow-pop),
       inset 0 1px 0 var(--glass-highlight);
+  }
+  /* Localized blue spotlight behind a hero element (Skyway). Put on a positioned parent. */
+  .spotlight {
+    position: relative;
+  }
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    inset: -40% -10% auto -10%;
+    height: 320px;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(60% 100% at 50% 0%, var(--blue-spot), transparent 70%);
+    filter: blur(8px);
+  }
+  /* Selected/active surface — solid blue edge + glow (e.g. chosen plan/filter). */
+  .is-selected {
+    border-color: var(--blue) !important;
+    box-shadow:
+      0 0 0 1px var(--blue),
+      0 8px 30px -8px var(--blue-glow);
+  }
+  /* Glowing circular action — the signature orb. */
+  .glow-orb {
+    background: var(--grad-blue);
+    color: #fff;
+    box-shadow:
+      0 0 0 1px rgba(106, 163, 255, 0.5),
+      0 10px 30px -6px var(--blue-glow),
+      0 0 50px -8px var(--blue-glow);
   }
   /* Primary action — blue gradient with a soft glow; the app's signature button. */
   .btn-primary {

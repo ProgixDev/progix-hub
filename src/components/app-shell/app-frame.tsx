@@ -22,7 +22,7 @@ export function AppFrame({
 }) {
   const [navOpen, setNavOpen] = useState(false);
   return (
-    <div className="bg-bg flex h-dvh overflow-hidden">
+    <div className="flex h-dvh overflow-hidden">
       <Sidebar
         recent={recent}
         open={navOpen}
