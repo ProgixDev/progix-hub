@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
+import { Modal } from "@/components/ui/modal";
 import { createClient } from "@/lib/supabase/client";
 import { type ActionResult, createTutorialAction, updateTutorialAction } from "../actions";
 import { useTutorialsStore } from "../provider";
@@ -21,7 +22,7 @@ export function TutorialForm({ platformOptions }: { platformOptions: PlatformOpt
   if (modal.mode === "closed") return null;
   const editing = modal.mode === "edit" ? modal.tutorial : null;
   return (
-    <Modal
+    <TutorialFormModal
       key={editing?.id ?? "new"}
       editing={editing}
       platformOptions={platformOptions}
@@ -53,7 +54,7 @@ function Field({
   );
 }
 
-function Modal({
+function TutorialFormModal({
   editing,
   platformOptions,
   onClose,
@@ -69,14 +70,6 @@ function Modal({
   const [formError, setFormError] = useState<string | null>(null);
   const [source, setSource] = useState<SourceType>(editing?.source_type ?? "embed");
   const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -130,126 +123,16 @@ function Modal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/70 px-4 py-[6vh] backdrop-blur-md"
-      role="dialog"
-      aria-modal="true"
-      aria-label={editing ? t("editTutorial") : t("newTutorial")}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <form onSubmit={onSubmit} className="glass-strong w-full max-w-lg rounded-2xl">
-        <div className="border-line flex items-center justify-between border-b px-5 py-4">
-          <h2 className="text-text text-[15px] font-semibold">
-            {editing ? t("editTutorial") : t("newTutorial")}
-          </h2>
-        </div>
-
-        <div className="flex flex-col gap-4 p-5">
-          {formError && (
-            <p className="border-red/30 bg-red-tint text-red-text rounded-md border px-3 py-2 text-[13px]">
-              {formError}
-            </p>
-          )}
-
-          <Field label={t("fieldTitle")} error={errors.title} required>
-            <input
-              name="title"
-              defaultValue={editing?.title ?? ""}
-              className={inputCls}
-              required
-              autoFocus
-            />
-          </Field>
-
-          <Field label={t("fieldSource")}>
-            <div className="border-line-1 flex w-fit items-center gap-0.5 rounded-md border p-0.5">
-              {(["embed", "upload"] as const).map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSource(s)}
-                  className={`h-8 rounded px-3 text-[12.5px] font-medium transition-colors ${
-                    source === s ? "bg-bg-2 text-text" : "text-text-3 hover:text-text"
-                  }`}
-                >
-                  {t(s === "embed" ? "sourceEmbed" : "sourceUpload")}
-                </button>
-              ))}
-            </div>
-          </Field>
-
-          {source === "embed" ? (
-            <Field label={t("fieldLink")} error={errors.embed_url} required>
-              <input
-                name="embed_url"
-                defaultValue={editing?.embed_url ?? ""}
-                placeholder="https://youtu.be/…"
-                className={`${inputCls} font-mono text-[13px]`}
-              />
-            </Field>
-          ) : (
-            <Field
-              label={t("fieldFile")}
-              error={errors.storage_path}
-              required={!editing?.storage_path}
-            >
-              <input ref={fileRef} type="file" accept="video/*" className={inputCls} />
-              {editing?.storage_path && (
-                <span className="text-text-3 text-[11.5px]">{t("fileKeepHint")}</span>
-              )}
-            </Field>
-          )}
-
-          <Field label={t("fieldPlatform")}>
-            <select
-              name="platform_service_id"
-              defaultValue={editing?.platform_service_id ?? ""}
-              className={inputCls}
-            >
-              <option value="">{t("platformNone")}</option>
-              {platformOptions.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <Field label={t("fieldLanguage")}>
-            <select name="language" defaultValue={editing?.language ?? ""} className={inputCls}>
-              <option value="">{t("languageBoth")}</option>
-              <option value="en">EN</option>
-              <option value="fr">FR</option>
-            </select>
-          </Field>
-
-          <Field label={t("fieldDescription")} error={errors.description}>
-            <textarea
-              name="description"
-              defaultValue={editing?.description ?? ""}
-              rows={2}
-              className={inputCls}
-            />
-          </Field>
-
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="visible_to_clients"
-              defaultChecked={editing?.visible_to_clients ?? false}
-              className="size-4"
-            />
-            <span className="text-text-1 text-[13px]">{t("fieldVisibleToClients")}</span>
-          </label>
-        </div>
-
-        <div className="border-line flex items-center justify-end gap-2 border-t px-5 py-4">
+    <Modal
+      title={editing ? t("editTutorial") : t("newTutorial")}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      footer={
+        <>
           <button
             type="button"
             onClick={onClose}
-            className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
+            className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full px-3.5 text-[13.5px] font-medium transition-colors"
           >
             {tCommon("cancel")}
           </button>
@@ -260,8 +143,101 @@ function Modal({
           >
             {pending ? tCommon("saving") : editing ? tCommon("save") : t("add")}
           </button>
+        </>
+      }
+    >
+      {formError && (
+        <p className="border-red/30 bg-red-tint text-red-text rounded-xl border px-3.5 py-2.5 text-[13px]">
+          {formError}
+        </p>
+      )}
+
+      <Field label={t("fieldTitle")} error={errors.title} required>
+        <input
+          name="title"
+          defaultValue={editing?.title ?? ""}
+          className={inputCls}
+          required
+          autoFocus
+        />
+      </Field>
+
+      <Field label={t("fieldSource")}>
+        <div className="border-line-1 flex w-fit items-center gap-0.5 rounded-md border p-0.5">
+          {(["embed", "upload"] as const).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setSource(s)}
+              className={`h-8 rounded px-3 text-[12.5px] font-medium transition-colors ${
+                source === s ? "bg-bg-2 text-text" : "text-text-3 hover:text-text"
+              }`}
+            >
+              {t(s === "embed" ? "sourceEmbed" : "sourceUpload")}
+            </button>
+          ))}
         </div>
-      </form>
-    </div>
+      </Field>
+
+      {source === "embed" ? (
+        <Field label={t("fieldLink")} error={errors.embed_url} required>
+          <input
+            name="embed_url"
+            defaultValue={editing?.embed_url ?? ""}
+            placeholder="https://youtu.be/…"
+            className={`${inputCls} font-mono text-[13px]`}
+          />
+        </Field>
+      ) : (
+        <Field label={t("fieldFile")} error={errors.storage_path} required={!editing?.storage_path}>
+          <input ref={fileRef} type="file" accept="video/*" className={inputCls} />
+          {editing?.storage_path && (
+            <span className="text-text-3 text-[11.5px]">{t("fileKeepHint")}</span>
+          )}
+        </Field>
+      )}
+
+      <Field label={t("fieldPlatform")}>
+        <select
+          name="platform_service_id"
+          defaultValue={editing?.platform_service_id ?? ""}
+          className={inputCls}
+        >
+          <option value="">{t("platformNone")}</option>
+          {platformOptions.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field label={t("fieldLanguage")}>
+        <select name="language" defaultValue={editing?.language ?? ""} className={inputCls}>
+          <option value="">{t("languageBoth")}</option>
+          <option value="en">EN</option>
+          <option value="fr">FR</option>
+        </select>
+      </Field>
+
+      <Field label={t("fieldDescription")} error={errors.description}>
+        <textarea
+          name="description"
+          defaultValue={editing?.description ?? ""}
+          rows={2}
+          className={inputCls}
+        />
+      </Field>
+
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          name="visible_to_clients"
+          defaultChecked={editing?.visible_to_clients ?? false}
+          className="size-4"
+        />
+        <span className="text-text-1 text-[13px]">{t("fieldVisibleToClients")}</span>
+      </label>
+    </Modal>
   );
 }
