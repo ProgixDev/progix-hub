@@ -280,6 +280,15 @@ export async function restoreSnapshotAction(
   };
 }
 
+/** Refetch the live plan (items + links) — used to sync after a collaborator's change. RLS-gated. */
+export async function getPlanStateAction(
+  projectId: string,
+): Promise<{ items: PlanItem[]; links: PlanLink[] } | null> {
+  if (!(await assertAccess(projectId))) return null;
+  const supabase = await createClient();
+  return readPlan(supabase, projectId);
+}
+
 /** Delete a snapshot. RLS scopes to accessible rows. */
 export async function deleteSnapshotAction(id: string): Promise<ActionResult> {
   if (!z.uuid().safeParse(id).success) return { ok: false };

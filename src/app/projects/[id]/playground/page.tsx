@@ -27,6 +27,11 @@ export default async function PlaygroundPage({ params }: { params: Promise<{ id:
       items={items}
       links={links}
       assignees={assignees}
+      me={{
+        id: user.id,
+        name: user.name ?? user.email ?? "Member",
+        initials: user.initials ?? "?",
+      }}
     />
   );
 }

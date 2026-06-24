@@ -42,6 +42,7 @@ const Card = memo(function Card({
   onStartLink,
   onStartEdit,
   onCommitTitle,
+  remote,
 }: {
   item: PlanItem;
   selected: boolean;
@@ -52,6 +53,7 @@ const Card = memo(function Card({
   onStartLink: (e: React.PointerEvent, item: PlanItem) => void;
   onStartEdit: (item: PlanItem) => void;
   onCommitTitle: (id: string, title: string) => void;
+  remote: { color: string; name: string } | null;
 }) {
   return (
     <div
@@ -72,8 +74,17 @@ const Card = memo(function Card({
         transform: `translate3d(${item.pos_x}px, ${item.pos_y}px, 0)`,
         width: CARD_W,
         background: item.type === "note" ? "rgba(224,165,59,0.1)" : undefined,
+        boxShadow: remote ? `0 0 0 2px ${remote.color}, 0 0 22px -6px ${remote.color}` : undefined,
       }}
     >
+      {remote && (
+        <span
+          className="absolute -top-5 left-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white"
+          style={{ background: remote.color }}
+        >
+          {remote.name}
+        </span>
+      )}
       {item.type === "task" && (
         <span className={cn("mb-1.5 inline-block size-2 rounded-full", STATUS_DOT[item.status])} />
       )}
@@ -154,8 +165,47 @@ const PhaseFrame = memo(function PhaseFrame({
   );
 });
 
-export function Canvas({ projectId }: { projectId: string }) {
+/** Remote collaborators' live cursors (isolated so it re-renders on cursor updates, not the canvas). */
+function Cursors() {
+  const cursors = usePlaygroundStore((s) => s.cursors);
+  const zoom = usePlaygroundStore((s) => s.zoom);
+  return (
+    <>
+      {cursors.map((c) => (
+        <div
+          key={c.userId}
+          className="pointer-events-none absolute top-0 left-0 z-20"
+          style={{ transform: `translate3d(${c.x}px, ${c.y}px, 0) scale(${1 / zoom})` }}
+        >
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <path
+              d="M1 1 L1 13 L4.6 9.6 L7 14 L9 13 L6.6 8.6 L11 8.6 Z"
+              fill={c.color}
+              stroke="white"
+              strokeWidth="1"
+            />
+          </svg>
+          <span
+            className="-mt-1 ml-3 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold text-white"
+            style={{ background: c.color }}
+          >
+            {c.name}
+          </span>
+        </div>
+      ))}
+    </>
+  );
+}
+
+export function Canvas({
+  projectId,
+  broadcastCursor,
+}: {
+  projectId: string;
+  broadcastCursor: (x: number, y: number) => void;
+}) {
   const items = usePlaygroundStore((s) => s.items);
+  const peers = usePlaygroundStore((s) => s.peers);
   const links = usePlaygroundStore((s) => s.links);
   const selectedId = usePlaygroundStore((s) => s.selectedId);
   const selectedLinkId = usePlaygroundStore((s) => s.selectedLinkId);
@@ -243,8 +293,27 @@ export function Canvas({ projectId }: { projectId: string }) {
     [links, byId, centerOf],
   );
 
+  const lastCursorMs = useRef(0);
+  const remoteByItem = useMemo(() => {
+    const m = new Map<string, { color: string; name: string }>();
+    for (const p of peers) if (p.selectedId) m.set(p.selectedId, { color: p.color, name: p.name });
+    return m;
+  }, [peers]);
+
   const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
+      // Broadcast our cursor (throttled) — even when just hovering.
+      const now = Date.now();
+      if (now - lastCursorMs.current > 45) {
+        lastCursorMs.current = now;
+        const rect = surfaceRef.current?.getBoundingClientRect();
+        if (rect) {
+          broadcastCursor(
+            (e.clientX - rect.left - panX) / zoom,
+            (e.clientY - rect.top - panY) / zoom,
+          );
+        }
+      }
       const d = g.current;
       if (!d) return;
       d.moved = true;
@@ -264,7 +333,7 @@ export function Canvas({ projectId }: { projectId: string }) {
         tempRef.current?.setAttribute("d", pathD(d.ox, d.oy, tx, ty));
       }
     },
-    [panX, panY, redrawLinks],
+    [panX, panY, zoom, redrawLinks, broadcastCursor],
   );
 
   const endGesture = useCallback(
@@ -542,8 +611,11 @@ export function Canvas({ projectId }: { projectId: string }) {
               onStartLink={startLink}
               onStartEdit={(item) => setEditing(item.id)}
               onCommitTitle={commitTitle}
+              remote={remoteByItem.get(it.id) ?? null}
             />
           ))}
+
+        <Cursors />
       </div>
 
       {items.length === 0 && (

@@ -34,6 +34,17 @@ export type PlanSnapshot = {
   created_at: string;
 };
 
+/** A collaborator currently in the playground (live presence). */
+export type Peer = {
+  userId: string;
+  name: string;
+  initials: string;
+  color: string;
+  selectedId: string | null;
+};
+/** A remote collaborator's cursor, in canvas coordinates. */
+export type RemoteCursor = { userId: string; name: string; color: string; x: number; y: number };
+
 export type Lens = "canvas" | "board";
 
 /** Assignee option (a project member). */
