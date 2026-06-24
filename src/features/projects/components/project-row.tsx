@@ -29,7 +29,7 @@ function initials(name: string) {
 export function ProjectRow({ project }: { project: Project }) {
   const t = useTranslations("projects");
   return (
-    <article className="bg-card border-line hover:border-line-strong flex items-center gap-3 rounded-lg border px-3.5 py-2.5 transition-colors">
+    <article className="card-hover bg-card border-line hover:border-line-strong flex items-center gap-3 rounded-lg border px-3.5 py-2.5 transition-colors">
       <span className="bg-bg-3 text-text-1 border-line-1 flex size-8 flex-none items-center justify-center rounded-md border text-[10.5px] font-semibold">
         {initials(project.name)}
       </span>

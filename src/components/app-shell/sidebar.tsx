@@ -252,22 +252,24 @@ function SidebarNav({
       {/* New project — glowing pill, or a glow-orb when collapsed */}
       <div className="mt-auto p-3">
         {collapsed ? (
-          <button
-            type="button"
+          <Link
+            href="/?new=1"
+            onClick={onNavigate}
             title={t("newProject")}
             aria-label={t("newProject")}
             className="glow-orb mx-auto flex size-11 items-center justify-center rounded-full transition-transform hover:scale-105"
           >
             <PlusIcon className="size-5" />
-          </button>
+          </Link>
         ) : (
-          <button
-            type="button"
+          <Link
+            href="/?new=1"
+            onClick={onNavigate}
             className="btn-primary flex h-10 w-full items-center justify-center gap-2 rounded-full text-[13.5px] font-medium"
           >
             <PlusIcon className="size-4" />
             {t("newProject")}
-          </button>
+          </Link>
         )}
       </div>
     </>

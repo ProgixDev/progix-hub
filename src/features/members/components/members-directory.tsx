@@ -68,13 +68,13 @@ export function MembersDirectory({
           {t("empty")}
         </div>
       ) : (
-        <ul className="divide-line/60 glass divide-y rounded-2xl">
+        <ul className="stagger divide-line/60 glass divide-y rounded-2xl">
           {members.map((member) => {
             const standing = standingOf(member);
             return (
               <li
                 key={member.user_id}
-                className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5"
+                className="card-hover flex flex-wrap items-center justify-between gap-2 px-4 py-2.5"
               >
                 <div className="min-w-0">
                   <Link

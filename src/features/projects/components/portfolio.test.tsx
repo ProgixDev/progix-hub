@@ -11,6 +11,12 @@ vi.mock("../actions", () => ({
   archiveProjectAction: vi.fn(),
 }));
 
+// The portfolio reads the router + search params (sidebar "New project" → /?new=1).
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 import { ProjectsPortfolio } from "./portfolio";
 
 const project: Project = {
