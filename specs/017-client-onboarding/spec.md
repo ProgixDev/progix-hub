@@ -1,6 +1,6 @@
 # Spec 017 — Client onboarding ("Setup") page
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** feature
 - **Requested by / owner:** Achref Arabi, founder
 - **Date:** 2026-06-24
