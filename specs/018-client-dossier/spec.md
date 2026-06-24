@@ -1,6 +1,6 @@
 # Spec 018 — Client dossier (team-only)
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** feature
 - **Requested by / owner:** Achref Arabi, founder
 - **Date:** 2026-06-24
