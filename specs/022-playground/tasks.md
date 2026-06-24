@@ -7,5 +7,5 @@
 - [x] T5 Inspector (edit title/status/assignee/estimate/body/delete) + glass floating toolbar + lens toggle
 - [x] T6 Board lens: status columns, drag card to change status
 - [ ] T7 Copy EN/FR; `pnpm` gates green (build on CI)
-- [ ] T8 `/review` appsec (RLS members-only, no anon, action authz); fix P0/P1
+- [x] T8 `/review` appsec (RLS members-only, no anon, action authz); fix P0/P1
 - [ ] T9 PR; CI; merge; deploy; `/update-docs` (spec shipped + CUJ)
