@@ -5,7 +5,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const inputCls =
-  "bg-bg-2 border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-11 w-full rounded-md border px-3 text-sm outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
+  "bg-bg-2 border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-11 w-full rounded-xl border px-3 text-sm outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
 
 /**
  * Email/password sign-in (spec 010). On success we do a FULL-PAGE navigation (not a client
@@ -72,7 +72,7 @@ export function EmailSignInForm() {
       <button
         type="submit"
         disabled={loading}
-        className="bg-blue text-primary-foreground hover:bg-blue-hover flex h-11 w-full items-center justify-center rounded-md text-sm font-medium transition-colors disabled:opacity-60"
+        className="btn-primary flex h-11 w-full items-center justify-center rounded-full text-sm font-medium transition-all disabled:opacity-60"
       >
         {loading ? t("redirecting") : t("signInEmail")}
       </button>

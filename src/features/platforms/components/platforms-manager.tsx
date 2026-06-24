@@ -74,7 +74,7 @@ function Inner({ platforms, canManage }: { platforms: Platform[]; canManage: boo
           <button
             type="button"
             onClick={openCreate}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover flex h-9 items-center gap-2 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+            className="btn-primary flex h-9 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium transition-all"
           >
             <PlusIcon className="size-4" />
             {t("add")}
@@ -93,7 +93,7 @@ function Inner({ platforms, canManage }: { platforms: Platform[]; canManage: boo
           {t("empty")}
         </div>
       ) : (
-        <ul className="divide-line/60 border-line-1 divide-y rounded-xl border">
+        <ul className="divide-line/60 glass divide-y rounded-2xl">
           {platforms.map((p) => (
             <li key={p.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
               <span className="bg-bg-3 text-text-1 border-line-1 flex size-9 flex-none items-center justify-center rounded-lg border text-[11px] font-semibold">
@@ -112,7 +112,7 @@ function Inner({ platforms, canManage }: { platforms: Platform[]; canManage: boo
                   <button
                     type="button"
                     onClick={() => openEdit(p)}
-                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors"
+                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors"
                   >
                     {tCommon("edit")}
                   </button>
@@ -120,7 +120,7 @@ function Inner({ platforms, canManage }: { platforms: Platform[]; canManage: boo
                     type="button"
                     disabled={pending}
                     onClick={() => disable(p)}
-                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                   >
                     {p.disabled ? t("enable") : t("disable")}
                   </button>
@@ -128,7 +128,7 @@ function Inner({ platforms, canManage }: { platforms: Platform[]; canManage: boo
                     type="button"
                     disabled={pending}
                     onClick={() => remove(p)}
-                    className="border-line-1 text-red-text hover:bg-red-tint h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                    className="border-line-1 text-red-text hover:bg-red-tint h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                   >
                     {tCommon("delete")}
                   </button>

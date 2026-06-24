@@ -45,7 +45,7 @@ function StepCard({ token, step, index }: { token: string; step: SetupStep; inde
   }
 
   return (
-    <li className="border-line-1 bg-card rounded-xl border p-4">
+    <li className="glass rounded-2xl p-4">
       <div className="flex items-start justify-between gap-2">
         <h2 className="text-text text-[15px] font-semibold">
           {index}. {p.name}
@@ -104,7 +104,7 @@ function StepCard({ token, step, index }: { token: string; step: SetupStep; inde
             href={p.invite_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue text-primary-foreground hover:bg-blue-hover mt-2 inline-flex h-9 items-center rounded-md px-3.5 text-[13px] font-medium transition-colors"
+            className="btn-primary mt-2 inline-flex h-9 items-center rounded-full px-3.5 text-[13px] font-medium transition-all"
           >
             {t("openInviteSettings")}
           </a>

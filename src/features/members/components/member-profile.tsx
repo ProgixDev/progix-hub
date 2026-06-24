@@ -45,7 +45,7 @@ export function MemberProfile({
       <Link href="/members" className="text-text-2 hover:text-text text-[12.5px]">
         ← {t("back")}
       </Link>
-      <div className="border-line-1 mt-3 rounded-xl border p-5">
+      <div className="glass mt-3 rounded-2xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="min-w-0">
             <h2 className="text-text text-[16px] font-semibold break-all">

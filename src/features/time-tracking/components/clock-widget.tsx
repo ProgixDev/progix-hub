@@ -68,13 +68,13 @@ export function ClockWidget() {
             type="button"
             disabled={pending}
             onClick={() => run(startWorkAction)}
-            className="bg-green/15 text-green border-green/30 hover:bg-green/25 flex h-9 items-center gap-2 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+            className="bg-green/15 text-green border-green/30 hover:bg-green/25 flex h-9 items-center gap-2 rounded-full border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
           >
             <span className="bg-green size-2 rounded-full" />
             {t("start")}
           </button>
         ) : (
-          <div className="border-line-1 bg-bg-2 flex h-9 items-center gap-1 rounded-md border pr-1 pl-2.5">
+          <div className="border-line-1 bg-bg-2 flex h-9 items-center gap-1 rounded-full border pr-1 pl-2.5">
             <span
               className={`size-2 flex-none rounded-full ${working ? "bg-green animate-pulse" : "bg-amber"}`}
               aria-hidden
@@ -87,7 +87,7 @@ export function ClockWidget() {
                 type="button"
                 disabled={pending}
                 onClick={() => run(pauseWorkAction)}
-                className="text-text-2 hover:bg-bg-3 hover:text-text h-7 rounded px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
+                className="text-text-2 hover:bg-bg-3 hover:text-text h-7 rounded-full px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
               >
                 {t("pause")}
               </button>
@@ -96,7 +96,7 @@ export function ClockWidget() {
                 type="button"
                 disabled={pending}
                 onClick={() => run(resumeWorkAction)}
-                className="text-green hover:bg-bg-3 h-7 rounded px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
+                className="text-green hover:bg-bg-3 h-7 rounded-full px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
               >
                 {t("resume")}
               </button>
@@ -105,7 +105,7 @@ export function ClockWidget() {
               type="button"
               disabled={pending}
               onClick={() => run(finishWorkAction)}
-              className="text-red-text hover:bg-red-tint h-7 rounded px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
+              className="text-red-text hover:bg-red-tint h-7 rounded-full px-2 text-[12px] font-medium transition-colors disabled:opacity-60"
             >
               {t("finish")}
             </button>
@@ -151,7 +151,7 @@ export function ClockWidget() {
                 type="button"
                 onClick={() => setExpanded(false)}
                 aria-label={t("collapse")}
-                className="text-text-2 hover:bg-bg-3 hover:text-text flex size-10 items-center justify-center rounded-md transition-colors"
+                className="text-text-2 hover:bg-bg-3 hover:text-text flex size-10 items-center justify-center rounded-full transition-colors"
               >
                 <ChevronDownGlyph />
               </button>

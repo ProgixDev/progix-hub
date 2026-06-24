@@ -29,7 +29,8 @@ const toneDot: Record<RecentProject["tone"], string> = {
   neutral: "bg-text-3",
 };
 
-const navActive = "border-line-blue bg-blue-tint text-text border";
+const navActive =
+  "border-line-blue bg-blue-tint text-text border shadow-[inset_0_1px_0_var(--glass-highlight)]";
 const navIdle =
   "nav-proj border border-transparent hover:bg-bg-2 text-text-1 hover:text-text transition-colors";
 
@@ -57,7 +58,7 @@ function SidebarNav({
       </div>
 
       <div className="px-3 pb-2">
-        <label className="border-line-1 bg-bg-inset focus-within:border-line-blue flex h-9 items-center gap-2.5 rounded-md border px-3 transition-colors">
+        <label className="border-line-1 bg-bg-inset focus-within:border-line-blue flex h-9 items-center gap-2.5 rounded-full border px-3.5 transition-colors">
           <SearchIcon className="text-text-2 size-4 flex-none" />
           <input
             type="search"
@@ -80,7 +81,7 @@ function SidebarNav({
           onClick={onNavigate}
           aria-current={projectsActive ? "page" : undefined}
           className={cn(
-            "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+            "flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13.5px] font-medium",
             projectsActive ? navActive : navIdle,
           )}
         >
@@ -93,7 +94,7 @@ function SidebarNav({
             onClick={onNavigate}
             aria-current={membersActive ? "page" : undefined}
             className={cn(
-              "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+              "flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13.5px] font-medium",
               membersActive ? navActive : navIdle,
             )}
           >
@@ -106,7 +107,7 @@ function SidebarNav({
           onClick={onNavigate}
           aria-current={tutorialsActive ? "page" : undefined}
           className={cn(
-            "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+            "flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13.5px] font-medium",
             tutorialsActive ? navActive : navIdle,
           )}
         >
@@ -118,7 +119,7 @@ function SidebarNav({
           onClick={onNavigate}
           aria-current={settingsActive ? "page" : undefined}
           className={cn(
-            "flex h-9 items-center gap-2.5 rounded-md px-3 text-[13.5px] font-medium",
+            "flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13.5px] font-medium",
             settingsActive ? navActive : navIdle,
           )}
         >
@@ -135,7 +136,7 @@ function SidebarNav({
               <Link
                 href={`/projects/${p.id}`}
                 onClick={onNavigate}
-                className="nav-proj hover:bg-bg-2 text-text-1 hover:text-text flex h-9 items-center gap-2.5 rounded-md px-3 text-[13px] transition-colors"
+                className="nav-proj hover:bg-bg-2 text-text-1 hover:text-text flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13px] transition-colors"
               >
                 <span className="bg-bg-3 border-line-1 text-text-2 flex size-5 flex-none items-center justify-center rounded-[5px] border font-mono text-[9px] font-medium">
                   {p.initials}
@@ -151,7 +152,7 @@ function SidebarNav({
       <div className="mt-auto p-3">
         <button
           type="button"
-          className="bg-blue text-primary-foreground hover:bg-blue-hover flex h-10 w-full items-center justify-center gap-2 rounded-md text-[13.5px] font-medium shadow-[0_6px_18px_rgba(76,130,251,0.28)] transition-colors"
+          className="btn-primary flex h-10 w-full items-center justify-center gap-2 rounded-full text-[13.5px] font-medium"
         >
           <PlusIcon className="size-4" />
           {t("newProject")}
@@ -225,7 +226,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop — unchanged */}
-      <aside className="bg-bg-sidebar border-line hidden h-dvh w-60 flex-none flex-col border-r md:flex">
+      <aside className="border-line hidden h-dvh w-60 flex-none flex-col border-r bg-[var(--bg-sidebar)]/80 backdrop-blur-xl md:flex">
         <SidebarNav recent={recent} showMembers={showMembers} />
       </aside>
 
@@ -262,7 +263,7 @@ export function Sidebar({
                 type="button"
                 onClick={onClose}
                 aria-label={t("closeMenu")}
-                className="text-text-2 hover:bg-bg-3 hover:text-text absolute top-2.5 right-2.5 z-10 flex size-9 items-center justify-center rounded-md text-[20px] leading-none transition-colors"
+                className="text-text-2 hover:bg-bg-3 hover:text-text absolute top-2.5 right-2.5 z-10 flex size-9 items-center justify-center rounded-full text-[20px] leading-none transition-colors"
               >
                 ×
               </button>

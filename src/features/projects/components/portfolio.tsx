@@ -57,7 +57,7 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
         <button
           type="button"
           onClick={openCreate}
-          className="bg-blue text-primary-foreground hover:bg-blue-hover flex h-9 items-center gap-2 rounded-md px-3.5 text-[13.5px] font-medium shadow-[0_6px_18px_rgba(76,130,251,0.28)] transition-colors"
+          className="btn-primary flex h-9 items-center gap-2 rounded-full px-3.5 text-[13.5px] font-medium transition-all"
         >
           <PlusIcon className="size-4" />
           {t("newProject")}
@@ -73,7 +73,7 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
                 type="button"
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "flex h-9 items-center gap-1.5 rounded-md px-3 text-[13px] font-medium transition-colors",
+                  "flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors",
                   filter === f.key
                     ? "bg-bg-2 text-text"
                     : "text-text-2 hover:bg-bg-2 hover:text-text",
@@ -129,7 +129,7 @@ function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: Proje
           aria-label={t(labelKey)}
           aria-pressed={view === value}
           className={cn(
-            "flex size-7 items-center justify-center rounded transition-colors",
+            "flex size-7 items-center justify-center rounded-full transition-colors",
             view === value ? "bg-bg-2 text-text" : "text-text-3 hover:text-text",
           )}
         >
@@ -149,7 +149,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
       <button
         type="button"
         onClick={onCreate}
-        className="bg-blue text-primary-foreground hover:bg-blue-hover mt-5 flex h-9 items-center gap-2 rounded-md px-3.5 text-[13.5px] font-medium transition-colors"
+        className="btn-primary mt-5 flex h-9 items-center gap-2 rounded-full px-3.5 text-[13.5px] font-medium transition-all"
       >
         <PlusIcon className="size-4" />
         {t("newProject")}

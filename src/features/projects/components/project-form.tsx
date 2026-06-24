@@ -51,7 +51,7 @@ function Field({
 }
 
 const inputCls =
-  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
+  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-xl border px-3.5 py-2.5 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
 
 export function ProjectFormModal({
   editing,
@@ -98,7 +98,7 @@ export function ProjectFormModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/60 px-4 py-[7vh] backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/70 px-4 py-[7vh] backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-label={editing ? t("editProject") : t("newProject")}
@@ -106,10 +106,7 @@ export function ProjectFormModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <form
-        onSubmit={onSubmit}
-        className="bg-card border-line-1 w-full max-w-lg rounded-xl border shadow-2xl"
-      >
+      <form onSubmit={onSubmit} className="glass-strong w-full max-w-lg rounded-2xl">
         <div className="border-line flex items-center justify-between border-b px-5 py-4">
           <h2 className="text-text text-[15px] font-semibold">
             {editing ? t("editProject") : t("newProject")}
@@ -169,14 +166,14 @@ export function ProjectFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
+            className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full px-3 text-[13.5px] font-medium transition-colors"
           >
             {tCommon("cancel")}
           </button>
           <button
             type="submit"
             disabled={pending}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
+            className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all disabled:opacity-60"
           >
             {pending ? tCommon("saving") : editing ? tCommon("save") : t("createProject")}
           </button>

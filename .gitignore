@@ -38,3 +38,7 @@ docs/reports/*.pdf
 # local agent scratch
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Playwright MCP scratch output
+.playwright-mcp/
+redesign-*.png

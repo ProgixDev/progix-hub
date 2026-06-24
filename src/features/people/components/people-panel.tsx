@@ -10,7 +10,7 @@ import {
 import { PROJECT_ROLES, ROLE_LABEL_KEY, type ProjectMember } from "../types";
 
 const inputCls =
-  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-9 rounded-md border px-3 text-[13px] outline-none";
+  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-9 rounded-xl border px-3 text-[13px] outline-none";
 
 /** The per-project People panel — PM/superadmin only (the page renders it only for them). */
 export function PeoplePanel({
@@ -65,7 +65,7 @@ export function PeoplePanel({
 
   return (
     <section className="mx-auto w-full max-w-5xl px-4 pb-8 sm:px-6">
-      <div className="border-line-1 rounded-xl border">
+      <div className="glass rounded-2xl">
         <div className="border-line border-b px-4 py-3">
           <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
           <p className="text-text-3 text-[12px]">{t("subtitle")}</p>
@@ -91,7 +91,7 @@ export function PeoplePanel({
                   aria-label={t("roleFor", { name: member.email ?? member.display_name ?? "" })}
                   disabled={pending}
                   onChange={(e) => onChangeRole(member.user_id, e.target.value)}
-                  className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-md border px-2 text-[12px] disabled:opacity-60"
+                  className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-xl border px-2 text-[12px] disabled:opacity-60"
                 >
                   {PROJECT_ROLES.map((role) => (
                     <option key={role} value={role}>
@@ -106,7 +106,7 @@ export function PeoplePanel({
                   aria-label={t("removeMember", {
                     name: member.email ?? member.display_name ?? "",
                   })}
-                  className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                  className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                 >
                   {t("remove")}
                 </button>
@@ -151,7 +151,7 @@ export function PeoplePanel({
           <button
             type="submit"
             disabled={pending}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60"
+            className="btn-primary h-9 rounded-full px-3.5 text-[13px] font-medium transition-all disabled:opacity-60"
           >
             {t("add")}
           </button>

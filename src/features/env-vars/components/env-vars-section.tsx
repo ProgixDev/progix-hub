@@ -110,7 +110,7 @@ function Header({ canWrite, projectId }: { canWrite: boolean; projectId: string 
             <button
               type="button"
               onClick={hideAll}
-              className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+              className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3 text-[13px] font-medium transition-colors"
             >
               {t("hideAll")}
             </button>
@@ -118,7 +118,7 @@ function Header({ canWrite, projectId }: { canWrite: boolean; projectId: string 
           <button
             type="button"
             onClick={openImport}
-            className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+            className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3 text-[13px] font-medium transition-colors"
           >
             {t("import")}
           </button>
@@ -126,7 +126,7 @@ function Header({ canWrite, projectId }: { canWrite: boolean; projectId: string 
           <button
             type="button"
             onClick={openCreate}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+            className="btn-primary h-9 rounded-full px-3.5 text-[13px] font-medium transition-all"
           >
             {t("addVariable")}
           </button>

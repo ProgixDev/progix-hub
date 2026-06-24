@@ -37,7 +37,7 @@ export function projectSurfaces(project: Project) {
 export function ProjectCard({ project }: { project: Project }) {
   const t = useTranslations("projects");
   return (
-    <article className="bg-card border-line hover:border-line-strong rounded-xl border p-4 transition-colors">
+    <article className="glass hover:border-line-strong rounded-2xl p-4 transition-colors">
       <div className="flex items-start gap-3">
         <span className="bg-bg-3 text-text-1 border-line-1 flex size-9 flex-none items-center justify-center rounded-lg border text-[11px] font-semibold">
           {initials(project.name)}
@@ -68,7 +68,7 @@ export function ProjectCard({ project }: { project: Project }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${label} (${t("opensNewTab")})`}
-              className="bg-bg-2 border-line-1 hover:border-line-strong flex size-7 items-center justify-center rounded-md border transition-colors"
+              className="glass hover:border-line-strong flex size-7 items-center justify-center rounded-xl transition-colors"
             >
               <Glyph size={15} />
             </a>

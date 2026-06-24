@@ -71,7 +71,7 @@ export function SetupPanel({
     : null;
 
   return (
-    <section className="border-line-1 bg-card mt-4 rounded-xl border p-5">
+    <section className="glass mt-4 rounded-2xl p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
         {setup && (
@@ -131,7 +131,7 @@ export function SetupPanel({
                 type="button"
                 disabled={pending || picked.length === 0}
                 onClick={create}
-                className="bg-blue text-primary-foreground hover:bg-blue-hover mt-3 h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60"
+                className="btn-primary mt-3 h-9 rounded-full px-3.5 text-[13px] font-medium transition-all disabled:opacity-60"
               >
                 {t("create")}
               </button>
@@ -140,7 +140,7 @@ export function SetupPanel({
         </div>
       ) : (
         <div className="mt-4">
-          <ul className="divide-line/60 border-line-1 divide-y rounded-lg border">
+          <ul className="divide-line/60 glass divide-y rounded-2xl">
             {steps.map((s) => (
               <li key={s.id} className="flex items-center justify-between gap-2 px-3.5 py-2.5">
                 <span className="text-text truncate text-[13px]">{s.platform_name}</span>
@@ -150,7 +150,7 @@ export function SetupPanel({
                     type="button"
                     disabled={pending}
                     onClick={() => verify(s)}
-                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                   >
                     {s.status === "verified" ? t("unverify") : t("verify")}
                   </button>
@@ -163,7 +163,7 @@ export function SetupPanel({
               type="button"
               disabled={pending}
               onClick={rotate}
-              className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+              className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
             >
               {t("rotate")}
             </button>
@@ -171,7 +171,7 @@ export function SetupPanel({
               type="button"
               disabled={pending}
               onClick={toggleEnabled}
-              className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+              className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
             >
               {setup.enabled ? t("disable") : t("enable")}
             </button>

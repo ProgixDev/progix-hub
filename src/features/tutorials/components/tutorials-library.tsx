@@ -76,7 +76,7 @@ function Inner({
           <button
             type="button"
             onClick={openCreate}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover flex h-9 items-center gap-2 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+            className="btn-primary flex h-9 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium transition-all"
           >
             <PlusIcon className="size-4" />
             {t("add")}
@@ -97,10 +97,7 @@ function Inner({
       ) : (
         <div className="grid gap-5 sm:grid-cols-2">
           {tutorials.map((item) => (
-            <article
-              key={item.id}
-              className="border-line-1 bg-card flex flex-col gap-2 rounded-xl border p-3"
-            >
+            <article key={item.id} className="glass flex flex-col gap-2 rounded-2xl p-3">
               <TutorialPlayer tutorial={item} videoUrl={videoUrls[item.id]} />
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -123,7 +120,7 @@ function Inner({
                   <button
                     type="button"
                     onClick={() => openEdit(item)}
-                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors"
+                    className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors"
                   >
                     {tCommon("edit")}
                   </button>
@@ -131,7 +128,7 @@ function Inner({
                     type="button"
                     disabled={pending}
                     onClick={() => remove(item)}
-                    className="border-line-1 text-red-text hover:bg-red-tint h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                    className="border-line-1 text-red-text hover:bg-red-tint h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                   >
                     {tCommon("delete")}
                   </button>
