@@ -119,6 +119,14 @@ export async function createLinkAction(
   }
   if (sourceId === targetId) return { ok: false };
   const supabase = await createClient();
+  // Both items must belong to this project (keeps links same-project; RLS-scoped read).
+  const { data: found } = await supabase
+    .from("plan_items")
+    .select("id")
+    .eq("project_id", projectId)
+    .in("id", [sourceId, targetId]);
+  if (!found || found.length !== 2) return { ok: false };
+
   const { data, error } = await supabase
     .from("plan_links")
     .insert({ project_id: projectId, source_id: sourceId, target_id: targetId })
