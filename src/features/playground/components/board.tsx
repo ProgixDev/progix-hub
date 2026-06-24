@@ -22,12 +22,18 @@ const COLUMN_DOT: Record<Status, string> = {
 
 export function Board() {
   const items = usePlaygroundStore((s) => s.items);
+  const links = usePlaygroundStore((s) => s.links);
   const select = usePlaygroundStore((s) => s.select);
   const selectedId = usePlaygroundStore((s) => s.selectedId);
   const patchItem = usePlaygroundStore((s) => s.patchItem);
   const [over, setOver] = useState<Status | null>(null);
 
   const tasks = items.filter((i) => i.type === "task");
+  const blocked = new Set<string>();
+  for (const l of links) {
+    const src = items.find((i) => i.id === l.source_id);
+    if (src && src.status !== "done") blocked.add(l.target_id);
+  }
 
   function drop(status: Status, id: string) {
     setOver(null);
@@ -74,14 +80,22 @@ export function Board() {
                     className={cn(
                       "glass cursor-grab rounded-xl p-3 text-left active:cursor-grabbing",
                       t.id === selectedId && "ring-blue-ring ring-2",
+                      blocked.has(t.id) && t.id !== selectedId && "ring-amber/60 ring-1",
                     )}
                   >
                     <p className="text-text text-[13px] leading-snug font-medium break-words">
                       {t.title || "Untitled"}
                     </p>
-                    {t.estimate_hours != null && (
-                      <p className="text-text-3 mt-1 font-mono text-[11px]">{t.estimate_hours}h</p>
-                    )}
+                    <div className="mt-1 flex items-center gap-2">
+                      {t.estimate_hours != null && (
+                        <span className="text-text-3 font-mono text-[11px]">
+                          {t.estimate_hours}h
+                        </span>
+                      )}
+                      {blocked.has(t.id) && (
+                        <span className="text-amber text-[10.5px] font-medium">● blocked</span>
+                      )}
+                    </div>
                   </button>
                 ))}
                 {col.length === 0 && (

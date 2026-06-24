@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { PLAN_COLS } from "./data";
-import { ITEM_TYPES, STATUSES, type PlanItem } from "./types";
+import { ITEM_TYPES, STATUSES, type PlanItem, type PlanLink } from "./types";
 
 export type CreateResult = { ok: true; item: PlanItem } | { ok: false };
 export type ActionResult = { ok: true } | { ok: false };
@@ -101,6 +101,47 @@ export async function deletePlanItemAction(id: string): Promise<ActionResult> {
   if (!(await getCurrentUser())) return { ok: false };
   const supabase = await createClient();
   const { error } = await supabase.from("plan_items").delete().eq("id", id);
+  if (error) return { ok: false };
+  return { ok: true };
+}
+
+export type LinkResult = { ok: true; link: PlanLink } | { ok: false };
+
+/** Create a dependency arrow (source → target). Authz: project access; RLS backstops. */
+export async function createLinkAction(
+  projectId: string,
+  sourceId: string,
+  targetId: string,
+): Promise<LinkResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  if (!z.uuid().safeParse(sourceId).success || !z.uuid().safeParse(targetId).success) {
+    return { ok: false };
+  }
+  if (sourceId === targetId) return { ok: false };
+  const supabase = await createClient();
+  // Both items must belong to this project (keeps links same-project; RLS-scoped read).
+  const { data: found } = await supabase
+    .from("plan_items")
+    .select("id")
+    .eq("project_id", projectId)
+    .in("id", [sourceId, targetId]);
+  if (!found || found.length !== 2) return { ok: false };
+
+  const { data, error } = await supabase
+    .from("plan_links")
+    .insert({ project_id: projectId, source_id: sourceId, target_id: targetId })
+    .select("id,source_id,target_id")
+    .single();
+  if (error || !data) return { ok: false };
+  return { ok: true, link: data as PlanLink };
+}
+
+/** Delete a dependency arrow. RLS scopes to accessible rows. */
+export async function deleteLinkAction(id: string): Promise<ActionResult> {
+  if (!z.uuid().safeParse(id).success) return { ok: false };
+  if (!(await getCurrentUser())) return { ok: false };
+  const supabase = await createClient();
+  const { error } = await supabase.from("plan_links").delete().eq("id", id);
   if (error) return { ok: false };
   return { ok: true };
 }
