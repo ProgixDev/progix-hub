@@ -5,12 +5,16 @@ import { useTransition } from "react";
 import { Wordmark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { createPlanItemAction } from "../actions";
+import { usePlaygroundPresence } from "../presence";
 import { PlaygroundStoreProvider, usePlaygroundStore } from "../provider";
 import type { ItemType, MemberOption, PlanItem, PlanLink } from "../types";
 import { Board } from "./board";
 import { Canvas } from "./canvas";
 import { Inspector } from "./inspector";
+import { PresenceBar } from "./presence-bar";
 import { SnapshotsPanel } from "./snapshots-panel";
+
+type Me = { id: string; name: string; initials: string };
 
 export function Playground({
   projectId,
@@ -19,6 +23,7 @@ export function Playground({
   items,
   links,
   assignees,
+  me,
 }: {
   projectId: string;
   projectName: string;
@@ -26,6 +31,7 @@ export function Playground({
   items: PlanItem[];
   links: PlanLink[];
   assignees: MemberOption[];
+  me: Me;
 }) {
   return (
     <PlaygroundStoreProvider items={items} links={links}>
@@ -34,6 +40,7 @@ export function Playground({
         projectName={projectName}
         backHref={backHref}
         assignees={assignees}
+        me={me}
       />
     </PlaygroundStoreProvider>
   );
@@ -44,12 +51,15 @@ function Shell({
   projectName,
   backHref,
   assignees,
+  me,
 }: {
   projectId: string;
   projectName: string;
   backHref: string;
   assignees: MemberOption[];
+  me: Me;
 }) {
+  const { broadcastCursor } = usePlaygroundPresence({ projectId, me });
   const lens = usePlaygroundStore((s) => s.lens);
   const setLens = usePlaygroundStore((s) => s.setLens);
   const addItem = usePlaygroundStore((s) => s.addItem);
@@ -116,6 +126,7 @@ function Shell({
           ))}
         </div>
 
+        <PresenceBar />
         <SnapshotsPanel projectId={projectId} />
 
         {/* add actions */}
@@ -148,7 +159,11 @@ function Shell({
       </header>
 
       <div className="relative flex min-h-0 flex-1">
-        {lens === "canvas" ? <Canvas projectId={projectId} /> : <Board />}
+        {lens === "canvas" ? (
+          <Canvas projectId={projectId} broadcastCursor={broadcastCursor} />
+        ) : (
+          <Board />
+        )}
         <Inspector assignees={assignees} />
 
         {/* zoom reset (canvas only) */}

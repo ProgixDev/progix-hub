@@ -28,3 +28,11 @@ export function usePlaygroundStore<T>(selector: (state: PlaygroundState) => T): 
   if (!store) throw new Error("usePlaygroundStore must be used within a PlaygroundStoreProvider");
   return useStore(store, selector);
 }
+
+/** The raw store (for subscribing imperatively, e.g. the presence hook). */
+export function usePlaygroundStoreApi(): PlaygroundStore {
+  const store = useContext(PlaygroundStoreContext);
+  if (!store)
+    throw new Error("usePlaygroundStoreApi must be used within a PlaygroundStoreProvider");
+  return store;
+}
