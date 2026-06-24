@@ -15,14 +15,21 @@ export function TutorialsLibrary({
   tutorials,
   canManage,
   platformOptions,
+  videoUrls = {},
 }: {
   tutorials: Tutorial[];
   canManage: boolean;
   platformOptions: PlatformOption[];
+  videoUrls?: Record<string, string>;
 }) {
   return (
     <TutorialsStoreProvider>
-      <Inner tutorials={tutorials} canManage={canManage} platformOptions={platformOptions} />
+      <Inner
+        tutorials={tutorials}
+        canManage={canManage}
+        platformOptions={platformOptions}
+        videoUrls={videoUrls}
+      />
       {canManage && <TutorialForm platformOptions={platformOptions} />}
     </TutorialsStoreProvider>
   );
@@ -32,10 +39,12 @@ function Inner({
   tutorials,
   canManage,
   platformOptions,
+  videoUrls,
 }: {
   tutorials: Tutorial[];
   canManage: boolean;
   platformOptions: PlatformOption[];
+  videoUrls: Record<string, string>;
 }) {
   const t = useTranslations("tutorials");
   const tCommon = useTranslations("common");
@@ -92,7 +101,7 @@ function Inner({
               key={item.id}
               className="border-line-1 bg-card flex flex-col gap-2 rounded-xl border p-3"
             >
-              <TutorialPlayer url={item.embed_url} title={item.title} />
+              <TutorialPlayer tutorial={item} videoUrl={videoUrls[item.id]} />
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <h2 className="text-text truncate text-[14px] font-semibold">{item.title}</h2>

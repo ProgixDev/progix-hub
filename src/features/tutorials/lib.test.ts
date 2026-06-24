@@ -51,4 +51,22 @@ describe("tutorialInputSchema (spec 016)", () => {
     expect(r.success).toBe(false);
     if (!r.success) expect(r.error.issues.some((i) => i.path[0] === "embed_url")).toBe(true);
   });
+
+  it("accepts an upload source with a storage path (spec 019 AC-1/AC-2)", () => {
+    const r = tutorialInputSchema.safeParse({
+      title: "Recorded walkthrough",
+      source_type: "upload",
+      storage_path: "0f8fad5b-d9cb-469f-a165-70867728950e/clip.mp4",
+    });
+    expect(r.success).toBe(true);
+    if (r.success)
+      expect(r.data.storage_path).toBe("0f8fad5b-d9cb-469f-a165-70867728950e/clip.mp4");
+  });
+
+  it("rejects an upload with no file and an embed with no link (AC-4)", () => {
+    expect(tutorialInputSchema.safeParse({ title: "x", source_type: "upload" }).success).toBe(
+      false,
+    );
+    expect(tutorialInputSchema.safeParse({ title: "x", source_type: "embed" }).success).toBe(false);
+  });
 });

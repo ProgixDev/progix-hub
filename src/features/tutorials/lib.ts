@@ -55,12 +55,16 @@ const optionalTrimmed = z
   .optional()
   .transform((v) => (v && v.length > 0 ? v : null));
 
+export const SOURCE_TYPES = ["embed", "upload"] as const;
+
 export const tutorialInputSchema = z
   .object({
     title: z.string().trim().min(1, "tutorials.errorTitle"),
     description: optionalTrimmed,
     platform_service_id: optionalTrimmed,
-    embed_url: z.string().trim().min(1, "tutorials.errorLink"),
+    source_type: z.enum(SOURCE_TYPES).default("embed"),
+    embed_url: optionalTrimmed,
+    storage_path: optionalTrimmed,
     language: z
       .string()
       .optional()
@@ -68,8 +72,14 @@ export const tutorialInputSchema = z
     visible_to_clients: z.boolean().default(false),
   })
   .superRefine((val, ctx) => {
-    if (!embedUrlFor(val.embed_url)) {
-      ctx.addIssue({ code: "custom", path: ["embed_url"], message: "tutorials.errorLink" });
+    // Exactly one source: an embed needs a recognized link; an upload needs a stored file.
+    if (val.source_type === "embed") {
+      if (!val.embed_url || !embedUrlFor(val.embed_url)) {
+        ctx.addIssue({ code: "custom", path: ["embed_url"], message: "tutorials.errorLink" });
+      }
+    } else if (!val.storage_path || !/^[0-9a-fA-F-]{36}\/.+/.test(val.storage_path)) {
+      // Must be a `<uuid>/<name>` key written by the upload flow — rejects arbitrary/typo paths.
+      ctx.addIssue({ code: "custom", path: ["storage_path"], message: "tutorials.errorFile" });
     }
   });
 

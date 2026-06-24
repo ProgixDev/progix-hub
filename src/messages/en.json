@@ -409,7 +409,16 @@
     "fieldVisibleToClients": "Can be shown to clients",
     "deleteConfirm": "Delete “{title}”? This can’t be undone.",
     "errorTitle": "Title is required",
-    "errorLink": "Paste a YouTube, Loom or Vimeo link"
+    "errorLink": "Paste a YouTube, Loom or Vimeo link",
+    "fieldSource": "Video source",
+    "sourceEmbed": "Embed link",
+    "sourceUpload": "Upload file",
+    "fieldFile": "Video file",
+    "fileKeepHint": "Leave empty to keep the current file.",
+    "errorFile": "Choose a video file",
+    "errorFileType": "That isn’t a video file",
+    "errorFileSize": "Video is too large (max 200 MB)",
+    "errorUpload": "Upload failed — please try again."
   },
   "setup": {
     "title": "Client setup page",
