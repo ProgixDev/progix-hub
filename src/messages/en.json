@@ -88,7 +88,8 @@
     "viewGrid": "Grid view",
     "viewList": "List view",
     "deleting": "Deleting…",
-    "deleteConfirm": "Permanently delete “{name}” and all its data? This can’t be undone."
+    "deleteConfirm": "Permanently delete “{name}” and all its data? This can’t be undone.",
+    "openPlayground": "Playground"
   },
   "envVars": {
     "title": "Environment variables",
