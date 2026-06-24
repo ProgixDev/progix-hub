@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { PLAN_COLS } from "./data";
-import { ITEM_TYPES, STATUSES, type PlanItem, type PlanLink } from "./types";
+import { listSnapshots, PLAN_COLS } from "./data";
+import { ITEM_TYPES, STATUSES, type PlanItem, type PlanLink, type PlanSnapshot } from "./types";
 
 export type CreateResult = { ok: true; item: PlanItem } | { ok: false };
 export type ActionResult = { ok: true } | { ok: false };
@@ -142,6 +142,115 @@ export async function deleteLinkAction(id: string): Promise<ActionResult> {
   if (!(await getCurrentUser())) return { ok: false };
   const supabase = await createClient();
   const { error } = await supabase.from("plan_links").delete().eq("id", id);
+  if (error) return { ok: false };
+  return { ok: true };
+}
+
+// ---- Snapshots (save-states) -------------------------------------------------
+
+type PlanSnapshotData = { items: PlanItem[]; links: PlanLink[] };
+export type RestoreResult = { ok: true; items: PlanItem[]; links: PlanLink[] } | { ok: false };
+
+async function readPlan(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  projectId: string,
+): Promise<PlanSnapshotData> {
+  const [itemsRes, linksRes] = await Promise.all([
+    supabase.from("plan_items").select(PLAN_COLS).eq("project_id", projectId),
+    supabase.from("plan_links").select("id,source_id,target_id").eq("project_id", projectId),
+  ]);
+  return {
+    items: (itemsRes.data ?? []) as PlanItem[],
+    links: (linksRes.data ?? []) as PlanLink[],
+  };
+}
+
+/** Save the current plan as a labeled snapshot. */
+export async function createSnapshotAction(
+  projectId: string,
+  label: string,
+): Promise<ActionResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+  const data = await readPlan(supabase, projectId);
+  const { error } = await supabase.from("plan_snapshots").insert({
+    project_id: projectId,
+    label: (label || "Snapshot").slice(0, 120),
+    data,
+    created_by: user!.id,
+    author_label: user!.name || user!.email,
+  });
+  if (error) return { ok: false };
+  return { ok: true };
+}
+
+/** List a project's snapshots (lazy-loaded by the panel). */
+export async function listSnapshotsAction(projectId: string): Promise<PlanSnapshot[]> {
+  if (!(await getCurrentUser())) return [];
+  return listSnapshots(projectId);
+}
+
+/** Replace the live plan with a snapshot, auto-backing-up the current state first. */
+export async function restoreSnapshotAction(
+  projectId: string,
+  snapshotId: string,
+): Promise<RestoreResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  if (!z.uuid().safeParse(snapshotId).success) return { ok: false };
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+
+  const { data: snap } = await supabase
+    .from("plan_snapshots")
+    .select("data")
+    .eq("id", snapshotId)
+    .single();
+  if (!snap?.data) return { ok: false };
+  const data = snap.data as PlanSnapshotData;
+
+  // Safety net: snapshot the current state before replacing it.
+  const current = await readPlan(supabase, projectId);
+  await supabase.from("plan_snapshots").insert({
+    project_id: projectId,
+    label: "Auto-backup before restore",
+    data: current,
+    created_by: user!.id,
+    author_label: user!.name || user!.email,
+  });
+
+  await supabase.from("plan_links").delete().eq("project_id", projectId);
+  await supabase.from("plan_items").delete().eq("project_id", projectId);
+
+  // Phases first so child tasks' parent_id FK resolves within the same insert.
+  const items = [...data.items].sort(
+    (a, b) => (a.type === "phase" ? 0 : 1) - (b.type === "phase" ? 0 : 1),
+  );
+  if (items.length > 0) {
+    const { error } = await supabase
+      .from("plan_items")
+      .insert(items.map((it) => ({ ...it, project_id: projectId })));
+    if (error) return { ok: false };
+  }
+  if (data.links.length > 0) {
+    await supabase.from("plan_links").insert(
+      data.links.map((l) => ({
+        id: l.id,
+        project_id: projectId,
+        source_id: l.source_id,
+        target_id: l.target_id,
+      })),
+    );
+  }
+  return { ok: true, items: data.items, links: data.links };
+}
+
+/** Delete a snapshot. RLS scopes to accessible rows. */
+export async function deleteSnapshotAction(id: string): Promise<ActionResult> {
+  if (!z.uuid().safeParse(id).success) return { ok: false };
+  if (!(await getCurrentUser())) return { ok: false };
+  const supabase = await createClient();
+  const { error } = await supabase.from("plan_snapshots").delete().eq("id", id);
   if (error) return { ok: false };
   return { ok: true };
 }

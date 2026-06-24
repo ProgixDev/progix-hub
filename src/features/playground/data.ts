@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { MemberOption, PlanItem, PlanLink } from "./types";
+import type { MemberOption, PlanItem, PlanLink, PlanSnapshot } from "./types";
 
 export const PLAN_COLS =
   "id,project_id,type,title,body,status,assignee,estimate_hours,parent_id,pos_x,pos_y,width,height,board_order,color";
@@ -26,6 +26,18 @@ export async function listPlanLinks(projectId: string): Promise<PlanLink[]> {
     .eq("project_id", projectId);
   if (error) throw new Error(error.message);
   return (data ?? []) as PlanLink[];
+}
+
+/** Snapshot list for a project (metadata only — newest first; RLS-gated). */
+export async function listSnapshots(projectId: string): Promise<PlanSnapshot[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("plan_snapshots")
+    .select("id,label,author_label,created_at")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as PlanSnapshot[];
 }
 
 /** Project members, as assignee options (via the access-checked RPC). */

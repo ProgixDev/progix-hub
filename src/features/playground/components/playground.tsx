@@ -10,6 +10,7 @@ import type { ItemType, MemberOption, PlanItem, PlanLink } from "../types";
 import { Board } from "./board";
 import { Canvas } from "./canvas";
 import { Inspector } from "./inspector";
+import { SnapshotsPanel } from "./snapshots-panel";
 
 export function Playground({
   projectId,
@@ -114,6 +115,8 @@ function Shell({
             </button>
           ))}
         </div>
+
+        <SnapshotsPanel projectId={projectId} />
 
         {/* add actions */}
         <div className="flex items-center gap-1.5">
