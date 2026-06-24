@@ -32,9 +32,12 @@ const admin = {
 };
 
 function clientWithInsert(result: { error: unknown } = { error: null }) {
-  const insert = vi.fn().mockResolvedValue(result);
+  // platforms: insert(row).select("id").single(); platform_tutorials: delete().eq() / insert([])
+  const single = vi.fn().mockResolvedValue({ data: { id: "p1" }, error: result.error });
+  const insert = vi.fn((_row: Record<string, unknown>) => ({ select: vi.fn(() => ({ single })) }));
+  const del = vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ error: null }) }));
   mockCreateClient.mockResolvedValue({
-    from: vi.fn(() => ({ insert })),
+    from: vi.fn(() => ({ insert, delete: del })),
   } as unknown as Awaited<ReturnType<typeof createClient>>);
   return { insert };
 }

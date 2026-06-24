@@ -43,12 +43,29 @@ function rowFrom(d: z.infer<typeof platformInputSchema>) {
     access_pattern: d.access_pattern,
     critical: d.critical,
     steps: d.steps,
-    video_url: d.video_url,
     invite_url: invite ? d.invite_url : null,
     invite_role: invite ? d.invite_role : null,
     invite_email: invite ? d.invite_email : null,
     key_label: key ? d.key_label : null,
   };
+}
+
+/** Replace a platform's attached tutorials with the chosen set (spec 020). */
+async function syncTutorials(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  platformId: string,
+  tutorials: z.infer<typeof platformInputSchema>["tutorials"],
+): Promise<void> {
+  await supabase.from("platform_tutorials").delete().eq("platform_id", platformId);
+  if (tutorials.length === 0) return;
+  await supabase.from("platform_tutorials").insert(
+    tutorials.map((tut, i) => ({
+      platform_id: platformId,
+      tutorial_id: tut.tutorial_id,
+      label: tut.label,
+      position: i,
+    })),
+  );
 }
 
 export async function createPlatformAction(input: unknown): Promise<ActionResult> {
@@ -63,10 +80,13 @@ export async function createPlatformAction(input: unknown): Promise<ActionResult
 
   const supabase = await createClient();
   const user = await getCurrentUser();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("platforms")
-    .insert({ ...rowFrom(parsed.data), created_by: user!.id });
-  if (error) return { ok: false, error: t("errors.tryAgain") };
+    .insert({ ...rowFrom(parsed.data), created_by: user!.id })
+    .select("id")
+    .single();
+  if (error || !data) return { ok: false, error: t("errors.tryAgain") };
+  await syncTutorials(supabase, data.id as string, parsed.data.tutorials);
 
   revalidatePath("/settings/platforms");
   return { ok: true };
@@ -86,6 +106,7 @@ export async function updatePlatformAction(id: string, input: unknown): Promise<
   const supabase = await createClient();
   const { error } = await supabase.from("platforms").update(rowFrom(parsed.data)).eq("id", id);
   if (error) return { ok: false, error: t("errors.tryAgain") };
+  await syncTutorials(supabase, id, parsed.data.tutorials);
 
   revalidatePath("/settings/platforms");
   return { ok: true };

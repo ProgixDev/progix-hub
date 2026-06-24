@@ -12,20 +12,20 @@ The platform form has a free-text "Tutorial video link." But videos are created 
 
 ## Desired behavior (the what)
 
-In the platform form, the "Tutorial video" row is a **button**. Clicking it opens a **picker modal listing the tutorials** already in the library (title + platform tag); the member selects one and it's attached to the platform (the button then shows the chosen tutorial's title, with a way to change or clear it). No URLs are typed here. On the client setup page, the platform shows **its chosen tutorial's** video (when that tutorial is an embed marked client-visible) instead of guessing by platform name.
+A platform can attach **several tutorials**, each labeled by purpose (e.g. "Create the account", "Invite us", …) — because a platform often needs more than one how-to. In the platform form there's a **Tutorial videos** section: an **Add video** button opens a **picker modal listing the tutorials** already in the library (title + platform tag); the member selects one and gives it a short label. Added videos show as a labeled list, each removable; they can be reordered by add order. No URLs are typed here. On the client setup page, the platform step shows **each attached tutorial's** video (those that are embeds marked client-visible), under its label.
 
 ## Acceptance criteria
 
-- **AC-1 (pick from library):** The platform form's tutorial field is a button that opens a modal of existing tutorials; selecting one attaches it to the platform and shows its title. No free-text URL entry remains.
-- **AC-2 (change / clear):** A member can change the selected tutorial or clear it (no tutorial); the platform persists the reference (or none).
-- **AC-3 (client page uses the choice):** The client setup page shows the platform's **chosen** tutorial's video when it's an embed marked client-visible; otherwise no video — never a raw/unsafe or private source.
-- **AC-4 (referential safety — non-happy):** Deleting a tutorial that a platform references leaves the platform intact with no tutorial (the reference clears), not a broken link.
+- **AC-1 (pick from library):** The platform form has an Add-video button opening a modal of existing tutorials; selecting one (with a label) attaches it to the platform and lists it. No free-text URL entry remains.
+- **AC-2 (multiple + manage):** A platform can hold several labeled tutorials; a member can add more and remove any; the set persists (order preserved).
+- **AC-3 (client page shows them):** The client setup page shows each attached tutorial's video, under its label, when it's an embed marked client-visible; otherwise that one is omitted — never a raw/unsafe or private source.
+- **AC-4 (referential safety — non-happy):** Deleting a tutorial that platforms reference just drops those links (cascade); platforms stay intact, no broken video.
 
 ## Out of scope
 
 - Creating/editing tutorials from the platform form (still done in the Tutorials library).
 - Showing uploaded (non-embed) tutorials on the client page (embed-only there, per 019).
-- Multiple tutorials per platform (one chosen tutorial).
+- Drag-to-reorder (kept simple — order follows the add order).
 
 ## CUJ impact
 

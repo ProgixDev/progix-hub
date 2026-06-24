@@ -6,6 +6,7 @@ import { canViewOrgMembers } from "@/features/members";
 import { canManagePlatforms, listPlatforms, PlatformsManager } from "@/features/platforms";
 import { listProjects, type Project } from "@/features/projects";
 import { ClockWidget } from "@/features/time-tracking";
+import { listTutorials } from "@/features/tutorials";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -22,13 +23,15 @@ export default async function PlatformsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
 
-  const [platforms, canManage, projects, showMembers, t] = await Promise.all([
+  const [platforms, canManage, projects, showMembers, tutorials, t] = await Promise.all([
     listPlatforms(),
     canManagePlatforms(),
     listProjects(),
     canViewOrgMembers(),
+    listTutorials(),
     getTranslations("platforms"),
   ]);
+  const tutorialOptions = tutorials.map((tut) => ({ id: tut.id, title: tut.title }));
 
   return (
     <AppShell
@@ -38,7 +41,11 @@ export default async function PlatformsPage() {
       clockSlot={<ClockWidget />}
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
-      <PlatformsManager platforms={platforms} canManage={canManage} />
+      <PlatformsManager
+        platforms={platforms}
+        canManage={canManage}
+        tutorialOptions={tutorialOptions}
+      />
     </AppShell>
   );
 }

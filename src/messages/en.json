@@ -389,7 +389,13 @@
     "errorInviteUrl": "Enter a valid invite link",
     "errorInviteRole": "Role is required",
     "errorInviteEmail": "Enter a valid email",
-    "errorKeyLabel": "Key label is required"
+    "errorKeyLabel": "Key label is required",
+    "fieldVideos": "Tutorial videos",
+    "noVideos": "No tutorials attached.",
+    "addVideo": "Add video",
+    "videoLabelHint": "What it’s for (e.g. Create account)",
+    "pickTutorial": "Choose a tutorial",
+    "noTutorialsLeft": "No more tutorials to add. Create them in Tutorials."
   },
   "tutorials": {
     "title": "Tutorials",
