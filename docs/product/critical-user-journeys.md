@@ -28,3 +28,4 @@ Adding or changing a CUJ is a product decision — PR must be approved by the pr
 - Screenshot names are stable (`<cuj>-<step>`), so reports and reviews can diff them release over release.
 - When a CUJ changes intentionally, update the spec, this table, and the screenshots in the same PR — `/update-docs` walks you through it.
   | CUJ-13 | Post a daily report | A member clicks Daily report in the top bar → picks a project → writes or loads a `.md` update → posts it; the project page lists the report rendered as formatted markdown, team-only | _manual (e2e follow-up)_ | `reports-*` |
+  | CUJ-14 | Plan in the playground | A member opens a project → Playground (full-screen) → adds phases + task/note cards on the Canvas, drags them, drops a task into a phase, edits it in the inspector; switches to the Board and drags a task across status columns — reflected everywhere, team-only | _manual (e2e follow-up)_ | `playground-*` |

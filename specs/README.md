@@ -50,4 +50,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [019](019-tutorial-uploads/spec.md)       | Tutorial file uploads         | shipped   |
 | [020](020-platform-tutorial-link/spec.md) | Link a tutorial to a platform | shipped   |
 | [021](021-daily-reports/spec.md)          | Daily reports (per-project)   | shipped   |
-| [022](022-playground/spec.md)             | Project planning playground   | active    |
+| [022](022-playground/spec.md)             | Project planning playground   | shipped   |
