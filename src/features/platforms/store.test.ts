@@ -9,7 +9,7 @@ const platform: Platform = {
   access_pattern: "invite_collaborator",
   critical: true,
   steps: ["Open settings"],
-  video_url: null,
+  tutorials: [],
   invite_url: "https://x.com",
   invite_role: "Dev",
   invite_email: "dev@progix.com",

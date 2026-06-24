@@ -2,6 +2,9 @@
 export const ACCESS_PATTERNS = ["invite_collaborator", "store_key", "diy"] as const;
 export type AccessPattern = (typeof ACCESS_PATTERNS)[number];
 
+/** A tutorial attached to a platform, with its purpose label (spec 020). `title` is for display. */
+export type PlatformTutorial = { tutorial_id: string; label: string | null; title?: string };
+
 /** A configured platform in the org-wide registry. */
 export type Platform = {
   id: string;
@@ -12,7 +15,8 @@ export type Platform = {
   critical: boolean;
   /** Ordered instruction steps the client follows. */
   steps: string[];
-  video_url: string | null;
+  /** Tutorials attached from the library, each labeled by purpose (spec 020). */
+  tutorials: PlatformTutorial[];
   // invite_collaborator pattern:
   invite_url: string | null;
   invite_role: string | null;

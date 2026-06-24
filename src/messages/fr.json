@@ -389,7 +389,13 @@
     "errorInviteUrl": "Saisissez un lien d’invitation valide",
     "errorInviteRole": "Le rôle est requis",
     "errorInviteEmail": "Saisissez un e-mail valide",
-    "errorKeyLabel": "Le libellé de la clé est requis"
+    "errorKeyLabel": "Le libellé de la clé est requis",
+    "fieldVideos": "Vidéos tutorielles",
+    "noVideos": "Aucun tutoriel attaché.",
+    "addVideo": "Ajouter une vidéo",
+    "videoLabelHint": "À quoi ça sert (ex. Créer le compte)",
+    "pickTutorial": "Choisir un tutoriel",
+    "noTutorialsLeft": "Plus de tutoriels à ajouter. Créez-les dans Tutoriels."
   },
   "tutorials": {
     "title": "Tutoriels",

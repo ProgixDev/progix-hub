@@ -36,19 +36,34 @@ describe("platformInputSchema (spec 015 AC-2 / AC-5)", () => {
     }
   });
 
-  it("rejects a malformed invite email and a non-http video URL", () => {
+  it("rejects a malformed invite email", () => {
     const r = platformInputSchema.safeParse({
       ...base,
       access_pattern: "invite_collaborator",
       invite_url: "https://x.com",
       invite_role: "Dev",
       invite_email: "not-an-email",
-      video_url: "ftp://nope",
     });
     expect(r.success).toBe(false);
     if (!r.success) {
       const paths = r.error.issues.map((i) => i.path[0]);
-      expect(paths).toEqual(expect.arrayContaining(["invite_email", "video_url"]));
+      expect(paths).toEqual(expect.arrayContaining(["invite_email"]));
+    }
+  });
+
+  it("accepts attached tutorials with labels (spec 020)", () => {
+    const r = platformInputSchema.safeParse({
+      ...base,
+      access_pattern: "diy",
+      tutorials: [
+        { tutorial_id: "0f8fad5b-d9cb-469f-a165-70867728950e", label: "Create account" },
+        { tutorial_id: "1f8fad5b-d9cb-469f-a165-70867728950e", label: "" },
+      ],
+    });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.tutorials).toHaveLength(2);
+      expect(r.data.tutorials[1]!.label).toBeNull();
     }
   });
 
@@ -70,8 +85,8 @@ describe("platformInputSchema (spec 015 AC-2 / AC-5)", () => {
     expect(r.success).toBe(true);
   });
 
-  it("normalizes empty optional strings to null", () => {
-    const r = platformInputSchema.safeParse({ ...base, access_pattern: "diy", video_url: "" });
-    expect(r.success && r.data.video_url).toBeNull();
+  it("normalizes an empty service_id to null", () => {
+    const r = platformInputSchema.safeParse({ ...base, access_pattern: "diy", service_id: "" });
+    expect(r.success && r.data.service_id).toBeNull();
   });
 });

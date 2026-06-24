@@ -33,7 +33,9 @@ function StepCard({ token, step, index }: { token: string; step: SetupStep; inde
   const [pending, start] = useTransition();
   const p = step.platform;
   const done = step.status !== "pending";
-  const embed = videoEmbedSrc(p.video_embed_url);
+  const videos = p.videos
+    .map((v) => ({ label: v.label, src: videoEmbedSrc(v.embed_url) }))
+    .filter((v): v is { label: string | null; src: string } => v.src !== null);
 
   function toggle() {
     start(async () => {
@@ -69,18 +71,21 @@ function StepCard({ token, step, index }: { token: string; step: SetupStep; inde
         )}
       </div>
 
-      {embed && (
-        <div className="border-line-1 mt-3 aspect-video w-full overflow-hidden rounded-lg border bg-black">
-          <iframe
-            src={embed}
-            title={p.name}
-            className="size-full"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            referrerPolicy="strict-origin-when-cross-origin"
-          />
+      {videos.map((v, i) => (
+        <div key={i} className="mt-3">
+          {v.label && <p className="text-text-2 mb-1 text-[12.5px] font-medium">{v.label}</p>}
+          <div className="border-line-1 aspect-video w-full overflow-hidden rounded-lg border bg-black">
+            <iframe
+              src={v.src}
+              title={v.label ?? p.name}
+              className="size-full"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          </div>
         </div>
-      )}
+      ))}
 
       {p.steps.length > 0 && (
         <ol className="text-text-2 mt-3 list-decimal space-y-1 pl-5 text-[13px]">

@@ -54,17 +54,27 @@ export const platformInputSchema = z
     access_pattern: z.enum(ACCESS_PATTERNS),
     critical: z.boolean().default(false),
     steps: z.array(z.string().trim().min(1)).default([]),
-    video_url: optionalTrimmed,
     invite_url: optionalTrimmed,
     invite_role: optionalTrimmed,
     invite_email: optionalTrimmed,
     key_label: optionalTrimmed,
+    // Tutorials attached from the library (spec 020), each with a purpose label.
+    tutorials: z
+      .array(
+        z.object({
+          tutorial_id: z.uuid(),
+          label: z
+            .string()
+            .trim()
+            .optional()
+            .transform((v) => (v && v.length > 0 ? v : null)),
+        }),
+      )
+      .default([]),
   })
   .superRefine((val, ctx) => {
     const issue = (path: string, message: string) =>
       ctx.addIssue({ code: "custom", path: [path], message });
-
-    if (val.video_url && !isHttpUrl(val.video_url)) issue("video_url", "platforms.errorVideoUrl");
 
     if (val.access_pattern === "invite_collaborator") {
       if (!val.invite_url || !isHttpUrl(val.invite_url))

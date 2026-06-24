@@ -7,7 +7,7 @@ import { PlusIcon } from "@/components/ui/icons";
 import { deletePlatformAction, setPlatformDisabledAction } from "../actions";
 import { PlatformsStoreProvider, usePlatformsStore } from "../provider";
 import type { AccessPattern, Platform } from "../types";
-import { PlatformForm } from "./platform-form";
+import { PlatformForm, type TutorialOption } from "./platform-form";
 
 const PATTERN_KEY: Record<AccessPattern, string> = {
   invite_collaborator: "patternInvite",
@@ -24,14 +24,16 @@ function initials(name: string) {
 export function PlatformsManager({
   platforms,
   canManage,
+  tutorialOptions,
 }: {
   platforms: Platform[];
   canManage: boolean;
+  tutorialOptions: TutorialOption[];
 }) {
   return (
     <PlatformsStoreProvider>
       <Inner platforms={platforms} canManage={canManage} />
-      {canManage && <PlatformForm />}
+      {canManage && <PlatformForm tutorialOptions={tutorialOptions} />}
     </PlatformsStoreProvider>
   );
 }
