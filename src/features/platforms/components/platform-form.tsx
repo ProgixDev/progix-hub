@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
+import { Modal } from "@/components/ui/modal";
 import { type ActionResult, createPlatformAction, updatePlatformAction } from "../actions";
 import { PLATFORM_SERVICES } from "../lib";
 import { usePlatformsStore } from "../provider";
@@ -81,14 +82,6 @@ function PlatformFormModal({
   const [videos, setVideos] = useState<PlatformTutorial[]>(editing?.tutorials ?? []);
   const [picking, setPicking] = useState(false);
 
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const fd = new FormData(event.currentTarget);
@@ -128,231 +121,51 @@ function PlatformFormModal({
   return (
     <>
       {picking && (
-        <div
-          className="fixed inset-0 z-[60] flex items-start justify-center overflow-auto bg-black/70 px-4 py-[8vh] backdrop-blur-md"
-          role="dialog"
-          aria-modal="true"
-          aria-label={t("pickTutorial")}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setPicking(false);
-          }}
+        <Modal
+          title={t("pickTutorial")}
+          onClose={() => setPicking(false)}
+          footer={
+            <button
+              type="button"
+              onClick={() => setPicking(false)}
+              className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full px-3.5 text-[13.5px] font-medium transition-colors"
+            >
+              {tCommon("cancel")}
+            </button>
+          }
         >
-          <div className="glass-strong w-full max-w-md rounded-2xl">
-            <div className="border-line flex items-center justify-between border-b px-5 py-4">
-              <h2 className="text-text text-[15px] font-semibold">{t("pickTutorial")}</h2>
-            </div>
-            <div className="max-h-[50vh] overflow-auto p-2">
-              {available.length === 0 ? (
-                <p className="text-text-3 px-3 py-6 text-center text-[13px]">
-                  {t("noTutorialsLeft")}
-                </p>
-              ) : (
-                available.map((o) => (
-                  <button
-                    key={o.id}
-                    type="button"
-                    onClick={() => {
-                      setVideos((prev) => [
-                        ...prev,
-                        { tutorial_id: o.id, label: null, title: o.title },
-                      ]);
-                      setPicking(false);
-                    }}
-                    className="text-text hover:bg-bg-3 flex w-full items-center rounded-md px-3 py-2 text-left text-[13.5px] transition-colors"
-                  >
-                    {o.title}
-                  </button>
-                ))
-              )}
-            </div>
-            <div className="border-line flex justify-end border-t px-5 py-3">
+          {available.length === 0 ? (
+            <p className="text-text-3 px-3 py-6 text-center text-[13px]">{t("noTutorialsLeft")}</p>
+          ) : (
+            available.map((o) => (
               <button
+                key={o.id}
                 type="button"
-                onClick={() => setPicking(false)}
-                className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
+                onClick={() => {
+                  setVideos((prev) => [
+                    ...prev,
+                    { tutorial_id: o.id, label: null, title: o.title },
+                  ]);
+                  setPicking(false);
+                }}
+                className="text-text hover:bg-bg-3 flex w-full items-center rounded-md px-3 py-2 text-left text-[13.5px] transition-colors"
               >
-                {tCommon("cancel")}
+                {o.title}
               </button>
-            </div>
-          </div>
-        </div>
+            ))
+          )}
+        </Modal>
       )}
-      <div
-        className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/70 px-4 py-[6vh] backdrop-blur-md"
-        role="dialog"
-        aria-modal="true"
-        aria-label={editing ? t("editPlatform") : t("newPlatform")}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <form onSubmit={onSubmit} className="glass-strong w-full max-w-lg rounded-2xl">
-          <div className="border-line flex items-center justify-between border-b px-5 py-4">
-            <h2 className="text-text text-[15px] font-semibold">
-              {editing ? t("editPlatform") : t("newPlatform")}
-            </h2>
-          </div>
-
-          <div className="flex flex-col gap-4 p-5">
-            {formError && (
-              <p className="border-red/30 bg-red-tint text-red-text rounded-md border px-3 py-2 text-[13px]">
-                {formError}
-              </p>
-            )}
-
-            <Field label={t("fieldName")} error={errors.name} required>
-              <input
-                name="name"
-                defaultValue={editing?.name ?? ""}
-                className={inputCls}
-                required
-                autoFocus
-              />
-            </Field>
-
-            <Field label={t("fieldLogo")}>
-              <select
-                name="service_id"
-                defaultValue={editing?.service_id ?? ""}
-                className={inputCls}
-              >
-                <option value="">{t("logoNone")}</option>
-                {PLATFORM_SERVICES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <Field label={t("fieldAccessPattern")}>
-              <select
-                name="access_pattern"
-                value={pattern}
-                onChange={(e) => setPattern(e.target.value as AccessPattern)}
-                className={inputCls}
-              >
-                {ACCESS_PATTERNS.map((p) => (
-                  <option key={p} value={p}>
-                    {t(PATTERN_KEY[p])}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            {pattern === "invite_collaborator" && (
-              <>
-                <Field label={t("fieldInviteUrl")} error={errors.invite_url} required>
-                  <input
-                    name="invite_url"
-                    defaultValue={editing?.invite_url ?? ""}
-                    placeholder="https://dashboard.stripe.com/settings/team"
-                    className={`${inputCls} font-mono text-[13px]`}
-                  />
-                </Field>
-                <Field label={t("fieldInviteRole")} error={errors.invite_role} required>
-                  <input
-                    name="invite_role"
-                    defaultValue={editing?.invite_role ?? ""}
-                    className={inputCls}
-                  />
-                </Field>
-                <Field label={t("fieldInviteEmail")} error={errors.invite_email} required>
-                  <input
-                    name="invite_email"
-                    type="email"
-                    defaultValue={editing?.invite_email ?? ""}
-                    placeholder="dev@progix.com"
-                    className={inputCls}
-                  />
-                </Field>
-              </>
-            )}
-
-            {pattern === "store_key" && (
-              <Field label={t("fieldKeyLabel")} error={errors.key_label} required>
-                <input
-                  name="key_label"
-                  defaultValue={editing?.key_label ?? ""}
-                  placeholder="STRIPE_SECRET_KEY"
-                  className={`${inputCls} font-mono text-[13px]`}
-                />
-              </Field>
-            )}
-
-            <Field label={t("fieldSteps")} error={errors.steps}>
-              <textarea
-                name="steps"
-                defaultValue={(editing?.steps ?? []).join("\n")}
-                rows={4}
-                placeholder={t("stepsHint")}
-                className={inputCls}
-              />
-            </Field>
-
-            <div className="flex flex-col gap-2">
-              <span className="text-text-1 text-[12.5px] font-medium">{t("fieldVideos")}</span>
-              {videos.length === 0 ? (
-                <p className="text-text-3 text-[12px]">{t("noVideos")}</p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {videos.map((v, i) => (
-                    <li
-                      key={v.tutorial_id}
-                      className="border-line-1 flex items-center gap-2 rounded-md border p-2"
-                    >
-                      <span className="text-text min-w-0 flex-none truncate text-[12.5px]">
-                        {v.title ??
-                          tutorialOptions.find((o) => o.id === v.tutorial_id)?.title ??
-                          v.tutorial_id}
-                      </span>
-                      <input
-                        value={v.label ?? ""}
-                        onChange={(e) =>
-                          setVideos((prev) =>
-                            prev.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)),
-                          )
-                        }
-                        placeholder={t("videoLabelHint")}
-                        className={`${inputCls} h-8 flex-1 py-1 text-[12.5px]`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setVideos((prev) => prev.filter((_, j) => j !== i))}
-                        aria-label={tCommon("delete")}
-                        className="text-text-3 hover:text-red-text flex-none px-1 text-[16px]"
-                      >
-                        ×
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <button
-                type="button"
-                onClick={() => setPicking(true)}
-                className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-8 w-fit rounded-full border px-3 text-[12.5px] font-medium transition-colors"
-              >
-                + {t("addVideo")}
-              </button>
-            </div>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="critical"
-                defaultChecked={editing?.critical ?? false}
-                className="size-4"
-              />
-              <span className="text-text-1 text-[13px]">{t("fieldCritical")}</span>
-            </label>
-          </div>
-
-          <div className="border-line flex items-center justify-end gap-2 border-t px-5 py-4">
+      <Modal
+        title={editing ? t("editPlatform") : t("newPlatform")}
+        onClose={onClose}
+        onSubmit={onSubmit}
+        footer={
+          <>
             <button
               type="button"
               onClick={onClose}
-              className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
+              className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full px-3.5 text-[13.5px] font-medium transition-colors"
             >
               {tCommon("cancel")}
             </button>
@@ -363,9 +176,158 @@ function PlatformFormModal({
             >
               {pending ? tCommon("saving") : editing ? tCommon("save") : t("add")}
             </button>
-          </div>
-        </form>
-      </div>
+          </>
+        }
+      >
+        {formError && (
+          <p className="border-red/30 bg-red-tint text-red-text rounded-xl border px-3.5 py-2.5 text-[13px]">
+            {formError}
+          </p>
+        )}
+
+        <Field label={t("fieldName")} error={errors.name} required>
+          <input
+            name="name"
+            defaultValue={editing?.name ?? ""}
+            className={inputCls}
+            required
+            autoFocus
+          />
+        </Field>
+
+        <Field label={t("fieldLogo")}>
+          <select name="service_id" defaultValue={editing?.service_id ?? ""} className={inputCls}>
+            <option value="">{t("logoNone")}</option>
+            {PLATFORM_SERVICES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label={t("fieldAccessPattern")}>
+          <select
+            name="access_pattern"
+            value={pattern}
+            onChange={(e) => setPattern(e.target.value as AccessPattern)}
+            className={inputCls}
+          >
+            {ACCESS_PATTERNS.map((p) => (
+              <option key={p} value={p}>
+                {t(PATTERN_KEY[p])}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        {pattern === "invite_collaborator" && (
+          <>
+            <Field label={t("fieldInviteUrl")} error={errors.invite_url} required>
+              <input
+                name="invite_url"
+                defaultValue={editing?.invite_url ?? ""}
+                placeholder="https://dashboard.stripe.com/settings/team"
+                className={`${inputCls} font-mono text-[13px]`}
+              />
+            </Field>
+            <Field label={t("fieldInviteRole")} error={errors.invite_role} required>
+              <input
+                name="invite_role"
+                defaultValue={editing?.invite_role ?? ""}
+                className={inputCls}
+              />
+            </Field>
+            <Field label={t("fieldInviteEmail")} error={errors.invite_email} required>
+              <input
+                name="invite_email"
+                type="email"
+                defaultValue={editing?.invite_email ?? ""}
+                placeholder="dev@progix.com"
+                className={inputCls}
+              />
+            </Field>
+          </>
+        )}
+
+        {pattern === "store_key" && (
+          <Field label={t("fieldKeyLabel")} error={errors.key_label} required>
+            <input
+              name="key_label"
+              defaultValue={editing?.key_label ?? ""}
+              placeholder="STRIPE_SECRET_KEY"
+              className={`${inputCls} font-mono text-[13px]`}
+            />
+          </Field>
+        )}
+
+        <Field label={t("fieldSteps")} error={errors.steps}>
+          <textarea
+            name="steps"
+            defaultValue={(editing?.steps ?? []).join("\n")}
+            rows={4}
+            placeholder={t("stepsHint")}
+            className={inputCls}
+          />
+        </Field>
+
+        <div className="flex flex-col gap-2">
+          <span className="text-text-1 text-[12.5px] font-medium">{t("fieldVideos")}</span>
+          {videos.length === 0 ? (
+            <p className="text-text-3 text-[12px]">{t("noVideos")}</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {videos.map((v, i) => (
+                <li
+                  key={v.tutorial_id}
+                  className="border-line-1 flex items-center gap-2 rounded-md border p-2"
+                >
+                  <span className="text-text min-w-0 flex-none truncate text-[12.5px]">
+                    {v.title ??
+                      tutorialOptions.find((o) => o.id === v.tutorial_id)?.title ??
+                      v.tutorial_id}
+                  </span>
+                  <input
+                    value={v.label ?? ""}
+                    onChange={(e) =>
+                      setVideos((prev) =>
+                        prev.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)),
+                      )
+                    }
+                    placeholder={t("videoLabelHint")}
+                    className={`${inputCls} h-8 flex-1 py-1 text-[12.5px]`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setVideos((prev) => prev.filter((_, j) => j !== i))}
+                    aria-label={tCommon("delete")}
+                    className="text-text-3 hover:text-red-text flex-none px-1 text-[16px]"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <button
+            type="button"
+            onClick={() => setPicking(true)}
+            className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text h-8 w-fit rounded-full border px-3 text-[12.5px] font-medium transition-colors"
+          >
+            + {t("addVideo")}
+          </button>
+        </div>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="critical"
+            defaultChecked={editing?.critical ?? false}
+            className="size-4"
+          />
+          <span className="text-text-1 text-[13px]">{t("fieldCritical")}</span>
+        </label>
+      </Modal>
     </>
   );
 }

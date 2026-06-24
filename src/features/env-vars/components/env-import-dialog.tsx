@@ -1,8 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Modal } from "@/components/ui/modal";
 import { importEnvVarsAction } from "../actions";
 import { detectScope, detectService, parseDotenv, scopeFromFilename } from "../lib";
 import { useEnvVarsStore } from "../provider";
@@ -70,18 +71,6 @@ function EnvImportModal({
     return [...merged.values()];
   }, [files, pasted]);
 
-  useEffect(() => {
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      previouslyFocused?.focus?.();
-    };
-  }, [onClose]);
-
   async function addFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;
     const read = await Promise.all(
@@ -136,192 +125,182 @@ function EnvImportModal({
   const includedCount = rows.filter((row) => includeOf(row.key)).length;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/70 px-4 py-[7vh] backdrop-blur-md"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t("importTitle")}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="glass-strong w-full max-w-2xl rounded-2xl">
-        <div className="border-line flex items-center justify-between border-b px-5 py-4">
-          <h2 className="text-text text-[15px] font-semibold">{t("importTitle")}</h2>
-        </div>
-
-        {summary ? (
-          <div className="flex flex-col gap-4 p-5">
-            <p className="text-text text-[13.5px]">
-              {t("importSummary", {
-                created: summary.created,
-                skipped: summary.skipped,
-                failed: summary.failed,
-              })}
-            </p>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all"
-              >
-                {tCommon("close")}
-              </button>
-            </div>
-          </div>
+    <Modal
+      title={t("importTitle")}
+      onClose={onClose}
+      size="lg"
+      footer={
+        summary ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all"
+          >
+            {tCommon("close")}
+          </button>
         ) : (
-          <div className="flex flex-col gap-4 p-5">
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragging(false);
-                void addFiles(e.dataTransfer.files);
-              }}
-              className={`flex flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center ${
-                dragging ? "border-line-blue bg-blue-tint" : "border-line/60"
-              }`}
+          <>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full px-3.5 text-[13.5px] font-medium transition-colors"
             >
-              <p className="text-text-2 text-[13px]">{t("importDropzone")}</p>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-3 text-[12.5px] font-medium transition-colors"
-              >
-                {t("importChoose")}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="hidden"
-                aria-label={t("importChoose")}
-                onChange={(e) => {
-                  void addFiles(e.target.files);
-                  e.target.value = "";
-                }}
-              />
-              {files.length > 0 && (
-                <p className="text-text-3 text-[11.5px]">
-                  {files.map((file) => file.name).join(", ")}
-                </p>
-              )}
-            </div>
-
-            <label className="flex flex-col gap-1.5">
-              <span className="text-text-1 text-[12.5px] font-medium">{t("importPaste")}</span>
-              <textarea
-                value={pasted}
-                onChange={(e) => setPasted(e.target.value)}
-                rows={4}
-                placeholder={
-                  "STRIPE_SECRET_KEY=sk_live_…\nNEXT_PUBLIC_API_URL=https://api.example.com"
-                }
-                className={`${inputCls} font-mono`}
-                aria-label={t("importPaste")}
-              />
-            </label>
-
-            {rows.length === 0 ? (
-              <p className="text-text-3 border-line/60 rounded-md border border-dashed px-3 py-4 text-center text-[12.5px]">
-                {t("importEmpty")}
-              </p>
-            ) : (
-              <div className="border-line-1 overflow-hidden rounded-lg border">
-                <div className="text-text-3 bg-bg-2 grid grid-cols-[auto_1fr_auto] gap-2 px-3 py-2 text-[11px] font-medium">
-                  <span>{t("importColInclude")}</span>
-                  <span>{t("importColKey")}</span>
-                  <span>{t("fieldScope")}</span>
-                </div>
-                <ul className="divide-line/60 divide-y">
-                  {rows.map((row) => {
-                    const isShown = shown[row.key] ?? false;
-                    const alreadyExists = existing.has(row.key);
-                    return (
-                      <li
-                        key={row.key}
-                        className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-3 py-2"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={includeOf(row.key)}
-                          aria-label={`${t("importColInclude")} ${row.key}`}
-                          onChange={(e) =>
-                            setIncludeOverride((prev) => ({ ...prev, [row.key]: e.target.checked }))
-                          }
-                        />
-                        <div className="min-w-0">
-                          <p className="flex flex-wrap items-center gap-2">
-                            <span className="text-text font-mono text-[12.5px] break-all">
-                              {row.key}
-                            </span>
-                            {alreadyExists && <Badge tone="amber">{t("importExists")}</Badge>}
-                          </p>
-                          <p className="text-text-2 truncate font-mono text-[11.5px]">
-                            <button
-                              type="button"
-                              className="hover:text-text mr-2 underline"
-                              onClick={() => setShown((prev) => ({ ...prev, [row.key]: !isShown }))}
-                            >
-                              {isShown ? t("hide") : t("reveal")}
-                            </button>
-                            {isShown ? row.value : "••••••••"}
-                          </p>
-                        </div>
-                        <select
-                          value={scopeOf(row.key, row.scope)}
-                          aria-label={`${t("fieldScope")} ${row.key}`}
-                          onChange={(e) =>
-                            setScopeOverride((prev) => ({
-                              ...prev,
-                              [row.key]: e.target.value as EnvScope,
-                            }))
-                          }
-                          className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-xl border px-2 text-[12px]"
-                        >
-                          {ENV_SCOPES.map((scope) => (
-                            <option key={scope} value={scope}>
-                              {scope === "frontend" ? t("scopeFrontend") : t("scopeBackend")}
-                            </option>
-                          ))}
-                        </select>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-
-            {error && (
-              <p role="alert" className="text-red-text max-w-full text-[12px]">
-                {error}
+              {tCommon("cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={onSubmit}
+              disabled={pending || includedCount === 0}
+              className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all disabled:opacity-60"
+            >
+              {pending ? tCommon("saving") : t("importSubmit", { count: includedCount })}
+            </button>
+          </>
+        )
+      }
+    >
+      {summary ? (
+        <p className="text-text text-[13.5px]">
+          {t("importSummary", {
+            created: summary.created,
+            skipped: summary.skipped,
+            failed: summary.failed,
+          })}
+        </p>
+      ) : (
+        <>
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              void addFiles(e.dataTransfer.files);
+            }}
+            className={`flex flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-6 text-center ${
+              dragging ? "border-line-blue bg-blue-tint" : "border-line/60"
+            }`}
+          >
+            <p className="text-text-2 text-[13px]">{t("importDropzone")}</p>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-3 text-[12.5px] font-medium transition-colors"
+            >
+              {t("importChoose")}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="hidden"
+              aria-label={t("importChoose")}
+              onChange={(e) => {
+                void addFiles(e.target.files);
+                e.target.value = "";
+              }}
+            />
+            {files.length > 0 && (
+              <p className="text-text-3 text-[11.5px]">
+                {files.map((file) => file.name).join(", ")}
               </p>
             )}
-
-            <div className="border-line flex items-center justify-end gap-2 border-t pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md px-3 text-[13.5px] font-medium transition-colors"
-              >
-                {tCommon("cancel")}
-              </button>
-              <button
-                type="button"
-                onClick={onSubmit}
-                disabled={pending || includedCount === 0}
-                className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all disabled:opacity-60"
-              >
-                {pending ? tCommon("saving") : t("importSubmit", { count: includedCount })}
-              </button>
-            </div>
           </div>
-        )}
-      </div>
-    </div>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-text-1 text-[12.5px] font-medium">{t("importPaste")}</span>
+            <textarea
+              value={pasted}
+              onChange={(e) => setPasted(e.target.value)}
+              rows={4}
+              placeholder={
+                "STRIPE_SECRET_KEY=sk_live_…\nNEXT_PUBLIC_API_URL=https://api.example.com"
+              }
+              className={`${inputCls} font-mono`}
+              aria-label={t("importPaste")}
+            />
+          </label>
+
+          {rows.length === 0 ? (
+            <p className="text-text-3 border-line/60 rounded-md border border-dashed px-3 py-4 text-center text-[12.5px]">
+              {t("importEmpty")}
+            </p>
+          ) : (
+            <div className="border-line-1 overflow-hidden rounded-lg border">
+              <div className="text-text-3 bg-bg-2 grid grid-cols-[auto_1fr_auto] gap-2 px-3 py-2 text-[11px] font-medium">
+                <span>{t("importColInclude")}</span>
+                <span>{t("importColKey")}</span>
+                <span>{t("fieldScope")}</span>
+              </div>
+              <ul className="divide-line/60 divide-y">
+                {rows.map((row) => {
+                  const isShown = shown[row.key] ?? false;
+                  const alreadyExists = existing.has(row.key);
+                  return (
+                    <li
+                      key={row.key}
+                      className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-3 py-2"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={includeOf(row.key)}
+                        aria-label={`${t("importColInclude")} ${row.key}`}
+                        onChange={(e) =>
+                          setIncludeOverride((prev) => ({ ...prev, [row.key]: e.target.checked }))
+                        }
+                      />
+                      <div className="min-w-0">
+                        <p className="flex flex-wrap items-center gap-2">
+                          <span className="text-text font-mono text-[12.5px] break-all">
+                            {row.key}
+                          </span>
+                          {alreadyExists && <Badge tone="amber">{t("importExists")}</Badge>}
+                        </p>
+                        <p className="text-text-2 truncate font-mono text-[11.5px]">
+                          <button
+                            type="button"
+                            className="hover:text-text mr-2 underline"
+                            onClick={() => setShown((prev) => ({ ...prev, [row.key]: !isShown }))}
+                          >
+                            {isShown ? t("hide") : t("reveal")}
+                          </button>
+                          {isShown ? row.value : "••••••••"}
+                        </p>
+                      </div>
+                      <select
+                        value={scopeOf(row.key, row.scope)}
+                        aria-label={`${t("fieldScope")} ${row.key}`}
+                        onChange={(e) =>
+                          setScopeOverride((prev) => ({
+                            ...prev,
+                            [row.key]: e.target.value as EnvScope,
+                          }))
+                        }
+                        className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-xl border px-2 text-[12px]"
+                      >
+                        {ENV_SCOPES.map((scope) => (
+                          <option key={scope} value={scope}>
+                            {scope === "frontend" ? t("scopeFrontend") : t("scopeBackend")}
+                          </option>
+                        ))}
+                      </select>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {error && (
+            <p role="alert" className="text-red-text max-w-full text-[12px]">
+              {error}
+            </p>
+          )}
+        </>
+      )}
+    </Modal>
   );
 }
