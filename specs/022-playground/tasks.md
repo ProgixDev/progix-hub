@@ -8,4 +8,4 @@
 - [x] T6 Board lens: status columns, drag card to change status
 - [ ] T7 Copy EN/FR; `pnpm` gates green (build on CI)
 - [x] T8 `/review` appsec (RLS members-only, no anon, action authz); fix P0/P1
-- [ ] T9 PR; CI; merge; deploy; `/update-docs` (spec shipped + CUJ)
+- [x] T9 PR; CI; merge; deploy; `/update-docs` (spec shipped + CUJ)

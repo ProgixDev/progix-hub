@@ -1,6 +1,6 @@
 # Spec 022 — Project planning playground
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** feature
 - **Owner:** Achref Arabi, founder · **Date:** 2026-06-24
 - **Slice:** new `src/features/playground`; a full-screen route `/projects/[id]/playground`; an entry button on the project page; migration (`plan_items`).
