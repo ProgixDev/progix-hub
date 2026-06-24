@@ -1,6 +1,6 @@
 # Spec 019 — Tutorial file uploads
 
-- **Status:** active
+- **Status:** shipped
 - **Type:** enhancement
 - **Requested by / owner:** Achref Arabi, founder
 - **Date:** 2026-06-24
