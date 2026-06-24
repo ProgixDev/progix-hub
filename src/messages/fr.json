@@ -492,5 +492,20 @@
     "title": "Commandes",
     "placeholder": "Rechercher une commande…",
     "empty": "Aucune commande"
+  },
+  "reports": {
+    "button": "Rapport quotidien",
+    "title": "Publier un rapport quotidien",
+    "subtitle": "Choisissez un projet et ajoutez une note en markdown — visible par l’équipe du projet.",
+    "fieldProject": "Projet",
+    "fieldContent": "Rapport (markdown)",
+    "loadFile": "Charger un .md",
+    "save": "Publier",
+    "contentHint": "## Livré\n- …\n\n## En cours\n- …",
+    "noProjects": "Aucun projet disponible",
+    "errorEmpty": "Choisissez un projet et rédigez le rapport",
+    "sectionTitle": "Rapports quotidiens",
+    "sectionSubtitle": "Notes markdown publiées par l’équipe pour ce projet.",
+    "none": "Aucun rapport pour l’instant."
   }
 }

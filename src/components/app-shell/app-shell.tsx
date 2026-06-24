@@ -11,6 +11,7 @@ export function AppShell({
   recent,
   userSlot,
   clockSlot,
+  reportSlot,
   showMembers,
   children,
 }: {
@@ -18,6 +19,7 @@ export function AppShell({
   recent: RecentProject[];
   userSlot?: React.ReactNode;
   clockSlot?: React.ReactNode;
+  reportSlot?: React.ReactNode;
   showMembers?: boolean;
   children: React.ReactNode;
 }) {
@@ -27,6 +29,7 @@ export function AppShell({
       recent={recent}
       userSlot={userSlot}
       clockSlot={clockSlot}
+      reportSlot={reportSlot}
       showMembers={showMembers}
     >
       {children}

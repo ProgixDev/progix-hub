@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { DailyReportButton } from "@/features/reports";
 import { canViewOrgMembers } from "@/features/members";
 import { canManagePlatforms, listPlatforms, PlatformsManager } from "@/features/platforms";
 import { listProjects, type Project } from "@/features/projects";
@@ -39,6 +40,7 @@ export default async function PlatformsPage() {
       recent={toRecent(projects)}
       showMembers={showMembers}
       clockSlot={<ClockWidget />}
+      reportSlot={<DailyReportButton />}
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <PlatformsManager

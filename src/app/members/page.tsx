@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { DailyReportButton } from "@/features/reports";
 import {
   canViewOrgMembers,
   listOrgMembers,
@@ -43,6 +44,7 @@ export default async function MembersPage() {
       recent={toRecent(projects)}
       showMembers
       clockSlot={<ClockWidget />}
+      reportSlot={<DailyReportButton />}
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <MembersDirectory members={members} canPromote={user.isSuperadmin} statuses={statuses} />
