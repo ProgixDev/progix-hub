@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { CommandMenu } from "./command-menu";
 import { Sidebar, type RecentProject } from "./sidebar";
 import { TopBar } from "./top-bar";
 
@@ -25,6 +26,7 @@ export function AppFrame({
   const pathname = usePathname();
   return (
     <div className="flex h-dvh overflow-hidden">
+      <CommandMenu showMembers={showMembers} />
       <Sidebar
         recent={recent}
         open={navOpen}

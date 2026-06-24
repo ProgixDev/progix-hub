@@ -40,10 +40,10 @@ export default async function SettingsPage() {
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <SettingsSection />
-      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-2xl px-4 pb-6 sm:px-6">
         <Link
           href="/settings/platforms"
-          className="border-line-1 bg-card hover:border-line-strong flex items-center justify-between gap-3 rounded-xl border px-5 py-4 transition-colors"
+          className="glass card-hover flex items-center justify-between gap-3 rounded-2xl px-5 py-4"
         >
           <div className="min-w-0">
             <p className="text-text text-[14px] font-semibold">{tPlatforms("title")}</p>

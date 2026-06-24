@@ -34,7 +34,7 @@ export function DocumentsSection({
 }) {
   return (
     <DocumentsStoreProvider>
-      <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
+      <section className="mx-auto mt-6 w-full max-w-5xl px-4 pb-12 sm:px-6">
         <Header projectId={projectId} canWrite={canWrite} />
         <Tabs documents={documents} />
         <List projectId={projectId} documents={documents} canWrite={canWrite} />

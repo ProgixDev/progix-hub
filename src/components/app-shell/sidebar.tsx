@@ -14,6 +14,11 @@ import {
   VideoIcon,
 } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
+import { COMMANDS_EVENT } from "./command-menu";
+
+function openCommands() {
+  window.dispatchEvent(new Event(COMMANDS_EVENT));
+}
 
 export type RecentProject = {
   id: string;
@@ -190,6 +195,7 @@ function SidebarNav({
         {collapsed ? (
           <button
             type="button"
+            onClick={openCommands}
             title={tCommon("search")}
             aria-label={tCommon("searchLabel")}
             className="border-line-1 bg-bg-inset hover:border-line-blue flex h-9 w-full items-center justify-center rounded-full border transition-colors"
@@ -197,21 +203,21 @@ function SidebarNav({
             <SearchIcon className="text-text-2 size-4" />
           </button>
         ) : (
-          <label className="border-line-1 bg-bg-inset focus-within:border-line-blue flex h-9 items-center gap-2.5 rounded-full border px-3.5 transition-colors">
+          <button
+            type="button"
+            onClick={openCommands}
+            aria-label={tCommon("searchLabel")}
+            className="border-line-1 bg-bg-inset hover:border-line-blue flex h-9 w-full items-center gap-2.5 rounded-full border px-3.5 text-left transition-colors"
+          >
             <SearchIcon className="text-text-2 size-4 flex-none" />
-            <input
-              type="search"
-              placeholder={tCommon("search")}
-              aria-label={tCommon("searchLabel")}
-              className="placeholder:text-text-3 w-full min-w-0 bg-transparent text-[13.5px] outline-none"
-            />
+            <span className="text-text-3 flex-1 truncate text-[13.5px]">{tCommon("search")}</span>
             <kbd className="text-text-1 bg-bg-3 border-line-1 hidden h-[18px] min-w-[18px] items-center justify-center rounded border px-1 font-mono text-[11px] sm:inline-flex">
               ⌘
             </kbd>
             <kbd className="text-text-1 bg-bg-3 border-line-1 hidden h-[18px] min-w-[18px] items-center justify-center rounded border px-1 font-mono text-[11px] sm:inline-flex">
               K
             </kbd>
-          </label>
+          </button>
         )}
       </div>
 
