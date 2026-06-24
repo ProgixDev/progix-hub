@@ -19,6 +19,7 @@ Adding or changing a CUJ is a product decision — PR must be approved by the pr
 | CUJ-09 | Track work time       | A member uses the header clock: Start working → running timer with Pause/Finish → Take a pause → Resume → Finish, returning to “Start working”; the Members directory shows everyone’s live status + hours today                                                              | `e2e/time.spec.ts`      | `clock-*`, `members-status` |
 | CUJ-10 | Configure a platform  | An admin opens Settings → Platforms → adds a platform with an access pattern + steps → edits/disables it; a non-admin member sees the registry read-only                                                                                                                      | `e2e/platforms.spec.ts` | `platforms`                 |
 | CUJ-11 | Browse tutorials      | A member opens Tutorials from the sidebar and watches a how-to; a pasted YouTube/Loom/Vimeo link renders as a safe inline embed; a non-admin sees the library read-only                                                                                                       | `e2e/tutorials.spec.ts` | `tutorials`                 |
+| CUJ-12 | Client onboarding     | A PM builds a Setup page from platforms (link + passcode shown once) and tracks progress; the client opens `/setup/[token]`, the passcode gates access and leaks nothing when wrong, then works the guided checklist                                                          | `e2e/setup.spec.ts`     | `setup-gate`                |
 
 ## Rules
 
