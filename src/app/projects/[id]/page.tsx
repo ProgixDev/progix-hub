@@ -12,7 +12,9 @@ import {
 import { EnvVarsSection, listEnvVarAudit, listProjectEnvVars } from "@/features/env-vars";
 import { getProjectMembers, PeoplePanel } from "@/features/people";
 import { canViewOrgMembers } from "@/features/members";
+import { listPlatforms } from "@/features/platforms";
 import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
+import { getProjectSetup, SetupPanel } from "@/features/setup";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { capabilities } from "@/lib/auth/roles";
 
@@ -41,6 +43,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       can.managePeople ? getProjectMembers(id) : Promise.resolve([]),
       getTranslations("portal"),
     ]);
+
+  // The client setup page is managed by the project's PM / global PM / superadmin (spec 017).
+  const setupData = can.manageProject ? await getProjectSetup(id) : { setup: null, steps: [] };
+  const platforms = can.manageProject ? await listPlatforms() : [];
 
   // No effective role (e.g. a removed member) ⇒ no access, even if the row were readable (AC-2).
   if (!project || !role) notFound();
@@ -79,6 +85,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           {t("openPortal")} →
         </Link>
       </div>
+      {can.manageProject && (
+        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+          <SetupPanel
+            projectId={id}
+            platforms={platforms
+              .filter((p) => !p.disabled)
+              .map((p) => ({ id: p.id, name: p.name }))}
+            setup={setupData.setup}
+            steps={setupData.steps}
+          />
+        </div>
+      )}
       {can.managePeople && <PeoplePanel projectId={id} members={members} />}
       {can.seeEnvVars && (
         <EnvVarsSection
