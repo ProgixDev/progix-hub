@@ -7,4 +7,4 @@
 - [x] T5 Plumb `reportSlot` through app-shell → pages; wire ReportsSection into project page; copy EN/FR
 - [x] T6 `pnpm verify` green
 - [x] T7 `/review` (appsec: RLS members-only, no anon, safe markdown, action authz)
-- [ ] T8 PR; merge; deploy; `/update-docs` (spec shipped + CUJ)
+- [x] T8 PR; merge; deploy; `/update-docs` (spec shipped + CUJ)
