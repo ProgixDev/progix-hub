@@ -18,6 +18,7 @@ Adding or changing a CUJ is a product decision — PR must be approved by the pr
 | CUJ-08 | Member GitHub profile | A member opens their profile from the account menu → sees their GitHub activity + recent commits (or a Connect GitHub prompt when unlinked) → opens the org directory and another member’s profile; activity sections degrade gracefully when the integration is unconfigured | `e2e/members.spec.ts`   | `profile-*`, `members-*`    |
 | CUJ-09 | Track work time       | A member uses the header clock: Start working → running timer with Pause/Finish → Take a pause → Resume → Finish, returning to “Start working”; the Members directory shows everyone’s live status + hours today                                                              | `e2e/time.spec.ts`      | `clock-*`, `members-status` |
 | CUJ-10 | Configure a platform  | An admin opens Settings → Platforms → adds a platform with an access pattern + steps → edits/disables it; a non-admin member sees the registry read-only                                                                                                                      | `e2e/platforms.spec.ts` | `platforms`                 |
+| CUJ-11 | Browse tutorials      | A member opens Tutorials from the sidebar and watches a how-to; a pasted YouTube/Loom/Vimeo link renders as a safe inline embed; a non-admin sees the library read-only                                                                                                       | `e2e/tutorials.spec.ts` | `tutorials`                 |
 
 ## Rules
 
