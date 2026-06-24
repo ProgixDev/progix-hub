@@ -118,7 +118,7 @@ function Segment({
               tabIndex={active ? 0 : -1}
               disabled={disabled}
               onClick={() => onChange(option.value)}
-              className={`h-8 rounded-md px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60 ${
+              className={`h-8 rounded-full px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60 ${
                 active ? "bg-blue text-primary-foreground" : "text-text-1 hover:text-text"
               }`}
             >

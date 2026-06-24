@@ -6,7 +6,7 @@ import { upsertDossierAction } from "../actions";
 import type { ClientDossier } from "../types";
 
 const inputCls =
-  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
+  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-xl border px-3.5 py-2.5 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
 
 function Field({
   label,
@@ -52,7 +52,7 @@ export function ClientDossierPanel({
   }
 
   return (
-    <section className="border-line-1 bg-card mt-4 rounded-xl border p-5">
+    <section className="glass mt-4 rounded-2xl p-5">
       <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
       <p className="text-text-3 mt-0.5 text-[12.5px]">{t("subtitle")}</p>
 
@@ -134,7 +134,7 @@ export function ClientDossierPanel({
           <button
             type="submit"
             disabled={pending}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
+            className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all disabled:opacity-60"
           >
             {pending ? t("saving") : t("save")}
           </button>

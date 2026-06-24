@@ -9,7 +9,7 @@ import { useEnvVarsStore } from "../provider";
 import { ENV_SCOPES, type EnvScope } from "../types";
 
 const inputCls =
-  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[13px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
+  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-xl border px-3.5 py-2.5 text-[13px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
 
 type ParsedFile = { name: string; text: string };
 type Summary = { created: number; skipped: number; failed: number };
@@ -137,7 +137,7 @@ function EnvImportModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/60 px-4 py-[7vh] backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-auto bg-black/70 px-4 py-[7vh] backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       aria-label={t("importTitle")}
@@ -145,7 +145,7 @@ function EnvImportModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-card border-line-1 w-full max-w-2xl rounded-xl border shadow-2xl">
+      <div className="glass-strong w-full max-w-2xl rounded-2xl">
         <div className="border-line flex items-center justify-between border-b px-5 py-4">
           <h2 className="text-text text-[15px] font-semibold">{t("importTitle")}</h2>
         </div>
@@ -163,7 +163,7 @@ function EnvImportModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors"
+                className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all"
               >
                 {tCommon("close")}
               </button>
@@ -190,7 +190,7 @@ function EnvImportModal({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-3 text-[12.5px] font-medium transition-colors"
+                className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-3 text-[12.5px] font-medium transition-colors"
               >
                 {t("importChoose")}
               </button>
@@ -281,7 +281,7 @@ function EnvImportModal({
                               [row.key]: e.target.value as EnvScope,
                             }))
                           }
-                          className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-md border px-2 text-[12px]"
+                          className="border-line-1 bg-bg-inset text-text-1 h-8 rounded-xl border px-2 text-[12px]"
                         >
                           {ENV_SCOPES.map((scope) => (
                             <option key={scope} value={scope}>
@@ -314,7 +314,7 @@ function EnvImportModal({
                 type="button"
                 onClick={onSubmit}
                 disabled={pending || includedCount === 0}
-                className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
+                className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all disabled:opacity-60"
               >
                 {pending ? tCommon("saving") : t("importSubmit", { count: includedCount })}
               </button>

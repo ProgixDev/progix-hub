@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { createMemberAccountAction } from "../actions";
 
 const inputCls =
-  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-10 w-full rounded-md border px-3 text-[13.5px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
+  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-10 w-full rounded-xl border px-3.5 text-[13.5px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
 
 /** Superadmin-only card to create an email/password org member (spec 010). */
 export function CreateMemberCard() {
@@ -41,7 +41,7 @@ export function CreateMemberCard() {
 
   return (
     <section className="mx-auto w-full max-w-2xl px-4 pb-8 sm:px-6">
-      <div className="border-line-1 rounded-xl border">
+      <div className="glass rounded-2xl">
         <div className="border-line border-b px-4 py-3">
           <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
           <p className="text-text-3 text-[12px]">{t("subtitle")}</p>
@@ -107,7 +107,7 @@ export function CreateMemberCard() {
             <button
               type="submit"
               disabled={pending}
-              className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13.5px] font-medium transition-colors disabled:opacity-60"
+              className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all disabled:opacity-60"
             >
               {pending ? tCommon("saving") : t("submit")}
             </button>

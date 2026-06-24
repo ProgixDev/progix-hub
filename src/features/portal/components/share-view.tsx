@@ -16,9 +16,9 @@ import { StatusBadge } from "./status-badge";
 
 const NAME_KEY = "portal-client-name";
 const inputCls =
-  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[13.5px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
+  "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-xl border px-3.5 py-2.5 text-[13.5px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
 const btn =
-  "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
+  "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
 
 /** The client's whole portal page — read everything, comment, attach, propose (view + comment role). */
 export function ShareView({ portal, token }: { portal: PublicPortal; token: string }) {
@@ -45,7 +45,7 @@ export function ShareView({ portal, token }: { portal: PublicPortal; token: stri
         <button
           type="button"
           onClick={() => setProposeOpen((open) => !open)}
-          className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+          className="btn-primary h-9 rounded-full px-3.5 text-[13px] font-medium transition-all"
         >
           {t("propose")}
         </button>
@@ -187,7 +187,7 @@ function PublicCard({
   }
 
   return (
-    <li className="bg-bg-1 border-line-1 rounded-xl border px-4 py-3.5">
+    <li className="glass rounded-2xl px-4 py-3.5">
       <div className="flex flex-wrap items-center gap-2">
         <p className="text-text min-w-0 text-[14px] font-medium break-words">{card.title}</p>
         <StatusBadge status={card.status} />
@@ -257,14 +257,14 @@ function PublicCard({
           onChange={(e) => onName(e.target.value)}
           placeholder={t("yourName")}
           required
-          className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 w-36 rounded-md border px-2.5 text-[12.5px] outline-none"
+          className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 w-36 rounded-xl border px-2.5 text-[12.5px] outline-none"
         />
         <input
           name="body"
           aria-label={t("commentPlaceholder")}
           placeholder={t("commentPlaceholder")}
           required
-          className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 min-w-40 flex-1 rounded-md border px-2.5 text-[12.5px] outline-none"
+          className="bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 h-8 min-w-40 flex-1 rounded-xl border px-2.5 text-[12.5px] outline-none"
         />
         <button type="submit" disabled={pending} className={btn}>
           {pending ? t("sending") : t("send")}
@@ -338,7 +338,7 @@ function ProposeForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="border-line-1 bg-bg-1 mt-6 space-y-3 rounded-xl border p-4"
+      className="glass mt-6 space-y-3 rounded-2xl p-4"
       aria-label={t("propose")}
     >
       <div>
@@ -396,7 +396,7 @@ function ProposeForm({
         <button
           type="submit"
           disabled={pending || sent}
-          className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-4 text-[13px] font-medium transition-colors disabled:opacity-60"
+          className="btn-primary h-9 rounded-full px-4 text-[13px] font-medium transition-all disabled:opacity-60"
         >
           {pending ? t("sending") : t("proposeSubmit")}
         </button>

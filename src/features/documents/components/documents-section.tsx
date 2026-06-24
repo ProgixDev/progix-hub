@@ -87,14 +87,14 @@ function Header({ projectId, canWrite }: { projectId: string; canWrite: boolean 
           <button
             type="button"
             onClick={openAddLink}
-            className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-md border px-3 text-[13px] font-medium transition-colors"
+            className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3 text-[13px] font-medium transition-colors"
           >
             {t("addLink")}
           </button>
           <button
             type="button"
             onClick={openAddNote}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+            className="btn-primary h-9 rounded-full px-3.5 text-[13px] font-medium transition-all"
           >
             {t("addNote")}
           </button>

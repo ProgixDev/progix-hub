@@ -68,7 +68,7 @@ export function MembersDirectory({
           {t("empty")}
         </div>
       ) : (
-        <ul className="divide-line/60 border-line-1 divide-y rounded-xl border">
+        <ul className="divide-line/60 glass divide-y rounded-2xl">
           {members.map((member) => {
             const standing = standingOf(member);
             return (
@@ -103,7 +103,7 @@ export function MembersDirectory({
                         type="button"
                         disabled={pending}
                         onClick={() => toggleGlobalPm(member)}
-                        className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                        className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                       >
                         {member.is_global_pm ? t("removeGlobalPm") : t("makeGlobalPm")}
                       </button>
@@ -111,7 +111,7 @@ export function MembersDirectory({
                         type="button"
                         disabled={pending}
                         onClick={() => toggleLead(member)}
-                        className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
+                        className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60"
                       >
                         {member.is_lead ? t("removeLead") : t("makeLead")}
                       </button>

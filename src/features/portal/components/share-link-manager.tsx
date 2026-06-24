@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { createShareLinkAction, revokeShareLinkAction } from "../actions";
 
 const btn =
-  "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
+  "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
 
 /**
  * The raw link is shown exactly once, right after minting — only its hash is stored, so
@@ -60,7 +60,7 @@ export function ShareLinkManager({
   }
 
   return (
-    <div className="bg-bg-2 border-line-1 rounded-lg border px-4 py-3.5">
+    <div className="glass rounded-2xl px-4 py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-text text-[13px] font-semibold">{t("shareTitle")}</p>
@@ -86,7 +86,7 @@ export function ShareLinkManager({
               type="button"
               disabled={pending}
               onClick={mint}
-              className="bg-blue text-primary-foreground hover:bg-blue-hover h-8 rounded-md px-3 text-[12.5px] font-medium transition-colors disabled:opacity-60"
+              className="btn-primary h-8 rounded-full px-3 text-[12.5px] font-medium transition-all disabled:opacity-60"
             >
               {t("createLink")}
             </button>

@@ -58,7 +58,7 @@ function Header({
           <button
             type="button"
             onClick={openAddBlock}
-            className="bg-blue text-primary-foreground hover:bg-blue-hover h-9 rounded-md px-3.5 text-[13px] font-medium transition-colors"
+            className="btn-primary h-9 rounded-full px-3.5 text-[13px] font-medium transition-all"
           >
             {t("addBlock")}
           </button>
@@ -127,7 +127,7 @@ function BlockPanel({
   }
 
   return (
-    <div className="border-line-1 rounded-xl border">
+    <div className="glass rounded-2xl">
       <div className="border-line flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
         <h2 className="text-text text-[14px] font-semibold">
           {block.name} <span className="text-text-3 font-normal">{cards.length}</span>
@@ -137,7 +137,7 @@ function BlockPanel({
             <button
               type="button"
               onClick={() => openAddCard(block.id)}
-              className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-md border px-2.5 text-[12px] font-medium transition-colors"
+              className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors"
             >
               {t("addCard")}
             </button>
@@ -146,7 +146,7 @@ function BlockPanel({
               disabled={pending}
               onClick={onArchiveBlock}
               aria-label={`${t("archiveCard")} ${block.name}`}
-              className="text-text-3 hover:text-text h-8 rounded-md px-2 text-[12px] transition-colors disabled:opacity-60"
+              className="text-text-3 hover:text-text h-8 rounded-full px-2 text-[12px] transition-colors disabled:opacity-60"
             >
               {t("archiveCard")}
             </button>
@@ -192,7 +192,7 @@ function ProposalsInbox({
   const unassigned = cardsForBlock(portal.cards, null);
   if (unassigned.length === 0) return null;
   return (
-    <div className="border-amber/40 mt-6 rounded-xl border">
+    <div className="glass border-amber/40 mt-6 rounded-2xl border">
       <div className="border-line border-b px-4 py-3">
         <h2 className="text-text text-[14px] font-semibold">
           {t("proposalsInbox")} <span className="text-text-3 font-normal">{unassigned.length}</span>
