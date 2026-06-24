@@ -45,3 +45,4 @@ ship → /update-docs                           status: shipped; learnings disti
 | [014](014-global-pm/spec.md)              | Global PM org role           | shipped   |
 | [015](015-platform-registry/spec.md)      | Platform registry (org-wide) | shipped   |
 | [016](016-tutorials/spec.md)              | Tutorials (video library)    | shipped   |
+| [017](017-client-onboarding/spec.md)      | Client onboarding (Setup)    | active    |
