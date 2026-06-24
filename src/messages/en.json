@@ -24,7 +24,8 @@
     "closeMenu": "Close menu",
     "menu": "Menu",
     "members": "Members",
-    "profile": "Profile"
+    "profile": "Profile",
+    "tutorials": "Tutorials"
   },
   "topbar": {
     "commands": "Commands",
@@ -389,5 +390,25 @@
     "errorInviteRole": "Role is required",
     "errorInviteEmail": "Enter a valid email",
     "errorKeyLabel": "Key label is required"
+  },
+  "tutorials": {
+    "title": "Tutorials",
+    "eyebrow": "Library",
+    "subtitle": "How-to videos for the platforms we set up — recorded once, reused everywhere.",
+    "add": "Add tutorial",
+    "newTutorial": "New tutorial",
+    "editTutorial": "Edit tutorial",
+    "empty": "No tutorials yet.",
+    "fieldTitle": "Title",
+    "fieldLink": "Video link (YouTube, Loom or Vimeo)",
+    "fieldPlatform": "Platform",
+    "platformNone": "None",
+    "fieldLanguage": "Language",
+    "languageBoth": "Both",
+    "fieldDescription": "Description",
+    "fieldVisibleToClients": "Can be shown to clients",
+    "deleteConfirm": "Delete “{title}”? This can’t be undone.",
+    "errorTitle": "Title is required",
+    "errorLink": "Paste a YouTube, Loom or Vimeo link"
   }
 }

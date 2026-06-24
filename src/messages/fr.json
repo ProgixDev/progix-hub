@@ -24,7 +24,8 @@
     "closeMenu": "Fermer le menu",
     "menu": "Menu",
     "members": "Membres",
-    "profile": "Profil"
+    "profile": "Profil",
+    "tutorials": "Tutoriels"
   },
   "topbar": {
     "commands": "Commandes",
@@ -389,5 +390,25 @@
     "errorInviteRole": "Le rôle est requis",
     "errorInviteEmail": "Saisissez un e-mail valide",
     "errorKeyLabel": "Le libellé de la clé est requis"
+  },
+  "tutorials": {
+    "title": "Tutoriels",
+    "eyebrow": "Bibliothèque",
+    "subtitle": "Vidéos pratiques pour les plateformes que nous configurons — enregistrées une fois, réutilisées partout.",
+    "add": "Ajouter un tutoriel",
+    "newTutorial": "Nouveau tutoriel",
+    "editTutorial": "Modifier le tutoriel",
+    "empty": "Aucun tutoriel pour l’instant.",
+    "fieldTitle": "Titre",
+    "fieldLink": "Lien de la vidéo (YouTube, Loom ou Vimeo)",
+    "fieldPlatform": "Plateforme",
+    "platformNone": "Aucune",
+    "fieldLanguage": "Langue",
+    "languageBoth": "Les deux",
+    "fieldDescription": "Description",
+    "fieldVisibleToClients": "Peut être montré aux clients",
+    "deleteConfirm": "Supprimer « {title} » ? Action irréversible.",
+    "errorTitle": "Le titre est requis",
+    "errorLink": "Collez un lien YouTube, Loom ou Vimeo"
   }
 }

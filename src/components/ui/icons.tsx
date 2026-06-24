@@ -57,6 +57,15 @@ export function TrashIcon(props: IconProps) {
   );
 }
 
+export function VideoIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="M10 9l5 3-5 3V9Z" />
+    </svg>
+  );
+}
+
 export function SettingsIcon(props: IconProps) {
   return (
     <svg {...base(props)}>
