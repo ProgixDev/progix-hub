@@ -20,7 +20,7 @@ Ordered, checkboxed. Tick on commit. `[P]` = parallel-safe. ≤ ~30 min each.
 
 ## Phase 3 — review & ship
 
-- [ ] T11 `/review` (appsec: iframe src safety, write gating); fix P0/P1
+- [x] T11 `/review` (appsec: iframe src safety, write gating); fix P0/P1
 - [ ] T12 PR; merge; deploy; `/update-docs` (CUJ + spec shipped). Manually add the test tutorial (`youtu.be/8VLGMiM-mm8`) to prod via the UI/DB to confirm live embed.
 
 ## AC coverage
