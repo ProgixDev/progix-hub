@@ -78,6 +78,53 @@ export async function createPlanItemAction(
   return { ok: true, item: data as PlanItem };
 }
 
+const boxSchema = z.object({
+  pos_x: z.number(),
+  pos_y: z.number(),
+  width: z.number().int(),
+  height: z.number().int(),
+});
+
+/** Create a phase frame at `box` and adopt `childIds` into it (lasso → make phase). */
+export async function groupIntoPhaseAction(
+  projectId: string,
+  childIds: string[],
+  box: unknown,
+  title?: string,
+): Promise<CreateResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  const ids = z.array(z.uuid()).safeParse(childIds);
+  const parsedBox = boxSchema.safeParse(box);
+  if (!ids.success || !parsedBox.success) return { ok: false };
+  const user = await getCurrentUser();
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("plan_items")
+    .insert({
+      project_id: projectId,
+      type: "phase",
+      title: (title || "Phase").slice(0, 500),
+      pos_x: Math.round(parsedBox.data.pos_x),
+      pos_y: Math.round(parsedBox.data.pos_y),
+      width: parsedBox.data.width,
+      height: parsedBox.data.height,
+      created_by: user!.id,
+    })
+    .select(PLAN_COLS)
+    .single();
+  if (error || !data) return { ok: false };
+  if (ids.data.length > 0) {
+    await supabase
+      .from("plan_items")
+      .update({ parent_id: (data as PlanItem).id })
+      .eq("project_id", projectId)
+      .in("id", ids.data);
+  }
+  revalidatePath(`/projects/${projectId}/playground`);
+  return { ok: true, item: data as PlanItem };
+}
+
 /** Patch a plan item (move, status, title, assignee, …). RLS scopes to accessible rows. */
 export async function updatePlanItemAction(id: string, patch: unknown): Promise<ActionResult> {
   if (!z.uuid().safeParse(id).success) return { ok: false };

@@ -6,6 +6,7 @@ import {
   createLinkAction,
   deleteLinkAction,
   deletePlanItemAction,
+  groupIntoPhaseAction,
   updatePlanItemAction,
 } from "../actions";
 import { usePlaygroundStore } from "../provider";
@@ -35,6 +36,7 @@ function pathD(sx: number, sy: number, tx: number, ty: number) {
 const Card = memo(function Card({
   item,
   selected,
+  multi,
   dimmed,
   blocked,
   editing,
@@ -46,6 +48,7 @@ const Card = memo(function Card({
 }: {
   item: PlanItem;
   selected: boolean;
+  multi: boolean;
   dimmed: boolean;
   blocked: boolean;
   editing: boolean;
@@ -67,7 +70,8 @@ const Card = memo(function Card({
         "group glass absolute top-0 left-0 rounded-xl p-3 [will-change:transform]",
         "shadow-[0_6px_18px_-10px_rgba(0,0,0,0.7)]",
         selected && "ring-blue-ring ring-2",
-        blocked && !selected && "ring-amber/60 ring-1",
+        multi && !selected && "ring-blue ring-2",
+        blocked && !selected && !multi && "ring-amber/60 ring-1",
         dimmed ? "opacity-30" : "opacity-100",
       )}
       style={{
@@ -217,8 +221,11 @@ export function Canvas({
   const focusPhase = usePlaygroundStore((s) => s.focusPhase);
   const patchItem = usePlaygroundStore((s) => s.patchItem);
   const removeItem = usePlaygroundStore((s) => s.removeItem);
+  const addItem = usePlaygroundStore((s) => s.addItem);
   const addLink = usePlaygroundStore((s) => s.addLink);
   const removeLink = usePlaygroundStore((s) => s.removeLink);
+  const multiIds = usePlaygroundStore((s) => s.multiIds);
+  const setMulti = usePlaygroundStore((s) => s.setMulti);
   const setViewport = usePlaygroundStore((s) => s.setViewport);
   const zoom = usePlaygroundStore((s) => s.zoom);
   const panX = usePlaygroundStore((s) => s.panX);
@@ -228,8 +235,10 @@ export function Canvas({
   const layerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const tempRef = useRef<SVGPathElement>(null);
+  const lassoRef = useRef<HTMLDivElement>(null);
+  const multiSet = useMemo(() => new Set(multiIds), [multiIds]);
   const g = useRef<{
-    mode: "pan" | "card" | "link";
+    mode: "pan" | "card" | "link" | "lasso";
     id?: string;
     el?: HTMLElement | null;
     z: number;
@@ -331,6 +340,17 @@ export function Canvas({
         const tx = (e.clientX - d.rectX - panX) / d.z;
         const ty = (e.clientY - d.rectY - panY) / d.z;
         tempRef.current?.setAttribute("d", pathD(d.ox, d.oy, tx, ty));
+      } else if (d.mode === "lasso") {
+        d.cx = e.clientX - d.rectX;
+        d.cy = e.clientY - d.rectY;
+        const el = lassoRef.current;
+        if (el) {
+          el.style.display = "block";
+          el.style.left = `${Math.min(d.ox, d.cx)}px`;
+          el.style.top = `${Math.min(d.oy, d.cy)}px`;
+          el.style.width = `${Math.abs(d.cx - d.ox)}px`;
+          el.style.height = `${Math.abs(d.cy - d.oy)}px`;
+        }
       }
     },
     [panX, panY, zoom, redrawLinks, broadcastCursor],
@@ -343,6 +363,25 @@ export function Canvas({
       if (!d) return;
       if (d.mode === "pan") {
         if (d.moved) setViewport({ panX: d.cx, panY: d.cy });
+        return;
+      }
+      if (d.mode === "lasso") {
+        if (lassoRef.current) lassoRef.current.style.display = "none";
+        const cx1 = (Math.min(d.ox, d.cx) - panX) / zoom;
+        const cy1 = (Math.min(d.oy, d.cy) - panY) / zoom;
+        const cx2 = (Math.max(d.ox, d.cx) - panX) / zoom;
+        const cy2 = (Math.max(d.oy, d.cy) - panY) / zoom;
+        const hit = items
+          .filter((it) => it.type !== "phase")
+          .filter(
+            (it) =>
+              it.pos_x < cx2 &&
+              it.pos_x + CARD_W > cx1 &&
+              it.pos_y < cy2 &&
+              it.pos_y + CARD_H > cy1,
+          )
+          .map((it) => it.id);
+        setMulti(hit);
         return;
       }
       if (d.mode === "link") {
@@ -377,7 +416,7 @@ export function Canvas({
         });
       }
     },
-    [byId, phases, patchItem, setViewport, addLink, projectId],
+    [byId, phases, patchItem, setViewport, addLink, projectId, items, panX, panY, zoom, setMulti],
   );
 
   const startCardDrag = useCallback(
@@ -436,6 +475,29 @@ export function Canvas({
   const startPan = useCallback(
     (e: React.PointerEvent) => {
       if (e.button !== 0) return;
+      // Shift+drag on empty canvas = lasso multi-select; plain drag = pan.
+      if (e.shiftKey) {
+        const rect = surfaceRef.current?.getBoundingClientRect();
+        const rx = rect?.left ?? 0;
+        const ry = rect?.top ?? 0;
+        g.current = {
+          mode: "lasso",
+          z: zoom,
+          rectX: rx,
+          rectY: ry,
+          startX: e.clientX,
+          startY: e.clientY,
+          ox: e.clientX - rx,
+          oy: e.clientY - ry,
+          cx: e.clientX - rx,
+          cy: e.clientY - ry,
+          w: 0,
+          h: 0,
+          moved: false,
+        };
+        surfaceRef.current?.setPointerCapture(e.pointerId);
+        return;
+      }
       select(null);
       g.current = {
         mode: "pan",
@@ -478,7 +540,14 @@ export function Canvas({
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if (e.key === "Delete" || e.key === "Backspace") {
-        if (selectedLinkId) {
+        if (multiIds.length > 0) {
+          e.preventDefault();
+          for (const id of multiIds) {
+            removeItem(id);
+            void deletePlanItemAction(id);
+          }
+          setMulti([]);
+        } else if (selectedLinkId) {
           e.preventDefault();
           const id = selectedLinkId;
           removeLink(id);
@@ -493,11 +562,22 @@ export function Canvas({
         select(null);
         selectLink(null);
         focusPhase(null);
+        setMulti([]);
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selectedId, selectedLinkId, removeItem, removeLink, select, selectLink, focusPhase]);
+  }, [
+    selectedId,
+    selectedLinkId,
+    multiIds,
+    removeItem,
+    removeLink,
+    select,
+    selectLink,
+    focusPhase,
+    setMulti,
+  ]);
 
   const commitTitle = useCallback(
     (id: string, title: string) => {
@@ -507,6 +587,36 @@ export function Canvas({
     },
     [patchItem, setEditing],
   );
+
+  function makePhase() {
+    const sel = items.filter((i) => multiSet.has(i.id));
+    if (sel.length === 0) return;
+    const minX = Math.min(...sel.map((i) => i.pos_x));
+    const minY = Math.min(...sel.map((i) => i.pos_y));
+    const maxX = Math.max(...sel.map((i) => i.pos_x + CARD_W));
+    const maxY = Math.max(...sel.map((i) => i.pos_y + CARD_H));
+    const box = {
+      pos_x: Math.round(minX - 20),
+      pos_y: Math.round(minY - 44),
+      width: Math.round(Math.max(240, maxX - minX + 40)),
+      height: Math.round(Math.max(180, maxY - minY + 64)),
+    };
+    const childIds = sel.filter((i) => i.type === "task").map((i) => i.id);
+    void groupIntoPhaseAction(projectId, childIds, box, "Phase").then((res) => {
+      if (!res.ok) return;
+      setMulti([]);
+      addItem(res.item);
+      childIds.forEach((id) => patchItem(id, { parent_id: res.item.id }));
+    });
+  }
+
+  function bulkDelete() {
+    for (const id of multiIds) {
+      removeItem(id);
+      void deletePlanItemAction(id);
+    }
+    setMulti([]);
+  }
 
   return (
     <div
@@ -604,6 +714,7 @@ export function Canvas({
               key={it.id}
               item={it}
               selected={it.id === selectedId}
+              multi={multiSet.has(it.id)}
               dimmed={Boolean(focusedPhaseId && it.parent_id !== focusedPhaseId)}
               blocked={blocked.has(it.id)}
               editing={editingId === it.id}
@@ -618,9 +729,47 @@ export function Canvas({
         <Cursors />
       </div>
 
+      {/* Lasso selection rectangle (screen coords) */}
+      <div
+        ref={lassoRef}
+        className="border-blue bg-blue-tint pointer-events-none absolute z-30 rounded-md border"
+        style={{ display: "none" }}
+      />
+
+      {/* Bulk action bar for a lasso selection */}
+      {multiIds.length > 0 && (
+        <div
+          onPointerDown={(e) => e.stopPropagation()}
+          className="glass-strong absolute bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 rounded-full py-1.5 pr-2 pl-3 text-[12.5px]"
+        >
+          <span className="text-text-2">{multiIds.length} selected</span>
+          <button
+            type="button"
+            onClick={makePhase}
+            className="btn-primary ml-1 h-8 rounded-full px-3 font-medium transition-all"
+          >
+            Make phase
+          </button>
+          <button
+            type="button"
+            onClick={bulkDelete}
+            className="text-red-text hover:bg-red-tint h-8 rounded-full px-3 font-medium transition-colors"
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            onClick={() => setMulti([])}
+            className="text-text-2 hover:text-text h-8 rounded-full px-2"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {items.length === 0 && (
         <div className="text-text-3 pointer-events-none absolute inset-0 flex items-center justify-center text-[13px]">
-          Add a phase, task, or note to start planning.
+          Add a phase, task, or note to start planning. Shift-drag to select.
         </div>
       )}
     </div>
