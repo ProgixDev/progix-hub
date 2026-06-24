@@ -47,7 +47,7 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="spotlight flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="t-eyebrow">{t("portfolio")}</p>
           <h1 className="text-text mt-1 text-[26px] font-semibold tracking-tight">
@@ -73,10 +73,10 @@ function PortfolioInner({ projects }: { projects: Project[] }) {
                 type="button"
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-colors",
+                  "flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors",
                   filter === f.key
-                    ? "bg-bg-2 text-text"
-                    : "text-text-2 hover:bg-bg-2 hover:text-text",
+                    ? "border-line-blue bg-blue-tint text-text shadow-[0_0_20px_-9px_var(--blue-glow)]"
+                    : "text-text-2 hover:bg-bg-2 hover:text-text border-transparent",
                 )}
               >
                 {t(f.labelKey)}
@@ -120,7 +120,7 @@ function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: Proje
     { value: "list", labelKey: "viewList", Icon: RowsIcon },
   ];
   return (
-    <div className="border-line-1 flex items-center gap-0.5 rounded-md border p-0.5" role="group">
+    <div className="border-line-1 flex items-center gap-0.5 rounded-full border p-0.5" role="group">
       {options.map(({ value, labelKey, Icon }) => (
         <button
           key={value}
@@ -130,7 +130,9 @@ function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: Proje
           aria-pressed={view === value}
           className={cn(
             "flex size-7 items-center justify-center rounded-full transition-colors",
-            view === value ? "bg-bg-2 text-text" : "text-text-3 hover:text-text",
+            view === value
+              ? "bg-blue-tint text-blue-text shadow-[0_0_16px_-8px_var(--blue-glow)]"
+              : "text-text-3 hover:text-text",
           )}
         >
           <Icon className="size-4" />

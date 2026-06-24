@@ -25,7 +25,9 @@
     "menu": "Menu",
     "members": "Members",
     "profile": "Profile",
-    "tutorials": "Tutorials"
+    "tutorials": "Tutorials",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "topbar": {
     "commands": "Commands",

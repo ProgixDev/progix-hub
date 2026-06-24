@@ -83,7 +83,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       <div className="mx-auto w-full max-w-5xl px-4 pb-2 sm:px-6">
         <Link
           href={`/projects/${id}/portal`}
-          className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text inline-flex h-9 items-center gap-2 rounded-md border px-3 text-[13px] font-medium transition-colors"
+          className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text inline-flex h-9 items-center gap-2 rounded-full border px-3.5 text-[13px] font-medium transition-colors"
         >
           {t("openPortal")} →
         </Link>
