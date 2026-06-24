@@ -7,6 +7,7 @@ import { DailyReportButton } from "@/features/reports";
 import { ClockWidget } from "@/features/time-tracking";
 import { listProjects, type Project } from "@/features/projects";
 import { canViewOrgMembers } from "@/features/members";
+import { listMcpTokens, McpTokensCard } from "@/features/mcp-tokens";
 import { SettingsSection } from "@/features/settings";
 import { CreateMemberCard } from "@/features/team";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -30,7 +31,7 @@ export default async function SettingsPage() {
 
   // Defense in depth — the middleware already gates this route to members (AC-7).
   if (!user) redirect("/sign-in");
-  const showMembers = await canViewOrgMembers();
+  const [showMembers, mcpTokens] = await Promise.all([canViewOrgMembers(), listMcpTokens()]);
 
   return (
     <AppShell
@@ -56,6 +57,7 @@ export default async function SettingsPage() {
           </span>
         </Link>
       </div>
+      <McpTokensCard tokens={mcpTokens} />
       {user.isSuperadmin && <CreateMemberCard />}
     </AppShell>
   );
