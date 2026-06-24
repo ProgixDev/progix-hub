@@ -97,7 +97,7 @@ function Inner({
       ) : (
         <div className="grid gap-5 sm:grid-cols-2">
           {tutorials.map((item) => (
-            <article key={item.id} className="glass flex flex-col gap-2 rounded-2xl p-3">
+            <article key={item.id} className="glass card-hover flex flex-col gap-2 rounded-2xl p-3">
               <TutorialPlayer tutorial={item} videoUrl={videoUrls[item.id]} />
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">

@@ -65,7 +65,7 @@ function DetailInner({ project, canManage }: { project: Project; canManage: bool
         ← {t("back")}
       </Link>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="spotlight flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
             <h1 className="text-text min-w-0 text-[22px] font-semibold tracking-tight break-words sm:text-[24px]">

@@ -37,7 +37,7 @@ export function projectSurfaces(project: Project) {
 export function ProjectCard({ project }: { project: Project }) {
   const t = useTranslations("projects");
   return (
-    <article className="glass hover:border-line-strong rounded-2xl p-4 transition-colors">
+    <article className="glass card-hover rounded-2xl p-4">
       <div className="flex items-start gap-3">
         <span className="bg-bg-3 text-text-1 border-line-1 flex size-9 flex-none items-center justify-center rounded-lg border text-[11px] font-semibold">
           {initials(project.name)}

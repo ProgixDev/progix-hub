@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Sidebar, type RecentProject } from "./sidebar";
 import { TopBar } from "./top-bar";
@@ -21,6 +22,7 @@ export function AppFrame({
   children: React.ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
+  const pathname = usePathname();
   return (
     <div className="flex h-dvh overflow-hidden">
       <Sidebar
@@ -36,7 +38,11 @@ export function AppFrame({
           clockSlot={clockSlot}
           onMenu={() => setNavOpen(true)}
         />
-        <main className="min-h-0 flex-1 overflow-auto">{children}</main>
+        <main className="min-h-0 flex-1 overflow-auto">
+          <div key={pathname} className="page-enter min-h-full">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );
