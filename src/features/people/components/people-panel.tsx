@@ -64,7 +64,7 @@ export function PeoplePanel({
   }
 
   return (
-    <section className="mx-auto w-full max-w-5xl px-4 pb-8 sm:px-6">
+    <section className="mx-auto mt-6 w-full max-w-5xl px-4 sm:px-6">
       <div className="glass rounded-2xl">
         <div className="border-line border-b px-4 py-3">
           <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>

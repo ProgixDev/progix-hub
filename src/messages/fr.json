@@ -487,5 +487,10 @@
     "saved": "Enregistré",
     "errorEmail": "Saisissez un e-mail valide",
     "errorSavviness": "Utilisez une note de 1 à 5"
+  },
+  "commands": {
+    "title": "Commandes",
+    "placeholder": "Rechercher une commande…",
+    "empty": "Aucune commande"
   }
 }

@@ -52,7 +52,7 @@ export function ClientDossierPanel({
   }
 
   return (
-    <section className="glass mt-4 rounded-2xl p-5">
+    <section className="glass mt-6 rounded-2xl p-5">
       <h2 className="text-text text-[15px] font-semibold">{t("title")}</h2>
       <p className="text-text-3 mt-0.5 text-[12.5px]">{t("subtitle")}</p>
 

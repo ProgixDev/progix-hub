@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { ClockIcon, CommandIcon, GridIcon } from "@/components/ui/icons";
+import { CommandIcon, GridIcon } from "@/components/ui/icons";
+import { COMMANDS_EVENT } from "./command-menu";
 
 export function TopBar({
   title,
@@ -40,17 +41,14 @@ export function TopBar({
         {clockSlot}
         <button
           type="button"
+          onClick={() => window.dispatchEvent(new Event(COMMANDS_EVENT))}
           className="border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text hidden h-9 items-center gap-2 rounded-full border px-3.5 text-[12.5px] font-medium transition-colors sm:flex"
         >
           <CommandIcon className="size-4" />
           <span className="hidden md:inline">{t("commands")}</span>
-        </button>
-        <button
-          type="button"
-          aria-label={t("recentActivity")}
-          className="text-text-2 hover:bg-bg-3 hover:text-text hidden size-9 items-center justify-center rounded-full transition-colors sm:flex"
-        >
-          <ClockIcon className="size-[18px]" />
+          <kbd className="text-text-2 bg-bg-inset border-line-1 ml-1 hidden h-[18px] items-center rounded border px-1.5 font-mono text-[10px] md:inline-flex">
+            ⌘K
+          </kbd>
         </button>
         {userSlot ?? (
           <span className="bg-blue-deep border-line-blue text-blue-text flex size-9 items-center justify-center rounded-full border text-[12px] font-semibold">

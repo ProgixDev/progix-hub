@@ -487,5 +487,10 @@
     "saved": "Saved",
     "errorEmail": "Enter a valid email",
     "errorSavviness": "Use a 1–5 rating"
+  },
+  "commands": {
+    "title": "Commands",
+    "placeholder": "Search commands…",
+    "empty": "No matching command"
   }
 }

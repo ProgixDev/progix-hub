@@ -32,7 +32,7 @@ export function EnvVarsSection({
   const t = useTranslations("envVars");
   return (
     <EnvVarsStoreProvider>
-      <section className="mx-auto w-full max-w-5xl px-4 pb-12 sm:px-6">
+      <section className="mx-auto mt-6 w-full max-w-5xl px-4 sm:px-6">
         <Header canWrite={canWrite} projectId={projectId} />
         {envVars.length === 0 ? (
           <div className="border-line/60 text-text-3 mt-3 rounded-lg border border-dashed px-4 py-10 text-center text-[13px]">
