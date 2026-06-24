@@ -15,7 +15,7 @@ vi.mock("next-intl/server", () => ({
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { createTutorialAction } from "./actions";
+import { createTutorialAction, deleteTutorialAction } from "./actions";
 
 const mockGetCurrentUser = vi.mocked(getCurrentUser);
 const mockCreateClient = vi.mocked(createClient);
@@ -72,5 +72,28 @@ describe("createTutorialAction (spec 016)", () => {
       platform_service_id: "stripe",
       created_by: admin.id,
     });
+  });
+});
+
+describe("deleteTutorialAction (spec 019 — storage cleanup)", () => {
+  beforeEach(() => vi.clearAllMocks());
+  const ID = "0f8fad5b-d9cb-469f-a165-70867728950e";
+
+  it("removes the stored video file when deleting an upload tutorial", async () => {
+    mockGetCurrentUser.mockResolvedValue(admin);
+    const remove = vi.fn().mockResolvedValue({ error: null });
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { storage_path: `${ID}/clip.mp4` } });
+    const del = vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ error: null }) }));
+    mockCreateClient.mockResolvedValue({
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle })) })),
+        delete: del,
+      })),
+      storage: { from: vi.fn(() => ({ remove })) },
+    } as unknown as Awaited<ReturnType<typeof createClient>>);
+
+    const res = await deleteTutorialAction(ID);
+    expect(res).toEqual({ ok: true });
+    expect(remove).toHaveBeenCalledWith([`${ID}/clip.mp4`]);
   });
 });
