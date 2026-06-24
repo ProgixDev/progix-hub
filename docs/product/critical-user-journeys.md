@@ -17,6 +17,7 @@ Adding or changing a CUJ is a product decision — PR must be approved by the pr
 | CUJ-07 | Manage people         | A PM opens a project’s People panel → adds a teammate by email as a developer → changes their role → a bogus email is rejected → removes them; the last PM can’t be removed (per-role enforcement proven at the DB)                                                           | `e2e/roles.spec.ts`     | `people-*`                  |
 | CUJ-08 | Member GitHub profile | A member opens their profile from the account menu → sees their GitHub activity + recent commits (or a Connect GitHub prompt when unlinked) → opens the org directory and another member’s profile; activity sections degrade gracefully when the integration is unconfigured | `e2e/members.spec.ts`   | `profile-*`, `members-*`    |
 | CUJ-09 | Track work time       | A member uses the header clock: Start working → running timer with Pause/Finish → Take a pause → Resume → Finish, returning to “Start working”; the Members directory shows everyone’s live status + hours today                                                              | `e2e/time.spec.ts`      | `clock-*`, `members-status` |
+| CUJ-10 | Configure a platform  | An admin opens Settings → Platforms → adds a platform with an access pattern + steps → edits/disables it; a non-admin member sees the registry read-only                                                                                                                      | `e2e/platforms.spec.ts` | `platforms`                 |
 
 ## Rules
 
