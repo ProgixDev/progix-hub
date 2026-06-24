@@ -7,6 +7,8 @@ export type PlaygroundState = {
   selectedId: string | null;
   selectedLinkId: string | null;
   editingId: string | null;
+  /** Lasso multi-selection (card ids). */
+  multiIds: string[];
   lens: Lens;
   zoom: number;
   panX: number;
@@ -21,6 +23,7 @@ export type PlaygroundState = {
   setLens: (lens: Lens) => void;
   select: (id: string | null) => void;
   selectLink: (id: string | null) => void;
+  setMulti: (ids: string[]) => void;
   setEditing: (id: string | null) => void;
   setViewport: (v: { zoom?: number; panX?: number; panY?: number }) => void;
   focusPhase: (id: string | null) => void;
@@ -42,6 +45,7 @@ export function createPlaygroundStore(initial: PlanItem[], initialLinks: PlanLin
     selectedId: null,
     selectedLinkId: null,
     editingId: null,
+    multiIds: [],
     lens: "canvas",
     zoom: 1,
     panX: 0,
@@ -53,8 +57,9 @@ export function createPlaygroundStore(initial: PlanItem[], initialLinks: PlanLin
     setPeers: (peers) => set({ peers }),
     setCursors: (cursors) => set({ cursors }),
     setLens: (lens) => set({ lens }),
-    select: (selectedId) => set({ selectedId, selectedLinkId: null }),
-    selectLink: (selectedLinkId) => set({ selectedLinkId, selectedId: null }),
+    select: (selectedId) => set({ selectedId, selectedLinkId: null, multiIds: [] }),
+    selectLink: (selectedLinkId) => set({ selectedLinkId, selectedId: null, multiIds: [] }),
+    setMulti: (multiIds) => set({ multiIds, selectedId: null, selectedLinkId: null }),
     setEditing: (editingId) => set({ editingId }),
     setViewport: (v) =>
       set((s) => ({
@@ -76,6 +81,7 @@ export function createPlaygroundStore(initial: PlanItem[], initialLinks: PlanLin
         links: s.links.filter((l) => l.source_id !== id && l.target_id !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
         editingId: s.editingId === id ? null : s.editingId,
+        multiIds: s.multiIds.filter((m) => m !== id),
         localRev: s.localRev + 1,
       })),
     addLink: (link) =>
