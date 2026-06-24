@@ -43,7 +43,8 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/sign-in") ||
     path.startsWith("/auth") ||
     path.startsWith("/api/health") ||
-    path.startsWith("/share");
+    path.startsWith("/share") ||
+    path.startsWith("/setup");
 
   // The gate enforces membership, not just "signed in": a signed-in non-member is bounced
   // to the access-denied screen, so the database RLS isn't the only thing standing guard.
