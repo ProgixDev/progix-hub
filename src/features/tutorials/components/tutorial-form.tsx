@@ -1,12 +1,16 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { type ActionResult, createTutorialAction, updateTutorialAction } from "../actions";
 import { useTutorialsStore } from "../provider";
-import type { Tutorial } from "../types";
+import type { SourceType, Tutorial } from "../types";
 
 export type PlatformOption = { value: string; label: string };
+
+const VIDEO_BUCKET = "tutorial-videos";
+const MAX_VIDEO_BYTES = 200 * 1024 * 1024;
 
 const inputCls =
   "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-md border px-3 py-2 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
@@ -63,6 +67,8 @@ function Modal({
   const [pending, start] = useTransition();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [source, setSource] = useState<SourceType>(editing?.source_type ?? "embed");
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -79,15 +85,39 @@ function Modal({
       const v = String(fd.get(k) ?? "").trim();
       return v.length > 0 ? v : undefined;
     };
-    const input = {
-      title: str("title"),
-      description: str("description"),
-      embed_url: str("embed_url"),
-      platform_service_id: str("platform_service_id"),
-      language: str("language"),
-      visible_to_clients: fd.get("visible_to_clients") === "on",
-    };
     start(async () => {
+      setErrors({});
+      setFormError(null);
+
+      // For an upload source, push the file to the private bucket first, then record the path.
+      let storagePath = editing?.storage_path ?? undefined;
+      if (source === "upload") {
+        const file = fileRef.current?.files?.[0];
+        if (file) {
+          if (!file.type.startsWith("video/"))
+            return setErrors({ storage_path: t("errorFileType") });
+          if (file.size > MAX_VIDEO_BYTES) return setErrors({ storage_path: t("errorFileSize") });
+          const supabase = createClient();
+          const path = `${crypto.randomUUID()}/${file.name}`;
+          const up = await supabase.storage
+            .from(VIDEO_BUCKET)
+            .upload(path, file, { contentType: file.type });
+          if (up.error) return setFormError(t("errorUpload"));
+          storagePath = path;
+        }
+        if (!storagePath) return setErrors({ storage_path: t("errorFile") });
+      }
+
+      const input = {
+        title: str("title"),
+        description: str("description"),
+        platform_service_id: str("platform_service_id"),
+        language: str("language"),
+        visible_to_clients: fd.get("visible_to_clients") === "on",
+        source_type: source,
+        embed_url: source === "embed" ? str("embed_url") : undefined,
+        storage_path: source === "upload" ? storagePath : undefined,
+      };
       const res: ActionResult = editing
         ? await updateTutorialAction(editing.id, input)
         : await createTutorialAction(input);
@@ -136,14 +166,44 @@ function Modal({
             />
           </Field>
 
-          <Field label={t("fieldLink")} error={errors.embed_url} required>
-            <input
-              name="embed_url"
-              defaultValue={editing?.embed_url ?? ""}
-              placeholder="https://youtu.be/…"
-              className={`${inputCls} font-mono text-[13px]`}
-            />
+          <Field label={t("fieldSource")}>
+            <div className="border-line-1 flex w-fit items-center gap-0.5 rounded-md border p-0.5">
+              {(["embed", "upload"] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSource(s)}
+                  className={`h-8 rounded px-3 text-[12.5px] font-medium transition-colors ${
+                    source === s ? "bg-bg-2 text-text" : "text-text-3 hover:text-text"
+                  }`}
+                >
+                  {t(s === "embed" ? "sourceEmbed" : "sourceUpload")}
+                </button>
+              ))}
+            </div>
           </Field>
+
+          {source === "embed" ? (
+            <Field label={t("fieldLink")} error={errors.embed_url} required>
+              <input
+                name="embed_url"
+                defaultValue={editing?.embed_url ?? ""}
+                placeholder="https://youtu.be/…"
+                className={`${inputCls} font-mono text-[13px]`}
+              />
+            </Field>
+          ) : (
+            <Field
+              label={t("fieldFile")}
+              error={errors.storage_path}
+              required={!editing?.storage_path}
+            >
+              <input ref={fileRef} type="file" accept="video/*" className={inputCls} />
+              {editing?.storage_path && (
+                <span className="text-text-3 text-[11.5px]">{t("fileKeepHint")}</span>
+              )}
+            </Field>
+          )}
 
           <Field label={t("fieldPlatform")}>
             <select

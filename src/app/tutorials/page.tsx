@@ -6,7 +6,12 @@ import { canViewOrgMembers } from "@/features/members";
 import { listPlatforms } from "@/features/platforms";
 import { listProjects, type Project } from "@/features/projects";
 import { ClockWidget } from "@/features/time-tracking";
-import { canManageTutorials, listTutorials, TutorialsLibrary } from "@/features/tutorials";
+import {
+  canManageTutorials,
+  listTutorials,
+  resolveVideoUrls,
+  TutorialsLibrary,
+} from "@/features/tutorials";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -32,6 +37,8 @@ export default async function TutorialsPage() {
     getTranslations("tutorials"),
   ]);
 
+  const videoUrls = await resolveVideoUrls(tutorials);
+
   // Platform-tag options from the registry (dedup by service key).
   const seen = new Set<string>();
   const platformOptions = platforms
@@ -50,6 +57,7 @@ export default async function TutorialsPage() {
         tutorials={tutorials}
         canManage={canManage}
         platformOptions={platformOptions}
+        videoUrls={videoUrls}
       />
     </AppShell>
   );

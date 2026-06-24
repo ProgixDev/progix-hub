@@ -409,7 +409,16 @@
     "fieldVisibleToClients": "Peut être montré aux clients",
     "deleteConfirm": "Supprimer « {title} » ? Action irréversible.",
     "errorTitle": "Le titre est requis",
-    "errorLink": "Collez un lien YouTube, Loom ou Vimeo"
+    "errorLink": "Collez un lien YouTube, Loom ou Vimeo",
+    "fieldSource": "Source de la vidéo",
+    "sourceEmbed": "Lien intégré",
+    "sourceUpload": "Téléverser un fichier",
+    "fieldFile": "Fichier vidéo",
+    "fileKeepHint": "Laissez vide pour garder le fichier actuel.",
+    "errorFile": "Choisissez un fichier vidéo",
+    "errorFileType": "Ce n’est pas un fichier vidéo",
+    "errorFileSize": "Vidéo trop volumineuse (max 200 Mo)",
+    "errorUpload": "Échec du téléversement — veuillez réessayer."
   },
   "setup": {
     "title": "Page de configuration client",

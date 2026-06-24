@@ -33,11 +33,15 @@ async function assertManager(t: Translate): Promise<ActionResult | null> {
 }
 
 function rowFrom(d: z.infer<typeof tutorialInputSchema>) {
+  const isUpload = d.source_type === "upload";
   return {
     title: d.title,
     description: d.description,
     platform_service_id: d.platform_service_id,
-    embed_url: d.embed_url,
+    source_type: d.source_type,
+    // Exactly one source persisted; the other is nulled so a source swap can't leave stale data.
+    embed_url: isUpload ? null : d.embed_url,
+    storage_path: isUpload ? d.storage_path : null,
     language: d.language,
     visible_to_clients: d.visible_to_clients,
   };
