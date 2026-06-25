@@ -8,6 +8,7 @@ import {
   createSetupAction,
   rotateSetupAction,
   setSetupEnabledAction,
+  updateSetupAction,
   verifyStepAction,
 } from "../actions";
 import type { ProjectSetup, SetupStatus, TeamSetupStep } from "../types";
@@ -37,6 +38,8 @@ export function SetupPanel({
   const [error, setError] = useState<string | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [issued, setIssued] = useState<{ token: string; passcode: string } | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editPicked, setEditPicked] = useState<string[]>([]);
 
   function handleResult(res: CreateResult) {
     if (res.ok) setIssued({ token: res.token, passcode: res.passcode });
@@ -63,6 +66,20 @@ export function SetupPanel({
     start(async () => {
       const res = await verifyStepAction(projectId, step.id, step.status !== "verified");
       if (!res.ok) setError(res.error);
+    });
+  }
+  function startEdit() {
+    setError(null);
+    setIssued(null);
+    setEditPicked(steps.map((s) => s.platform_id));
+    setEditing(true);
+  }
+  function saveEdit() {
+    setError(null);
+    start(async () => {
+      const res = await updateSetupAction(projectId, editPicked);
+      if (res.ok) setEditing(false);
+      else setError(res.error);
     });
   }
 
@@ -138,6 +155,46 @@ export function SetupPanel({
             </>
           )}
         </div>
+      ) : editing ? (
+        <div className="mt-4">
+          <p className="text-text-2 text-[12.5px]">{t("pickPlatforms")}</p>
+          <p className="text-text-3 mt-0.5 mb-2 text-[11.5px]">{t("editHint")}</p>
+          <div className="flex flex-col gap-1.5">
+            {platforms.map((p) => (
+              <label key={p.id} className="flex items-center gap-2 text-[13px]">
+                <input
+                  type="checkbox"
+                  className="size-4"
+                  checked={editPicked.includes(p.id)}
+                  onChange={(e) =>
+                    setEditPicked((prev) =>
+                      e.target.checked ? [...prev, p.id] : prev.filter((x) => x !== p.id),
+                    )
+                  }
+                />
+                <span className="text-text">{p.name}</span>
+              </label>
+            ))}
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              disabled={pending || editPicked.length === 0}
+              onClick={saveEdit}
+              className="btn-primary h-9 rounded-full px-3.5 text-[13px] font-medium transition-all disabled:opacity-60"
+            >
+              {t("save")}
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => setEditing(false)}
+              className="border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3 text-[13px] font-medium transition-colors disabled:opacity-60"
+            >
+              {t("cancel")}
+            </button>
+          </div>
+        </div>
       ) : (
         <div className="mt-4">
           <ul className="divide-line/60 glass divide-y rounded-2xl">
@@ -159,6 +216,14 @@ export function SetupPanel({
             ))}
           </ul>
           <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={pending}
+              onClick={startEdit}
+              className="btn-primary h-9 rounded-full px-3.5 text-[13px] font-medium transition-all disabled:opacity-60"
+            >
+              {t("editPlatforms")}
+            </button>
             <button
               type="button"
               disabled={pending}
