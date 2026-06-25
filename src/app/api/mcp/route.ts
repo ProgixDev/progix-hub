@@ -2,12 +2,16 @@ import { createMcpHandler, experimental_withMcpAuth as withMcpAuth } from "mcp-h
 import { z } from "zod";
 import { resolveBearerUser } from "@/lib/mcp/auth";
 import {
+  mcpAddFeature,
   mcpBulkCreatePlan,
   mcpCreateItem,
+  mcpDeleteItem,
   mcpGetPlan,
   mcpLink,
+  mcpListFeatures,
   mcpListProjects,
   mcpSetStatus,
+  mcpUpdateItem,
 } from "@/lib/mcp/tools";
 
 const STATUS = z.enum(["backlog", "in_progress", "in_review", "done"]);
@@ -92,6 +96,55 @@ const handler = createMcpHandler(
       "Set a task's status.",
       { itemId: z.string().uuid(), status: STATUS },
       async (a, extra) => text(await mcpSetStatus(userId(extra), a.itemId, a.status)),
+    );
+
+    server.tool(
+      "update_task",
+      "Edit a card's title, status, and/or estimate.",
+      {
+        itemId: z.string().uuid(),
+        title: z.string().max(500).optional(),
+        status: STATUS.optional(),
+        estimate_hours: z.number().nullable().optional(),
+      },
+      async (a, extra) =>
+        text(
+          await mcpUpdateItem(userId(extra), a.itemId, {
+            title: a.title,
+            status: a.status,
+            estimate_hours: a.estimate_hours,
+          }),
+        ),
+    );
+
+    server.tool(
+      "delete_item",
+      "Delete a card (task, note, or phase).",
+      { itemId: z.string().uuid() },
+      async (a, extra) => text(await mcpDeleteItem(userId(extra), a.itemId)),
+    );
+
+    server.tool(
+      "add_note",
+      "Add a sticky note to the playground.",
+      { projectId: z.string().uuid(), text: z.string() },
+      async (a, extra) =>
+        text(await mcpCreateItem(userId(extra), a.projectId, { type: "note", title: a.text })),
+    );
+
+    server.tool(
+      "list_features",
+      "List the prebuilt feature blocks (Stripe, Twilio, …) you can add, with their keys.",
+      {},
+      async () => text(mcpListFeatures()),
+    );
+
+    server.tool(
+      "add_feature",
+      "Add a prebuilt feature block as a rich card (with brand + a starter checklist), optionally inside a phase. Use list_features for valid keys.",
+      { projectId: z.string().uuid(), key: z.string(), phaseId: z.string().uuid().optional() },
+      async (a, extra) =>
+        text(await mcpAddFeature(userId(extra), a.projectId, a.key, { phaseId: a.phaseId })),
     );
 
     server.tool(

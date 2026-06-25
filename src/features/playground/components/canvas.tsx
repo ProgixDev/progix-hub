@@ -11,7 +11,7 @@ import {
   groupIntoPhaseAction,
   updatePlanItemAction,
 } from "../actions";
-import { BLOCK_BY_KEY, checklistFor, DRAG_MIME, monogram } from "../feature-catalog";
+import { BLOCK_BY_KEY, checklistFor, DRAG_MIME, monogram } from "@/lib/playground/feature-catalog";
 import { usePlaygroundStore } from "../provider";
 import type { PlanItem, PlanStroke, Status } from "../types";
 

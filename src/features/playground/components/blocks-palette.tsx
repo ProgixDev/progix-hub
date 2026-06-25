@@ -11,7 +11,7 @@ import {
   FEATURE_CATEGORIES,
   type FeatureBlock,
   monogram,
-} from "../feature-catalog";
+} from "@/lib/playground/feature-catalog";
 import { usePlaygroundStoreApi } from "../provider";
 
 function Tile({ block, size = 28 }: { block: FeatureBlock; size?: number }) {

@@ -1,4 +1,5 @@
-import type { ChecklistStep } from "./types";
+/** A checklist sub-step on a feature card. */
+export type ChecklistStep = { label: string; done: boolean };
 
 /**
  * Prebuilt feature blocks (spec 025). Drag one onto a phase and it becomes a rich feature card with
