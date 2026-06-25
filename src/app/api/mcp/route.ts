@@ -1,6 +1,6 @@
 import { createMcpHandler, experimental_withMcpAuth as withMcpAuth } from "mcp-handler";
 import { z } from "zod";
-import { resolveMcpUser } from "@/lib/mcp/auth";
+import { resolveBearerUser } from "@/lib/mcp/auth";
 import {
   mcpBulkCreatePlan,
   mcpCreateItem,
@@ -128,7 +128,7 @@ const handler = createMcpHandler(
 const authed = withMcpAuth(
   handler,
   async (_req, bearer) => {
-    const id = await resolveMcpUser(bearer);
+    const id = await resolveBearerUser(bearer);
     if (!id) return undefined;
     return { token: bearer!, clientId: id, scopes: [], extra: { userId: id } };
   },
