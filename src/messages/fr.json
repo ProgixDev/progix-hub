@@ -37,8 +37,15 @@
     "members": "Membres",
     "profile": "Profil",
     "tutorials": "Tutoriels",
+    "activity": "Activité",
     "collapse": "Réduire le menu",
     "expand": "Agrandir le menu"
+  },
+  "activity": {
+    "eyebrow": "Activité",
+    "title": "Activité",
+    "subtitle": "Mises à jour récentes de vos projets.",
+    "empty": "Aucune activité pour l’instant."
   },
   "topbar": {
     "commands": "Commandes",

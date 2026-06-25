@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
+import { recordActivity } from "@/lib/activity/record";
 import { getProjectRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { generatePasscode, generateToken } from "./lib";
@@ -47,6 +48,7 @@ async function buildSetup(
         p_platform_ids: platformIds,
       });
   if (error) return { ok: false, error: t("errors.tryAgain") };
+  if (!rotate) await recordActivity(projectId, "setup", "created the client setup page");
   revalidatePath(`/projects/${projectId}`);
   return { ok: true, token, passcode };
 }
