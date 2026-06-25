@@ -556,6 +556,7 @@
     "loadFile": "Charger un .md",
     "save": "Publier",
     "contentHint": "## Livré\n- …\n\n## En cours\n- …",
+    "previewHint": "L’aperçu de votre rapport s’affiche ici au fil de la saisie.",
     "noProjects": "Aucun projet disponible",
     "errorEmpty": "Choisissez un projet et rédigez le rapport",
     "sectionTitle": "Rapports quotidiens",
