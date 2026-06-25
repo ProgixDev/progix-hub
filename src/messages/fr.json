@@ -1,4 +1,15 @@
 {
+  "dashboard": {
+    "eyebrow": "Aujourd’hui",
+    "welcome": "Bon retour",
+    "welcomeName": "Bon retour, {name}",
+    "myTasks": "Qui me sont assignées",
+    "noTasks": "Rien d’assigné — vous êtes à jour.",
+    "recentReports": "Rapports récents",
+    "noReports": "Aucun rapport pour l’instant.",
+    "openPlan": "Ouvrir le plan",
+    "by": "par {who}"
+  },
   "common": {
     "cancel": "Annuler",
     "add": "Ajouter",
