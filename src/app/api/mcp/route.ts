@@ -6,12 +6,18 @@ import {
   mcpAddFeature,
   mcpBulkCreatePlan,
   mcpCreateItem,
+  mcpCreateProject,
   mcpDeleteItem,
+  mcpGetEnvKeys,
   mcpGetPlan,
+  mcpGetProjectStatus,
   mcpLink,
+  mcpListDocuments,
   mcpListFeatures,
   mcpListProjects,
+  mcpListSpecs,
   mcpPostDailyReport,
+  mcpSetProjectLinks,
   mcpSetStatus,
   mcpSyncSpecs,
   mcpUpdateItem,
@@ -44,6 +50,76 @@ const handler = createMcpHandler(
   (server) => {
     server.tool("list_projects", "List the projects you can plan.", {}, async (_args, extra) =>
       text(await mcpListProjects(userId(extra))),
+    );
+
+    // http(s) only — block javascript:/data: schemes from reaching an href.
+    const URL_OPT = z
+      .string()
+      .url()
+      .refine((u) => /^https?:\/\//i.test(u), "http(s) only")
+      .optional();
+
+    server.tool(
+      "create_project",
+      "Create a new hub project (you become its PM). Optionally set links.",
+      {
+        name: z.string(),
+        description: z.string().optional(),
+        github_url: URL_OPT,
+        notion_url: URL_OPT,
+        slack_url: URL_OPT,
+        live_url: URL_OPT,
+      },
+      async (a, extra) => text(await mcpCreateProject(userId(extra), a)),
+    );
+
+    server.tool(
+      "set_project_links",
+      "Set a project's external links (GitHub / Notion / Slack / Live). PM only.",
+      {
+        projectId: z.string().uuid(),
+        github_url: URL_OPT,
+        notion_url: URL_OPT,
+        slack_url: URL_OPT,
+        live_url: URL_OPT,
+      },
+      async (a, extra) =>
+        text(
+          await mcpSetProjectLinks(userId(extra), a.projectId, {
+            github_url: a.github_url,
+            notion_url: a.notion_url,
+            slack_url: a.slack_url,
+            live_url: a.live_url,
+          }),
+        ),
+    );
+
+    server.tool(
+      "get_project_status",
+      "The project setup checklist — what's configured (GitHub, env, specs, docs, setup, portal, reports) vs missing.",
+      { projectId: z.string().uuid() },
+      async (a, extra) => text(await mcpGetProjectStatus(userId(extra), a.projectId)),
+    );
+
+    server.tool(
+      "get_env_keys",
+      "List a project's environment variable names + scope (NEVER the secret values). PM/developer.",
+      { projectId: z.string().uuid() },
+      async (a, extra) => text(await mcpGetEnvKeys(userId(extra), a.projectId)),
+    );
+
+    server.tool(
+      "list_documents",
+      "List a project's documents (titles, kinds, link URLs).",
+      { projectId: z.string().uuid() },
+      async (a, extra) => text(await mcpListDocuments(userId(extra), a.projectId)),
+    );
+
+    server.tool(
+      "list_specs",
+      "List a project's synced specs/PRDs (metadata).",
+      { projectId: z.string().uuid() },
+      async (a, extra) => text(await mcpListSpecs(userId(extra), a.projectId)),
     );
 
     server.tool(

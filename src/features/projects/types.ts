@@ -25,9 +25,13 @@ export type Project = {
 /** Blank strings become undefined so optional fields stay optional. */
 const emptyToUndefined = (v: unknown) => (typeof v === "string" && v.trim() === "" ? undefined : v);
 
+// http(s) only — reject javascript:/data: schemes that would otherwise render as an unsafe href.
 const optionalUrl = z.preprocess(
   emptyToUndefined,
-  z.url({ error: "projects.errorUrl" }).optional(),
+  z
+    .url({ error: "projects.errorUrl" })
+    .refine((u) => /^https?:\/\//i.test(u), { error: "projects.errorUrl" })
+    .optional(),
 );
 
 /** Validated create/edit input (AC-4): name required, links optional but valid URLs.
