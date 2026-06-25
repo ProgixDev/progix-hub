@@ -1,3 +1,5 @@
+import type { ChecklistStep } from "@/lib/playground/feature-catalog";
+
 /** Project planning playground (spec 022). One item type renders both lenses. */
 export const ITEM_TYPES = ["task", "note", "phase"] as const;
 export type ItemType = (typeof ITEM_TYPES)[number];
@@ -5,8 +7,7 @@ export type ItemType = (typeof ITEM_TYPES)[number];
 export const STATUSES = ["backlog", "in_progress", "in_review", "done"] as const;
 export type Status = (typeof STATUSES)[number];
 
-/** A checklist sub-step on a feature card. */
-export type ChecklistStep = { label: string; done: boolean };
+export type { ChecklistStep };
 
 /** Extra data on a card. Feature cards (seeded from the block catalog) carry brand + checklist. */
 export type ItemMeta = {

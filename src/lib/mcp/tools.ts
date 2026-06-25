@@ -1,9 +1,10 @@
 import "server-only";
+import { BLOCK_BY_KEY, checklistFor, FEATURE_BLOCKS } from "@/lib/playground/feature-catalog";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const ROLES = ["pm", "developer", "video_editor", "viewer"];
 const COLS =
-  "id,project_id,type,title,body,status,assignee,estimate_hours,parent_id,pos_x,pos_y,width,height,board_order,color";
+  "id,project_id,type,title,body,status,assignee,estimate_hours,parent_id,pos_x,pos_y,width,height,board_order,color,meta";
 type Status = "backlog" | "in_progress" | "in_review" | "done";
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -196,4 +197,113 @@ export async function mcpBulkCreatePlan(userId: string, projectId: string, plan:
   }
 
   return { createdPhases, createdTasks, createdLinks };
+}
+
+/** Resolve an item to its project and check access (used by item-scoped edits). */
+async function itemProject(admin: Admin, userId: string, itemId: string): Promise<string> {
+  const { data: item } = await admin
+    .from("plan_items")
+    .select("id,project_id")
+    .eq("id", itemId)
+    .maybeSingle();
+  if (!item) throw new Error("Item not found");
+  const projectId = item.project_id as string;
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that item");
+  return projectId;
+}
+
+/** Edit a card's title / status / estimate. */
+export async function mcpUpdateItem(
+  userId: string,
+  itemId: string,
+  patch: { title?: string; status?: Status; estimate_hours?: number | null },
+) {
+  const admin = createAdminClient();
+  await itemProject(admin, userId, itemId);
+  const fields: Record<string, unknown> = {};
+  if (patch.title !== undefined) fields.title = patch.title.slice(0, 500);
+  if (patch.status !== undefined) fields.status = patch.status;
+  if (patch.estimate_hours !== undefined) fields.estimate_hours = patch.estimate_hours;
+  if (Object.keys(fields).length === 0) return { ok: true };
+  const { error } = await admin.from("plan_items").update(fields).eq("id", itemId);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** Delete a card (a phase's children are detached by the FK, not deleted). */
+export async function mcpDeleteItem(userId: string, itemId: string) {
+  const admin = createAdminClient();
+  await itemProject(admin, userId, itemId);
+  const { error } = await admin.from("plan_items").delete().eq("id", itemId);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** The prebuilt feature-block catalog (so the model knows valid keys). */
+export function mcpListFeatures() {
+  return FEATURE_BLOCKS.map((b) => ({ key: b.key, name: b.name, category: b.category }));
+}
+
+/** Drop a prebuilt feature block (Stripe, Twilio, …) as a rich card, optionally inside a phase. */
+export async function mcpAddFeature(
+  userId: string,
+  projectId: string,
+  key: string,
+  opts: { phaseId?: string } = {},
+) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that project");
+  const block = BLOCK_BY_KEY.get(key);
+  if (!block) throw new Error(`Unknown feature block: ${key}`);
+
+  let pos_x = 80;
+  let pos_y = 80;
+  let parent_id: string | null = null;
+  if (opts.phaseId) {
+    const { data: phase } = await admin
+      .from("plan_items")
+      .select("id,pos_x,pos_y")
+      .eq("id", opts.phaseId)
+      .eq("project_id", projectId)
+      .maybeSingle();
+    if (phase) {
+      parent_id = phase.id as string;
+      const { count } = await admin
+        .from("plan_items")
+        .select("id", { count: "exact", head: true })
+        .eq("parent_id", phase.id);
+      pos_x = (phase.pos_x as number) + 20;
+      pos_y = (phase.pos_y as number) + 54 + (count ?? 0) * 74;
+    }
+  } else {
+    const { count } = await admin
+      .from("plan_items")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", projectId);
+    pos_x = 80 + ((count ?? 0) % 6) * 30;
+    pos_y = 80 + ((count ?? 0) % 6) * 30;
+  }
+
+  const { data, error } = await admin
+    .from("plan_items")
+    .insert({
+      project_id: projectId,
+      type: "task",
+      title: block.name,
+      status: "backlog",
+      pos_x,
+      pos_y,
+      parent_id,
+      meta: {
+        feature: block.key,
+        category: block.category,
+        color: block.color,
+        checklist: checklistFor(block),
+      },
+      created_by: userId,
+    })
+    .select(COLS)
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
 }
