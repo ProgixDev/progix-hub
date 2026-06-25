@@ -260,15 +260,33 @@ function Shell({
         )}
         <Inspector assignees={assignees} />
 
-        {/* zoom reset (canvas only) */}
+        {/* zoom controls (canvas only) */}
         {lens === "canvas" && (
-          <button
-            type="button"
-            onClick={() => setViewport({ zoom: 1, panX: 0, panY: 0 })}
-            className="border-line-1 bg-bg-2/80 text-text-2 hover:text-text absolute bottom-4 left-4 flex h-9 items-center rounded-full border px-3.5 text-[12px] font-medium backdrop-blur-md transition-colors"
-          >
-            Reset view · {Math.round(zoom * 100)}%
-          </button>
+          <div className="border-line-1 bg-bg-2/80 absolute bottom-4 left-4 flex items-center gap-0.5 rounded-full border p-0.5 backdrop-blur-md">
+            <button
+              type="button"
+              aria-label="Zoom out"
+              onClick={() => setViewport({ zoom: Math.max(0.35, zoom * 0.9) })}
+              className="text-text-2 hover:bg-bg-3 hover:text-text grid size-8 place-items-center rounded-full text-[16px] transition-colors"
+            >
+              −
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewport({ zoom: 1, panX: 0, panY: 0 })}
+              className="text-text-2 hover:text-text h-8 min-w-[3.25rem] rounded-full text-[12px] font-medium transition-colors"
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+            <button
+              type="button"
+              aria-label="Zoom in"
+              onClick={() => setViewport({ zoom: Math.min(2, zoom * 1.1) })}
+              className="text-text-2 hover:bg-bg-3 hover:text-text grid size-8 place-items-center rounded-full text-[16px] transition-colors"
+            >
+              +
+            </button>
+          </div>
         )}
       </div>
     </div>
