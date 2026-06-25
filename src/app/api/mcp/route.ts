@@ -13,6 +13,7 @@ import {
   mcpListProjects,
   mcpPostDailyReport,
   mcpSetStatus,
+  mcpSyncSpecs,
   mcpUpdateItem,
   mcpUploadEnv,
 } from "@/lib/mcp/tools";
@@ -166,6 +167,25 @@ const handler = createMcpHandler(
             url: a.url,
           }),
         ),
+    );
+
+    server.tool(
+      "sync_specs",
+      "Sync a project's specs/PRDs from the repo (upsert by slug) so they appear in the playground's Specs lens. Pass each spec's slug, title, status, kind (spec|prd), and markdown body.",
+      {
+        projectId: z.string().uuid(),
+        specs: z.array(
+          z.object({
+            slug: z.string(),
+            number: z.number().int().optional(),
+            title: z.string().optional(),
+            status: z.string().optional(),
+            kind: z.enum(["spec", "prd"]).optional(),
+            body_md: z.string().optional(),
+          }),
+        ),
+      },
+      async (a, extra) => text(await mcpSyncSpecs(userId(extra), a.projectId, a.specs)),
     );
 
     server.tool(

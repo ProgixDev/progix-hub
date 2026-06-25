@@ -4,6 +4,7 @@ import {
   listAssignees,
   listPlanItems,
   listPlanLinks,
+  listSpecs,
   listStrokes,
   Playground,
 } from "@/features/playground";
@@ -17,11 +18,12 @@ export default async function PlaygroundPage({ params }: { params: Promise<{ id:
   const role = await getProjectRole(id);
   if (!role) notFound();
 
-  const [project, items, links, strokes, assignees] = await Promise.all([
+  const [project, items, links, strokes, specs, assignees] = await Promise.all([
     getProject(id),
     listPlanItems(id),
     listPlanLinks(id),
     listStrokes(id),
+    listSpecs(id),
     listAssignees(id),
   ]);
   if (!project) notFound();
@@ -34,6 +36,7 @@ export default async function PlaygroundPage({ params }: { params: Promise<{ id:
       items={items}
       links={links}
       strokes={strokes}
+      specs={specs}
       assignees={assignees}
       me={{
         id: user.id,

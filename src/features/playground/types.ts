@@ -62,7 +62,19 @@ export type Peer = {
 /** A remote collaborator's cursor, in canvas coordinates. */
 export type RemoteCursor = { userId: string; name: string; color: string; x: number; y: number };
 
-export type Lens = "canvas" | "board";
+export type Lens = "canvas" | "board" | "specs";
+
+/** A spec/PRD synced from the project repo (Specs lens). */
+export type PlanSpec = {
+  id: string;
+  slug: string;
+  number: number | null;
+  title: string;
+  status: string;
+  kind: string;
+  body_md: string | null;
+  updated_at: string;
+};
 
 /** Assignee option (a project member). */
 export type MemberOption = { id: string; label: string };
