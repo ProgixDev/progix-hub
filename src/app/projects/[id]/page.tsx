@@ -15,7 +15,14 @@ import { getProjectMembers, PeoplePanel } from "@/features/people";
 import { canViewOrgMembers } from "@/features/members";
 import { ClientDossierPanel, getClientDossier } from "@/features/client-dossier";
 import { listPlatforms } from "@/features/platforms";
-import { ProjectDetail, getProject, listProjects, type Project } from "@/features/projects";
+import {
+  getProject,
+  getProjectConfigCounts,
+  ProjectChecklist,
+  ProjectDetail,
+  listProjects,
+  type Project,
+} from "@/features/projects";
 import { getProjectSetup, SetupPanel } from "@/features/setup";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { capabilities } from "@/lib/auth/roles";
@@ -53,6 +60,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const dossier = await getClientDossier(id);
   // Team-only daily reports for this project (spec 021).
   const reports = await listProjectReports(id);
+  // Setup checklist counts (managers only — they configure the project).
+  const configCounts = can.manageProject
+    ? await getProjectConfigCounts(id)
+    : { specs: 0, portalActive: false };
 
   // No effective role (e.g. a removed member) ⇒ no access, even if the row were readable (AC-2).
   if (!project || !role) notFound();
@@ -74,6 +85,20 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <ProjectDetail project={project} canManage={can.manageProject} />
+      {can.manageProject && (
+        <ProjectChecklist
+          status={{
+            projectId: id,
+            githubUrl: project.github_url ?? null,
+            envCount: envVars.length,
+            specs: configCounts.specs,
+            docs: documents.length,
+            reports: reports.length,
+            hasSetup: setupData.setup !== null,
+            portalActive: configCounts.portalActive,
+          }}
+        />
+      )}
       {readOnly && (
         <div className="mx-auto w-full max-w-5xl px-4 pb-2 sm:px-6">
           <p
