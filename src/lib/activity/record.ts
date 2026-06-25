@@ -22,7 +22,8 @@ export async function recordActivity(
       kind,
       summary,
     });
-  } catch {
-    // swallow — activity logging is non-critical
+  } catch (err) {
+    // swallow — activity logging is non-critical, but surface it for diagnosis
+    console.error("recordActivity failed", err);
   }
 }
