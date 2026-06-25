@@ -57,6 +57,43 @@ export async function createProjectAction(input: unknown): Promise<ActionResult>
   return { ok: true };
 }
 
+export type GithubRepoInfo =
+  | { ok: true; full_name: string; description: string | null; stars: number; private: boolean }
+  | { ok: false; error: string };
+
+const GH_RE = /github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git|\/|$)/i;
+
+/** Verify a GitHub repo URL points to a real repo (public API), so a project links to a real repo. */
+export async function verifyGithubRepoAction(url: string): Promise<GithubRepoInfo> {
+  const member = await requireMember();
+  if (!member) return { ok: false, error: "notAuthorized" };
+  const m = GH_RE.exec((url ?? "").trim());
+  if (!m) return { ok: false, error: "notRepoUrl" };
+  try {
+    const res = await fetch(`https://api.github.com/repos/${m[1]}/${m[2]}`, {
+      headers: { Accept: "application/vnd.github+json" },
+      cache: "no-store",
+    });
+    if (res.status === 404) return { ok: false, error: "repoNotFound" };
+    if (!res.ok) return { ok: false, error: "repoUnreachable" };
+    const j = (await res.json()) as {
+      full_name?: string;
+      description?: string | null;
+      stargazers_count?: number;
+      private?: boolean;
+    };
+    return {
+      ok: true,
+      full_name: j.full_name ?? `${m[1]}/${m[2]}`,
+      description: j.description ?? null,
+      stars: j.stargazers_count ?? 0,
+      private: Boolean(j.private),
+    };
+  } catch {
+    return { ok: false, error: "repoUnreachable" };
+  }
+}
+
 /** Edit a project (AC-5). */
 export async function updateProjectAction(id: string, input: unknown): Promise<ActionResult> {
   const t = await getTranslations();
