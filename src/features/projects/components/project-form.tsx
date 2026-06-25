@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/modal";
 import { createProjectAction, updateProjectAction, type ActionResult } from "../actions";
 import { useProjectsStore } from "../provider";
 import { PROJECT_STATUSES, type Project, type ProjectStatus } from "../types";
+import { ProjectWizard } from "./project-wizard";
 
 const STATUS_KEY = {
   active: "statusActive",
@@ -24,8 +25,9 @@ export function ProjectForm() {
   const modal = useProjectsStore((s) => s.modal);
   const close = useProjectsStore((s) => s.closeModal);
   if (modal.mode === "closed") return null;
-  const editing = modal.mode === "edit" ? modal.project : null;
-  return <ProjectFormModal key={editing?.id ?? "new"} editing={editing} onClose={close} />;
+  // Create flow → full-screen wizard; edit stays a quick modal.
+  if (modal.mode !== "edit") return <ProjectWizard onClose={close} />;
+  return <ProjectFormModal key={modal.project.id} editing={modal.project} onClose={close} />;
 }
 
 function Field({
