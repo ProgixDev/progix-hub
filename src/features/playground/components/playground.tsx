@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Wordmark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { createPlanItemAction } from "../actions";
 import { usePlaygroundPresence } from "../presence";
 import { PlaygroundStoreProvider, usePlaygroundStore } from "../provider";
 import type { ItemType, MemberOption, PlanItem, PlanLink } from "../types";
+import { BlocksCommand, BlocksDrawer } from "./blocks-palette";
 import { Board } from "./board";
 import { Canvas } from "./canvas";
 import { Inspector } from "./inspector";
@@ -60,6 +61,7 @@ function Shell({
   me: Me;
 }) {
   const { broadcastCursor, broadcastDrag } = usePlaygroundPresence({ projectId, me });
+  const [blocksOpen, setBlocksOpen] = useState(false);
   const lens = usePlaygroundStore((s) => s.lens);
   const setLens = usePlaygroundStore((s) => s.setLens);
   const addItem = usePlaygroundStore((s) => s.addItem);
@@ -133,6 +135,19 @@ function Shell({
         <div className="flex items-center gap-1.5">
           <button
             type="button"
+            onClick={() => setBlocksOpen((v) => !v)}
+            aria-pressed={blocksOpen}
+            className={cn(
+              "hidden h-9 items-center gap-1.5 rounded-full border px-3 text-[12.5px] font-medium transition-colors sm:flex",
+              blocksOpen
+                ? "border-line-blue bg-blue-tint text-blue-text"
+                : "border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text",
+            )}
+          >
+            ◳ Blocks
+          </button>
+          <button
+            type="button"
             onClick={() => add("task")}
             disabled={pending}
             className="btn-primary flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[12.5px] font-medium transition-all disabled:opacity-60"
@@ -158,13 +173,18 @@ function Shell({
         </div>
       </header>
 
+      <BlocksCommand projectId={projectId} />
+
       <div className="relative flex min-h-0 flex-1">
         {lens === "canvas" ? (
-          <Canvas
-            projectId={projectId}
-            broadcastCursor={broadcastCursor}
-            broadcastDrag={broadcastDrag}
-          />
+          <>
+            <Canvas
+              projectId={projectId}
+              broadcastCursor={broadcastCursor}
+              broadcastDrag={broadcastDrag}
+            />
+            <BlocksDrawer open={blocksOpen} onClose={() => setBlocksOpen(false)} />
+          </>
         ) : (
           <Board />
         )}
