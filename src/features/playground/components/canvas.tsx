@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   createLinkAction,
   createPlanItemAction,
+  createStrokeAction,
   deleteLinkAction,
   deletePlanItemAction,
   groupIntoPhaseAction,
@@ -12,7 +13,7 @@ import {
 } from "../actions";
 import { BLOCK_BY_KEY, checklistFor, DRAG_MIME, monogram } from "../feature-catalog";
 import { usePlaygroundStore } from "../provider";
-import type { PlanItem, Status } from "../types";
+import type { PlanItem, PlanStroke, Status } from "../types";
 
 const STATUS_DOT: Record<Status, string> = {
   backlog: "bg-text-3",
@@ -33,6 +34,13 @@ function dims(it: PlanItem) {
 function pathD(sx: number, sy: number, tx: number, ty: number) {
   const dx = (tx - sx) * 0.5;
   return `M ${sx} ${sy} C ${sx + dx} ${sy}, ${tx - dx} ${ty}, ${tx} ${ty}`;
+}
+/** A polyline SVG path from flattened [x0,y0,x1,y1,…] sketch points. */
+function strokePath(pts: number[]) {
+  if (pts.length < 2) return "";
+  let d = `M ${pts[0]} ${pts[1]}`;
+  for (let i = 2; i < pts.length; i += 2) d += ` L ${pts[i]} ${pts[i + 1]}`;
+  return d;
 }
 
 const Card = memo(function Card({
@@ -235,10 +243,16 @@ export function Canvas({
   projectId,
   broadcastCursor,
   broadcastDrag,
+  broadcastStroke,
+  drawMode,
+  drawColor,
 }: {
   projectId: string;
   broadcastCursor: (x: number, y: number) => void;
   broadcastDrag: (id: string, x: number, y: number) => void;
+  broadcastStroke: (stroke: PlanStroke) => void;
+  drawMode: boolean;
+  drawColor: string;
 }) {
   const items = usePlaygroundStore((s) => s.items);
   const peers = usePlaygroundStore((s) => s.peers);
@@ -254,6 +268,7 @@ export function Canvas({
   const patchItem = usePlaygroundStore((s) => s.patchItem);
   const removeItem = usePlaygroundStore((s) => s.removeItem);
   const addItem = usePlaygroundStore((s) => s.addItem);
+  const addStroke = usePlaygroundStore((s) => s.addStroke);
   const addLink = usePlaygroundStore((s) => s.addLink);
   const removeLink = usePlaygroundStore((s) => s.removeLink);
   const multiIds = usePlaygroundStore((s) => s.multiIds);
@@ -267,10 +282,12 @@ export function Canvas({
   const layerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const tempRef = useRef<SVGPathElement>(null);
+  const drawTempRef = useRef<SVGPathElement>(null);
   const lassoRef = useRef<HTMLDivElement>(null);
+  const strokes = usePlaygroundStore((s) => s.strokes);
   const multiSet = useMemo(() => new Set(multiIds), [multiIds]);
   const g = useRef<{
-    mode: "pan" | "card" | "link" | "lasso";
+    mode: "pan" | "card" | "link" | "lasso" | "draw";
     id?: string;
     el?: HTMLElement | null;
     z: number;
@@ -285,6 +302,7 @@ export function Canvas({
     w: number;
     h: number;
     moved: boolean;
+    pts?: number[];
   } | null>(null);
 
   const phases = items.filter((i) => i.type === "phase");
@@ -369,6 +387,17 @@ export function Canvas({
         d.el.style.transform = `translate3d(${d.cx}px, ${d.cy}px, 0)`;
         redrawLinks(d.id!, d.cx + d.w / 2, d.cy + d.h / 2);
         broadcastDrag(d.id!, d.cx, d.cy);
+      } else if (d.mode === "draw" && d.pts) {
+        const x = (e.clientX - d.rectX - panX) / zoom;
+        const y = (e.clientY - d.rectY - panY) / zoom;
+        const n = d.pts.length;
+        const dx = x - d.pts[n - 2]!;
+        const dy = y - d.pts[n - 1]!;
+        // Skip near-duplicate points to keep strokes light; cap total length.
+        if ((dx * dx + dy * dy > 4 || n < 4) && n < 3800) {
+          d.pts.push(x, y);
+          drawTempRef.current?.setAttribute("d", strokePath(d.pts));
+        }
       } else if (d.mode === "link") {
         const tx = (e.clientX - d.rectX - panX) / d.z;
         const ty = (e.clientY - d.rectY - panY) / d.z;
@@ -389,11 +418,29 @@ export function Canvas({
     [panX, panY, zoom, redrawLinks, broadcastCursor, broadcastDrag],
   );
 
+  const commitStroke = useCallback(
+    (pts: number[]) => {
+      const points = pts.map((n) => Math.round(n));
+      void createStrokeAction(projectId, { points, color: drawColor, width: 2.5 }).then((res) => {
+        if (res.ok) {
+          addStroke(res.stroke);
+          broadcastStroke(res.stroke);
+        }
+      });
+    },
+    [projectId, drawColor, addStroke, broadcastStroke],
+  );
+
   const endGesture = useCallback(
     (e: React.PointerEvent) => {
       const d = g.current;
       g.current = null;
       if (!d) return;
+      if (d.mode === "draw") {
+        drawTempRef.current?.setAttribute("d", "");
+        if (d.pts && d.pts.length >= 4) commitStroke(d.pts);
+        return;
+      }
       if (d.mode === "pan") {
         if (d.moved) setViewport({ panX: d.cx, panY: d.cy });
         return;
@@ -449,7 +496,20 @@ export function Canvas({
         });
       }
     },
-    [byId, phases, patchItem, setViewport, addLink, projectId, items, panX, panY, zoom, setMulti],
+    [
+      byId,
+      phases,
+      patchItem,
+      setViewport,
+      addLink,
+      projectId,
+      items,
+      panX,
+      panY,
+      zoom,
+      setMulti,
+      commitStroke,
+    ],
   );
 
   const startCardDrag = useCallback(
@@ -508,6 +568,30 @@ export function Canvas({
   const startPan = useCallback(
     (e: React.PointerEvent) => {
       if (e.button !== 0) return;
+      // Draw mode: every empty-canvas drag is a freehand stroke.
+      if (drawMode) {
+        const rect = surfaceRef.current?.getBoundingClientRect();
+        const rx = rect?.left ?? 0;
+        const ry = rect?.top ?? 0;
+        g.current = {
+          mode: "draw",
+          z: zoom,
+          rectX: rx,
+          rectY: ry,
+          startX: e.clientX,
+          startY: e.clientY,
+          ox: 0,
+          oy: 0,
+          cx: 0,
+          cy: 0,
+          w: 0,
+          h: 0,
+          moved: false,
+          pts: [(e.clientX - rx - panX) / zoom, (e.clientY - ry - panY) / zoom],
+        };
+        surfaceRef.current?.setPointerCapture(e.pointerId);
+        return;
+      }
       // Shift+drag on empty canvas = lasso multi-select; plain drag = pan.
       if (e.shiftKey) {
         const rect = surfaceRef.current?.getBoundingClientRect();
@@ -549,7 +633,7 @@ export function Canvas({
       };
       surfaceRef.current?.setPointerCapture(e.pointerId);
     },
-    [select, zoom, panX, panY],
+    [select, zoom, panX, panY, drawMode],
   );
 
   function onWheel(e: React.WheelEvent) {
@@ -695,7 +779,10 @@ export function Canvas({
   return (
     <div
       ref={surfaceRef}
-      className="relative min-h-0 flex-1 cursor-grab touch-none overflow-hidden select-none active:cursor-grabbing"
+      className={cn(
+        "relative min-h-0 flex-1 touch-none overflow-hidden select-none",
+        drawMode ? "cursor-crosshair" : "cursor-grab active:cursor-grabbing",
+      )}
       onPointerDown={startPan}
       onPointerMove={onPointerMove}
       onPointerUp={endGesture}
@@ -709,7 +796,11 @@ export function Canvas({
       <div
         ref={layerRef}
         className="absolute top-0 left-0 origin-top-left [will-change:transform]"
-        style={{ transform: `translate3d(${panX}px, ${panY}px, 0) scale(${zoom})` }}
+        style={{
+          transform: `translate3d(${panX}px, ${panY}px, 0) scale(${zoom})`,
+          // In draw mode the whole layer is pass-through so strokes land on the surface, over cards.
+          pointerEvents: drawMode ? "none" : undefined,
+        }}
       >
         {/* Dependency arrows (behind cards) */}
         <svg
@@ -771,6 +862,27 @@ export function Canvas({
             stroke="var(--blue)"
             strokeWidth={1.75}
             strokeDasharray="5 4"
+          />
+          {/* freehand sketch strokes */}
+          {strokes.map((s) => (
+            <path
+              key={s.id}
+              d={strokePath(s.points)}
+              fill="none"
+              stroke={s.color}
+              strokeWidth={s.width}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+          <path
+            ref={drawTempRef}
+            d=""
+            fill="none"
+            stroke={drawColor}
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
 

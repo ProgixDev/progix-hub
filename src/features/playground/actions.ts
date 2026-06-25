@@ -5,7 +5,14 @@ import { z } from "zod";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { listSnapshots, PLAN_COLS } from "./data";
-import { ITEM_TYPES, STATUSES, type PlanItem, type PlanLink, type PlanSnapshot } from "./types";
+import {
+  ITEM_TYPES,
+  STATUSES,
+  type PlanItem,
+  type PlanLink,
+  type PlanSnapshot,
+  type PlanStroke,
+} from "./types";
 
 export type CreateResult = { ok: true; item: PlanItem } | { ok: false };
 export type ActionResult = { ok: true } | { ok: false };
@@ -205,6 +212,50 @@ export async function deleteLinkAction(id: string): Promise<ActionResult> {
   if (!(await getCurrentUser())) return { ok: false };
   const supabase = await createClient();
   const { error } = await supabase.from("plan_links").delete().eq("id", id);
+  if (error) return { ok: false };
+  return { ok: true };
+}
+
+// ---- Draw mode (freehand strokes) -------------------------------------------
+
+export type StrokeResult = { ok: true; stroke: PlanStroke } | { ok: false };
+
+const strokeSchema = z.object({
+  points: z.array(z.number().finite()).min(4).max(4000),
+  color: z
+    .string()
+    .max(20)
+    .regex(/^#[0-9a-fA-F]{3,8}$/),
+  width: z.number().min(0.5).max(24),
+});
+
+/** Persist one freehand stroke. Authz: project access; RLS backstops. */
+export async function createStrokeAction(projectId: string, input: unknown): Promise<StrokeResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  const parsed = strokeSchema.safeParse(input);
+  if (!parsed.success) return { ok: false };
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("plan_drawings")
+    .insert({
+      project_id: projectId,
+      points: parsed.data.points,
+      color: parsed.data.color,
+      width: parsed.data.width,
+      created_by: user!.id,
+    })
+    .select("id,points,color,width")
+    .single();
+  if (error || !data) return { ok: false };
+  return { ok: true, stroke: data as PlanStroke };
+}
+
+/** Wipe all sketch strokes for a project (the "clear drawing" button). */
+export async function clearStrokesAction(projectId: string): Promise<ActionResult> {
+  if (!(await assertAccess(projectId))) return { ok: false };
+  const supabase = await createClient();
+  const { error } = await supabase.from("plan_drawings").delete().eq("project_id", projectId);
   if (error) return { ok: false };
   return { ok: true };
 }

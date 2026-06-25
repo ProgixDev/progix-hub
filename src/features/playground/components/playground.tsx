@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Wordmark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
-import { createPlanItemAction } from "../actions";
+import { clearStrokesAction, createPlanItemAction } from "../actions";
 import { usePlaygroundPresence } from "../presence";
 import { PlaygroundStoreProvider, usePlaygroundStore } from "../provider";
-import type { ItemType, MemberOption, PlanItem, PlanLink } from "../types";
+import type { ItemType, MemberOption, PlanItem, PlanLink, PlanStroke } from "../types";
 import { BlocksCommand, BlocksDrawer } from "./blocks-palette";
 import { Board } from "./board";
 import { Canvas } from "./canvas";
@@ -17,12 +17,15 @@ import { SnapshotsPanel } from "./snapshots-panel";
 
 type Me = { id: string; name: string; initials: string };
 
+const DRAW_COLORS = ["#4c82fb", "#e8edf5", "#3fb97f", "#e0a53b", "#f0613b", "#a78bfa"];
+
 export function Playground({
   projectId,
   projectName,
   backHref,
   items,
   links,
+  strokes,
   assignees,
   me,
 }: {
@@ -31,11 +34,12 @@ export function Playground({
   backHref: string;
   items: PlanItem[];
   links: PlanLink[];
+  strokes: PlanStroke[];
   assignees: MemberOption[];
   me: Me;
 }) {
   return (
-    <PlaygroundStoreProvider items={items} links={links}>
+    <PlaygroundStoreProvider items={items} links={links} strokes={strokes}>
       <Shell
         projectId={projectId}
         projectName={projectName}
@@ -60,11 +64,20 @@ function Shell({
   assignees: MemberOption[];
   me: Me;
 }) {
-  const { broadcastCursor, broadcastDrag } = usePlaygroundPresence({ projectId, me });
+  const { broadcastCursor, broadcastDrag, broadcastStroke, broadcastClear } = usePlaygroundPresence(
+    {
+      projectId,
+      me,
+    },
+  );
   const [blocksOpen, setBlocksOpen] = useState(false);
+  const [drawMode, setDrawMode] = useState(false);
+  const [drawColor, setDrawColor] = useState<string>(DRAW_COLORS[0]!);
   const lens = usePlaygroundStore((s) => s.lens);
   const setLens = usePlaygroundStore((s) => s.setLens);
   const addItem = usePlaygroundStore((s) => s.addItem);
+  const clearStrokes = usePlaygroundStore((s) => s.clearStrokes);
+  const strokeCount = usePlaygroundStore((s) => s.strokes.length);
   const zoom = usePlaygroundStore((s) => s.zoom);
   const panX = usePlaygroundStore((s) => s.panX);
   const panY = usePlaygroundStore((s) => s.panY);
@@ -91,6 +104,12 @@ function Shell({
         if (lens === "board" && type !== "task") setLens("canvas");
       }
     });
+  }
+
+  function clearDrawing() {
+    clearStrokes();
+    broadcastClear();
+    void clearStrokesAction(projectId);
   }
 
   return (
@@ -133,6 +152,19 @@ function Shell({
 
         {/* add actions */}
         <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setDrawMode((v) => !v)}
+            aria-pressed={drawMode}
+            className={cn(
+              "hidden h-9 items-center gap-1.5 rounded-full border px-3 text-[12.5px] font-medium transition-colors sm:flex",
+              drawMode
+                ? "border-line-blue bg-blue-tint text-blue-text"
+                : "border-line-1 bg-bg-2 text-text-1 hover:bg-bg-3 hover:text-text",
+            )}
+          >
+            ✎ Draw
+          </button>
           <button
             type="button"
             onClick={() => setBlocksOpen((v) => !v)}
@@ -182,8 +214,46 @@ function Shell({
               projectId={projectId}
               broadcastCursor={broadcastCursor}
               broadcastDrag={broadcastDrag}
+              broadcastStroke={broadcastStroke}
+              drawMode={drawMode}
+              drawColor={drawColor}
             />
             <BlocksDrawer open={blocksOpen} onClose={() => setBlocksOpen(false)} />
+            {drawMode && (
+              <div className="glass-strong absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full px-3 py-2">
+                {DRAW_COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setDrawColor(c)}
+                    aria-label={`Colour ${c}`}
+                    className={cn(
+                      "size-6 rounded-full transition-transform",
+                      drawColor === c
+                        ? "ring-2 ring-white ring-offset-2 ring-offset-[var(--bg-2)]"
+                        : "hover:scale-110",
+                    )}
+                    style={{ background: c }}
+                  />
+                ))}
+                <span className="bg-line-1 mx-1 h-5 w-px" />
+                <button
+                  type="button"
+                  onClick={clearDrawing}
+                  disabled={strokeCount === 0}
+                  className="text-text-2 hover:text-red-text text-[12.5px] font-medium transition-colors disabled:opacity-40"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDrawMode(false)}
+                  className="text-text-2 hover:text-text text-[12.5px] font-medium transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <Board />

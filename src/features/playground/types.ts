@@ -39,6 +39,9 @@ export type PlanItem = {
 /** A dependency arrow: source is a prerequisite of target ("source → target"). */
 export type PlanLink = { id: string; source_id: string; target_id: string };
 
+/** A freehand sketch stroke (draw mode): flattened canvas-space points [x0,y0,x1,y1,…]. */
+export type PlanStroke = { id: string; points: number[]; color: string; width: number };
+
 /** A saved version of the plan (items + links). The list view omits the heavy `data` blob. */
 export type PlanSnapshot = {
   id: string;

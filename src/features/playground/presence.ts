@@ -4,7 +4,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { usePlaygroundStore, usePlaygroundStoreApi } from "./provider";
-import type { Peer, PlanItem, PlanLink, RemoteCursor } from "./types";
+import type { Peer, PlanItem, PlanLink, PlanStroke, RemoteCursor } from "./types";
 
 const COLORS = [
   "#4c82fb",
@@ -25,6 +25,8 @@ function colorFor(id: string) {
 type CursorPayload = { userId: string; name: string; color: string; x: number; y: number };
 type DragPayload = { userId: string; id: string; x: number; y: number };
 type SyncPayload = { userId: string; items: PlanItem[]; links: PlanLink[] };
+type StrokePayload = { userId: string; stroke: PlanStroke };
+type ClearPayload = { userId: string };
 type PresenceMeta = {
   name?: string;
   initials?: string;
@@ -48,6 +50,8 @@ export function usePlaygroundPresence({
   const setCursors = usePlaygroundStore((s) => s.setCursors);
   const syncPlan = usePlaygroundStore((s) => s.syncPlan);
   const syncPatch = usePlaygroundStore((s) => s.syncPatch);
+  const addStroke = usePlaygroundStore((s) => s.addStroke);
+  const clearStrokes = usePlaygroundStore((s) => s.clearStrokes);
   const store = usePlaygroundStoreApi();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const cursors = useRef<Map<string, RemoteCursor>>(new Map());
@@ -104,6 +108,15 @@ export function usePlaygroundPresence({
         const s = payload as SyncPayload;
         if (s.userId === me.id) return;
         syncPlan(s.items, s.links);
+      })
+      .on("broadcast", { event: "stroke" }, ({ payload }) => {
+        const s = payload as StrokePayload;
+        if (s.userId === me.id) return;
+        addStroke(s.stroke);
+      })
+      .on("broadcast", { event: "clearstrokes" }, ({ payload }) => {
+        if ((payload as ClearPayload).userId === me.id) return;
+        clearStrokes();
       });
 
     // Private channels require the auth token on the realtime socket for both read AND write
@@ -159,7 +172,7 @@ export function usePlaygroundPresence({
       void supabase.removeChannel(channel);
       channelRef.current = null;
     };
-  }, [projectId, me, store, setPeers, setCursors, syncPlan, syncPatch]);
+  }, [projectId, me, store, setPeers, setCursors, syncPlan, syncPatch, addStroke, clearStrokes]);
 
   return {
     broadcastCursor(x: number, y: number) {
@@ -182,6 +195,22 @@ export function usePlaygroundPresence({
         type: "broadcast",
         event: "drag",
         payload: { userId: me.id, id, x, y } satisfies DragPayload,
+      });
+    },
+    /** A committed sketch stroke, so peers see it appear. */
+    broadcastStroke(stroke: PlanStroke) {
+      void channelRef.current?.send({
+        type: "broadcast",
+        event: "stroke",
+        payload: { userId: me.id, stroke } satisfies StrokePayload,
+      });
+    },
+    /** The drawing was cleared. */
+    broadcastClear() {
+      void channelRef.current?.send({
+        type: "broadcast",
+        event: "clearstrokes",
+        payload: { userId: me.id } satisfies ClearPayload,
       });
     },
   };
