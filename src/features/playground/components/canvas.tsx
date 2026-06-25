@@ -381,6 +381,7 @@ export function Canvas({
         d.cy = d.oy + (e.clientY - d.startY);
         if (layerRef.current)
           layerRef.current.style.transform = `translate3d(${d.cx}px, ${d.cy}px, 0) scale(${d.z})`;
+        if (surfaceRef.current) surfaceRef.current.style.backgroundPosition = `${d.cx}px ${d.cy}px`;
       } else if (d.mode === "card" && d.el) {
         d.cx = d.ox + (e.clientX - d.startX) / d.z;
         d.cy = d.oy + (e.clientY - d.startY) / d.z;
@@ -792,6 +793,11 @@ export function Canvas({
         if (e.dataTransfer.types.includes(DRAG_MIME)) e.preventDefault();
       }}
       onDrop={dropBlock}
+      style={{
+        backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)",
+        backgroundSize: `${24 * zoom}px ${24 * zoom}px`,
+        backgroundPosition: `${panX}px ${panY}px`,
+      }}
     >
       <div
         ref={layerRef}
@@ -957,9 +963,27 @@ export function Canvas({
         </div>
       )}
 
-      {items.length === 0 && (
-        <div className="text-text-3 pointer-events-none absolute inset-0 flex items-center justify-center text-[13px]">
-          Add a phase, task, or note to start planning. Shift-drag to select.
+      {items.length === 0 && strokes.length === 0 && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="page-enter flex max-w-sm flex-col items-center text-center">
+            <div className="glass-strong mb-4 flex size-14 items-center justify-center rounded-2xl text-[24px]">
+              ✎
+            </div>
+            <p className="text-text text-[15px] font-semibold">Plan it out</p>
+            <p className="text-text-3 mt-1 text-[12.5px] leading-relaxed">
+              Add a phase, drop a feature block, or sketch with Draw. Drag to pan, scroll to move,
+              ⌘-scroll to zoom — shift-drag to select.
+            </p>
+            <div className="text-text-3 mt-4 flex flex-wrap items-center justify-center gap-1.5 text-[11px]">
+              <kbd className="border-line-1 bg-bg-inset rounded-md border px-1.5 py-0.5">
+                + Task
+              </kbd>
+              <kbd className="border-line-1 bg-bg-inset rounded-md border px-1.5 py-0.5">
+                ◳ Blocks
+              </kbd>
+              <kbd className="border-line-1 bg-bg-inset rounded-md border px-1.5 py-0.5">⌘K</kbd>
+            </div>
+          </div>
         </div>
       )}
     </div>
