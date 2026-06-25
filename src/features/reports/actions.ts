@@ -3,6 +3,7 @@
 import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { recordActivity } from "@/lib/activity/record";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { listReportableProjects } from "./data";
@@ -42,6 +43,7 @@ export async function createReportAction(input: unknown): Promise<ActionResult> 
   });
   if (error) return { ok: false, error: t("errors.tryAgain") };
 
+  await recordActivity(parsed.data.project_id, "report", "posted a daily report");
   revalidatePath(`/projects/${parsed.data.project_id}`);
   return { ok: true };
 }

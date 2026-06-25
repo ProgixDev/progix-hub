@@ -3,6 +3,7 @@ import en from "@/messages/en.json";
 
 vi.mock("@/lib/auth/session", () => ({ getProjectRole: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
+vi.mock("@/lib/activity/record", () => ({ recordActivity: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(async () => (key: string) => {

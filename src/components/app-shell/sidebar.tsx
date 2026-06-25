@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { LogoMark, Wordmark } from "@/components/brand/logo";
 import {
+  BellIcon,
   GridIcon,
   PlusIcon,
   SearchIcon,
@@ -151,6 +152,13 @@ function SidebarNav({
       icon: <UsersIcon className="size-[18px] flex-none" />,
       active: pathname.startsWith("/members"),
       show: !!showMembers,
+    },
+    {
+      href: "/activity",
+      label: t("activity"),
+      icon: <BellIcon className="size-[18px] flex-none" />,
+      active: pathname.startsWith("/activity"),
+      show: true,
     },
     {
       href: "/tutorials",

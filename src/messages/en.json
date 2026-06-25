@@ -37,8 +37,15 @@
     "members": "Members",
     "profile": "Profile",
     "tutorials": "Tutorials",
+    "activity": "Activity",
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar"
+  },
+  "activity": {
+    "eyebrow": "Activity",
+    "title": "Activity",
+    "subtitle": "Recent updates across your projects.",
+    "empty": "No activity yet."
   },
   "topbar": {
     "commands": "Commands",
