@@ -2,6 +2,7 @@ import { createMcpHandler, experimental_withMcpAuth as withMcpAuth } from "mcp-h
 import { z } from "zod";
 import { resolveBearerUser } from "@/lib/mcp/auth";
 import {
+  mcpAddDocument,
   mcpAddFeature,
   mcpBulkCreatePlan,
   mcpCreateItem,
@@ -10,8 +11,10 @@ import {
   mcpLink,
   mcpListFeatures,
   mcpListProjects,
+  mcpPostDailyReport,
   mcpSetStatus,
   mcpUpdateItem,
+  mcpUploadEnv,
 } from "@/lib/mcp/tools";
 
 const STATUS = z.enum(["backlog", "in_progress", "in_review", "done"]);
@@ -137,6 +140,43 @@ const handler = createMcpHandler(
       "List the prebuilt feature blocks (Stripe, Twilio, …) you can add, with their keys.",
       {},
       async () => text(mcpListFeatures()),
+    );
+
+    server.tool(
+      "post_daily_report",
+      "Post a daily report (markdown) to a project from the repo.",
+      { projectId: z.string().uuid(), content_md: z.string() },
+      async (a, extra) => text(await mcpPostDailyReport(userId(extra), a.projectId, a.content_md)),
+    );
+
+    server.tool(
+      "add_document",
+      "Add a document to a project — a markdown note, or a link when `url` is given.",
+      {
+        projectId: z.string().uuid(),
+        title: z.string(),
+        body: z.string().optional(),
+        url: z.string().url().optional(),
+      },
+      async (a, extra) =>
+        text(
+          await mcpAddDocument(userId(extra), a.projectId, {
+            title: a.title,
+            body: a.body,
+            url: a.url,
+          }),
+        ),
+    );
+
+    server.tool(
+      "upload_env",
+      "Upload a project's .env (PM/developer only). Each variable is encrypted at rest; duplicates are skipped; frontend scope is auto-detected from NEXT_PUBLIC_/EXPO_PUBLIC_ prefixes.",
+      {
+        projectId: z.string().uuid(),
+        dotenv: z.string(),
+        scope: z.enum(["backend", "frontend"]).optional(),
+      },
+      async (a, extra) => text(await mcpUploadEnv(userId(extra), a.projectId, a.dotenv, a.scope)),
     );
 
     server.tool(
