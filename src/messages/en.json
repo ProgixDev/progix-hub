@@ -1,4 +1,15 @@
 {
+  "dashboard": {
+    "eyebrow": "Today",
+    "welcome": "Welcome back",
+    "welcomeName": "Welcome back, {name}",
+    "myTasks": "Assigned to me",
+    "noTasks": "Nothing assigned — you’re all clear.",
+    "recentReports": "Recent reports",
+    "noReports": "No reports yet.",
+    "openPlan": "Open plan",
+    "by": "by {who}"
+  },
   "common": {
     "cancel": "Cancel",
     "add": "Add",

@@ -1,5 +1,6 @@
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
+import { getMyOpenTasks, listRecentReports, TodayPanel } from "@/features/dashboard";
 import { DailyReportButton } from "@/features/reports";
 import { ClockWidget } from "@/features/time-tracking";
 import { ProjectsPortfolio, listProjects, type Project } from "@/features/projects";
@@ -18,6 +19,10 @@ function toRecent(projects: Project[]): RecentProject[] {
 export default async function Home() {
   const [user, projects] = await Promise.all([getCurrentUser(), listProjects()]);
   const showMembers = await canViewOrgMembers();
+  const [tasks, reports] = await Promise.all([
+    user ? getMyOpenTasks(user.id) : Promise.resolve([]),
+    listRecentReports(),
+  ]);
 
   return (
     <AppShell
@@ -28,6 +33,7 @@ export default async function Home() {
       reportSlot={<DailyReportButton />}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
+      <TodayPanel name={user?.name ?? null} tasks={tasks} reports={reports} />
       <ProjectsPortfolio projects={projects} />
     </AppShell>
   );
