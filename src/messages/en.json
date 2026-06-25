@@ -556,6 +556,7 @@
     "loadFile": "Load .md file",
     "save": "Post report",
     "contentHint": "## What shipped\n- …\n\n## In progress\n- …",
+    "previewHint": "Your report preview appears here as you type.",
     "noProjects": "No projects available",
     "errorEmpty": "Choose a project and write the report",
     "sectionTitle": "Daily reports",
