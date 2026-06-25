@@ -64,6 +64,32 @@ export async function rotateSetupAction(projectId: string): Promise<CreateResult
   return buildSetup(projectId, [], await getTranslations(), true);
 }
 
+/**
+ * Edit which platforms an existing setup includes. Reconciles steps in place — platforms that stay
+ * keep their client progress, the link is untouched — so a PM can add/remove platforms after the
+ * client has already started.
+ */
+export async function updateSetupAction(
+  projectId: string,
+  platformIds: string[],
+): Promise<ActionResult> {
+  const t = await getTranslations();
+  if (!z.uuid().safeParse(projectId).success)
+    return { ok: false, error: t("errors.unknownProject") };
+  if (!(await isManager(projectId))) return { ok: false, error: t("errors.notAuthorized") };
+  if (!z.array(z.uuid()).min(1).safeParse(platformIds).success) {
+    return { ok: false, error: t("setup.errorPickPlatform") };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_project_setup", {
+    p_project: projectId,
+    p_platform_ids: platformIds,
+  });
+  if (error) return { ok: false, error: t("errors.tryAgain") };
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}
+
 export async function setSetupEnabledAction(
   projectId: string,
   enabled: boolean,
