@@ -7,4 +7,6 @@
 - [x] Verify: discovery JSON ok; 401 WWW-Authenticate ok; PAT + Supabase JWT both connect via real MCP client
 - [x] appsec (APPROVE, no P0/P1) + P2 aud check
 - [ ] Ship: PR → CI → merge → deploy
-- [ ] Operator: enable Supabase OAuth Server + DCR; add hub.progix.pro
+- [x] OAuth consent screen `/oauth/consent` + decision route `/api/oauth/decision` (Supabase delegates the consent UI to the app)
+- [x] Operator: enabled Supabase OAuth Server + DCR; project transferred to Pro org
+- [ ] Operator: set Site URL to hub.progix.pro once DNS live
