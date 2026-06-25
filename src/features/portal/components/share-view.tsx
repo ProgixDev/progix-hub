@@ -11,7 +11,7 @@ import {
   submitPortalCommentAction,
   submitPortalProposalAction,
 } from "../public-actions";
-import type { PublicPortal } from "../types";
+import type { PortalPhase, PublicPortal } from "../types";
 import { StatusBadge } from "./status-badge";
 
 const NAME_KEY = "portal-client-name";
@@ -21,8 +21,23 @@ const btn =
   "border-line-1 text-text-2 hover:bg-bg-3 hover:text-text h-8 rounded-full border px-2.5 text-[12px] font-medium transition-colors disabled:opacity-60";
 
 /** The client's whole portal page — read everything, comment, attach, propose (view + comment role). */
-export function ShareView({ portal, token }: { portal: PublicPortal; token: string }) {
+export function ShareView({
+  portal,
+  roadmap,
+  token,
+}: {
+  portal: PublicPortal;
+  roadmap: PortalPhase[];
+  token: string;
+}) {
   const t = useTranslations("portal");
+  const total = portal.cards.length;
+  const delivered = portal.cards.filter((c) => c.status === "delivered").length;
+  const inProgress = portal.cards.filter((c) => c.status === "in_progress").length;
+  const planned = portal.cards.filter(
+    (c) => c.status === "planned" || c.status === "proposed",
+  ).length;
+  const pct = total ? Math.round((delivered / total) * 100) : 0;
   // Lazy-init from localStorage (SSR renders empty; the client value wins on hydration —
   // the inputs carry suppressHydrationWarning for exactly this).
   const [name, setName] = useState(() =>
@@ -59,6 +74,59 @@ export function ShareView({ portal, token }: { portal: PublicPortal; token: stri
           onName={rememberName}
           onDone={() => setProposeOpen(false)}
         />
+      )}
+
+      {(total > 0 || roadmap.length > 0) && (
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+          {total > 0 && (
+            <div className="glass rounded-2xl p-5">
+              <div className="flex items-end justify-between">
+                <h2 className="text-text text-[14px] font-semibold">{t("progressTitle")}</h2>
+                <span className="text-text text-[22px] font-semibold">{pct}%</span>
+              </div>
+              <div className="bg-line-1 mt-2 h-2 w-full overflow-hidden rounded-full">
+                <div
+                  className="bg-green h-full rounded-full transition-[width]"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+              <div className="text-text-2 mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12px]">
+                <span>
+                  <b className="text-text">{delivered}</b> {t("delivered")}
+                </span>
+                <span>
+                  <b className="text-text">{inProgress}</b> {t("inProgress")}
+                </span>
+                <span>
+                  <b className="text-text">{planned}</b> {t("planned")}
+                </span>
+              </div>
+            </div>
+          )}
+          {roadmap.length > 0 && (
+            <div className="glass rounded-2xl p-5">
+              <h2 className="text-text text-[14px] font-semibold">{t("roadmapTitle")}</h2>
+              <ul className="mt-3 flex flex-col gap-2.5">
+                {roadmap.map((ph) => {
+                  const p = ph.total ? Math.round((ph.done / ph.total) * 100) : 0;
+                  return (
+                    <li key={ph.id}>
+                      <div className="flex items-center justify-between text-[12.5px]">
+                        <span className="text-text truncate font-medium">{ph.name}</span>
+                        <span className="text-text-3 flex-none">
+                          {ph.done}/{ph.total}
+                        </span>
+                      </div>
+                      <div className="bg-line-1 mt-1 h-1.5 w-full overflow-hidden rounded-full">
+                        <div className="bg-blue h-full rounded-full" style={{ width: `${p}%` }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
 
       <div className="mt-8 space-y-8">

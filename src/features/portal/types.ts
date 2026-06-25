@@ -54,6 +54,9 @@ export type ShareLink = {
   created_at: string;
 };
 
+/** A roadmap phase shown to the client (whitelisted: name + task progress only). */
+export type PortalPhase = { id: string; name: string; total: number; done: number };
+
 /** The JSON tree `portal_public_view` returns to the share page. */
 export type PublicPortal = {
   project_name: string;
