@@ -3,9 +3,8 @@
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { getPlanStateAction } from "./actions";
 import { usePlaygroundStore, usePlaygroundStoreApi } from "./provider";
-import type { Peer, RemoteCursor } from "./types";
+import type { Peer, PlanItem, PlanLink, RemoteCursor } from "./types";
 
 const COLORS = [
   "#4c82fb",
@@ -24,6 +23,8 @@ function colorFor(id: string) {
 }
 
 type CursorPayload = { userId: string; name: string; color: string; x: number; y: number };
+type DragPayload = { userId: string; id: string; x: number; y: number };
+type SyncPayload = { userId: string; items: PlanItem[]; links: PlanLink[] };
 type PresenceMeta = {
   name?: string;
   initials?: string;
@@ -32,9 +33,9 @@ type PresenceMeta = {
 };
 
 /**
- * Live presence over a Supabase Realtime channel. Carries ONLY ephemeral signals — presence
- * (name/initials/color/selection), cursors, and a "plan changed" ping — never plan content.
- * On a ping, the actual plan is refetched through the RLS-gated server action, so nothing leaks.
+ * Live collaboration over a Supabase Realtime channel. The channel is PRIVATE (RLS-gated to project
+ * members, migration 0031), so it carries the real changes: presence, cursors, live drags, and the
+ * full plan state on every local edit — applied to peers instantly (no refetch round-trip).
  */
 export function usePlaygroundPresence({
   projectId,
@@ -46,10 +47,12 @@ export function usePlaygroundPresence({
   const setPeers = usePlaygroundStore((s) => s.setPeers);
   const setCursors = usePlaygroundStore((s) => s.setCursors);
   const syncPlan = usePlaygroundStore((s) => s.syncPlan);
+  const syncPatch = usePlaygroundStore((s) => s.syncPatch);
   const store = usePlaygroundStoreApi();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const cursors = useRef<Map<string, RemoteCursor>>(new Map());
   const lastSent = useRef(0);
+  const lastDrag = useRef(0);
 
   useEffect(() => {
     const supabase = createClient();
@@ -83,8 +86,6 @@ export function usePlaygroundPresence({
       setCursors([...cursors.current.values()]);
     }
 
-    let dirtyTimer: ReturnType<typeof setTimeout> | null = null;
-
     channel
       .on("presence", { event: "sync" }, rebuildPeers)
       .on("presence", { event: "leave" }, rebuildPeers)
@@ -94,13 +95,15 @@ export function usePlaygroundPresence({
         cursors.current.set(c.userId, c);
         setCursors([...cursors.current.values()]);
       })
-      .on("broadcast", { event: "dirty" }, ({ payload }) => {
-        if ((payload as { userId: string }).userId === me.id) return;
-        if (dirtyTimer) clearTimeout(dirtyTimer);
-        dirtyTimer = setTimeout(async () => {
-          const state = await getPlanStateAction(projectId);
-          if (state) syncPlan(state.items, state.links);
-        }, 250);
+      .on("broadcast", { event: "drag" }, ({ payload }) => {
+        const d = payload as DragPayload;
+        if (d.userId === me.id) return;
+        syncPatch(d.id, { pos_x: d.x, pos_y: d.y });
+      })
+      .on("broadcast", { event: "sync" }, ({ payload }) => {
+        const s = payload as SyncPayload;
+        if (s.userId === me.id) return;
+        syncPlan(s.items, s.links);
       });
 
     // Private channels require the auth token on the realtime socket for both read AND write
@@ -119,13 +122,25 @@ export function usePlaygroundPresence({
       });
     });
 
-    // Broadcast a "dirty" ping on local edits; re-track presence when the local selection changes.
+    // On a local edit, broadcast the full plan state (coalesced) so peers apply it instantly — and
+    // re-track presence when the local selection changes.
     let lastRev = store.getState().localRev;
     let lastSel = store.getState().selectedId;
+    let syncTimer: ReturnType<typeof setTimeout> | null = null;
     const unsub = store.subscribe((state) => {
       if (state.localRev !== lastRev) {
         lastRev = state.localRev;
-        void channel.send({ type: "broadcast", event: "dirty", payload: { userId: me.id } });
+        if (!syncTimer) {
+          syncTimer = setTimeout(() => {
+            syncTimer = null;
+            const st = store.getState();
+            void channel.send({
+              type: "broadcast",
+              event: "sync",
+              payload: { userId: me.id, items: st.items, links: st.links } satisfies SyncPayload,
+            });
+          }, 50);
+        }
       }
       if (state.selectedId !== lastSel) {
         lastSel = state.selectedId;
@@ -140,11 +155,11 @@ export function usePlaygroundPresence({
 
     return () => {
       unsub();
-      if (dirtyTimer) clearTimeout(dirtyTimer);
+      if (syncTimer) clearTimeout(syncTimer);
       void supabase.removeChannel(channel);
       channelRef.current = null;
     };
-  }, [projectId, me, store, setPeers, setCursors, syncPlan]);
+  }, [projectId, me, store, setPeers, setCursors, syncPlan, syncPatch]);
 
   return {
     broadcastCursor(x: number, y: number) {
@@ -156,6 +171,17 @@ export function usePlaygroundPresence({
         type: "broadcast",
         event: "cursor",
         payload: { userId: me.id, name: me.name, color, x, y } satisfies CursorPayload,
+      });
+    },
+    /** Live card position during a drag, so peers watch it move (throttled). */
+    broadcastDrag(id: string, x: number, y: number) {
+      const now = Date.now();
+      if (now - lastDrag.current < 45) return;
+      lastDrag.current = now;
+      void channelRef.current?.send({
+        type: "broadcast",
+        event: "drag",
+        payload: { userId: me.id, id, x, y } satisfies DragPayload,
       });
     },
   };

@@ -204,9 +204,11 @@ function Cursors() {
 export function Canvas({
   projectId,
   broadcastCursor,
+  broadcastDrag,
 }: {
   projectId: string;
   broadcastCursor: (x: number, y: number) => void;
+  broadcastDrag: (id: string, x: number, y: number) => void;
 }) {
   const items = usePlaygroundStore((s) => s.items);
   const peers = usePlaygroundStore((s) => s.peers);
@@ -336,6 +338,7 @@ export function Canvas({
         d.cy = d.oy + (e.clientY - d.startY) / d.z;
         d.el.style.transform = `translate3d(${d.cx}px, ${d.cy}px, 0)`;
         redrawLinks(d.id!, d.cx + d.w / 2, d.cy + d.h / 2);
+        broadcastDrag(d.id!, d.cx, d.cy);
       } else if (d.mode === "link") {
         const tx = (e.clientX - d.rectX - panX) / d.z;
         const ty = (e.clientY - d.rectY - panY) / d.z;
@@ -353,7 +356,7 @@ export function Canvas({
         }
       }
     },
-    [panX, panY, zoom, redrawLinks, broadcastCursor],
+    [panX, panY, zoom, redrawLinks, broadcastCursor, broadcastDrag],
   );
 
   const endGesture = useCallback(

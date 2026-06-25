@@ -59,7 +59,7 @@ function Shell({
   assignees: MemberOption[];
   me: Me;
 }) {
-  const { broadcastCursor } = usePlaygroundPresence({ projectId, me });
+  const { broadcastCursor, broadcastDrag } = usePlaygroundPresence({ projectId, me });
   const lens = usePlaygroundStore((s) => s.lens);
   const setLens = usePlaygroundStore((s) => s.setLens);
   const addItem = usePlaygroundStore((s) => s.addItem);
@@ -160,7 +160,11 @@ function Shell({
 
       <div className="relative flex min-h-0 flex-1">
         {lens === "canvas" ? (
-          <Canvas projectId={projectId} broadcastCursor={broadcastCursor} />
+          <Canvas
+            projectId={projectId}
+            broadcastCursor={broadcastCursor}
+            broadcastDrag={broadcastDrag}
+          />
         ) : (
           <Board />
         )}
