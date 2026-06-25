@@ -10,6 +10,19 @@ import { ITEM_TYPES, STATUSES, type PlanItem, type PlanLink, type PlanSnapshot }
 export type CreateResult = { ok: true; item: PlanItem } | { ok: false };
 export type ActionResult = { ok: true } | { ok: false };
 
+const metaSchema = z
+  .object({
+    feature: z.string().max(60),
+    category: z.string().max(60),
+    color: z
+      .string()
+      .max(20)
+      .regex(/^#[0-9a-fA-F]{3,8}$/),
+    checklist: z.array(z.object({ label: z.string().max(200), done: z.boolean() })).max(40),
+  })
+  .partial()
+  .strict();
+
 const createSchema = z.object({
   type: z.enum(ITEM_TYPES),
   title: z.string().max(500).optional(),
@@ -19,6 +32,7 @@ const createSchema = z.object({
   width: z.number().int().nullable().optional(),
   height: z.number().int().nullable().optional(),
   color: z.string().max(20).nullable().optional(),
+  meta: metaSchema.optional(),
 });
 
 const patchSchema = z
@@ -35,6 +49,7 @@ const patchSchema = z
     height: z.number().int().nullable(),
     board_order: z.number().int(),
     color: z.string().max(20).nullable(),
+    meta: metaSchema,
   })
   .partial()
   .strict();
@@ -69,6 +84,7 @@ export async function createPlanItemAction(
       width: parsed.data.width ?? null,
       height: parsed.data.height ?? null,
       color: parsed.data.color ?? null,
+      meta: parsed.data.meta ?? {},
       created_by: user!.id,
     })
     .select(PLAN_COLS)

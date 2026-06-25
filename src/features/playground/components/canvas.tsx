@@ -4,11 +4,13 @@ import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import {
   createLinkAction,
+  createPlanItemAction,
   deleteLinkAction,
   deletePlanItemAction,
   groupIntoPhaseAction,
   updatePlanItemAction,
 } from "../actions";
+import { BLOCK_BY_KEY, checklistFor, DRAG_MIME, monogram } from "../feature-catalog";
 import { usePlaygroundStore } from "../provider";
 import type { PlanItem, Status } from "../types";
 
@@ -89,7 +91,20 @@ const Card = memo(function Card({
           {remote.name}
         </span>
       )}
-      {item.type === "task" && (
+      {item.meta?.feature && (
+        <div className="mb-2 flex items-center gap-2">
+          <span
+            className="flex size-7 flex-none items-center justify-center rounded-lg text-[11px] font-bold text-white"
+            style={{ background: item.meta.color || "#4c82fb" }}
+          >
+            {monogram(item.title)}
+          </span>
+          <span className="border-line-1 text-text-3 rounded-full border px-1.5 py-0.5 text-[10px] font-medium">
+            {item.meta.category}
+          </span>
+        </div>
+      )}
+      {item.type === "task" && !item.meta?.feature && (
         <span className={cn("mb-1.5 inline-block size-2 rounded-full", STATUS_DOT[item.status])} />
       )}
       {editing ? (
@@ -108,8 +123,23 @@ const Card = memo(function Card({
           {item.title || (item.type === "note" ? "Note" : "Untitled")}
         </p>
       )}
-      {item.type === "task" && item.estimate_hours != null && (
+      {item.type === "task" && item.estimate_hours != null && !item.meta?.feature && (
         <p className="text-text-3 mt-1 font-mono text-[11px]">{item.estimate_hours}h</p>
+      )}
+      {item.meta?.feature && (item.meta.checklist?.length ?? 0) > 0 && (
+        <div className="mt-2">
+          <div className="bg-line-1 h-1 w-full overflow-hidden rounded-full">
+            <div
+              className="bg-blue h-full rounded-full transition-[width]"
+              style={{
+                width: `${(item.meta.checklist!.filter((c) => c.done).length / item.meta.checklist!.length) * 100}%`,
+              }}
+            />
+          </div>
+          <p className="text-text-3 mt-1 text-[10px]">
+            {item.meta.checklist!.filter((c) => c.done).length}/{item.meta.checklist!.length} steps
+          </p>
+        </div>
       )}
       {/* connector handle — drag to another card to draw a dependency */}
       <span
@@ -621,6 +651,47 @@ export function Canvas({
     setMulti([]);
   }
 
+  // A block dropped from the palette becomes a feature card at the drop point, adopted by whatever
+  // phase it lands in.
+  function dropBlock(e: React.DragEvent) {
+    const key = e.dataTransfer.getData(DRAG_MIME);
+    const block = key ? BLOCK_BY_KEY.get(key) : undefined;
+    if (!block) return;
+    e.preventDefault();
+    const rect = surfaceRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const cx = (e.clientX - rect.left - panX) / zoom;
+    const cy = (e.clientY - rect.top - panY) / zoom;
+    const x = Math.round(cx - CARD_W / 2);
+    const y = Math.round(cy - CARD_H / 2);
+    const parent = items.find(
+      (it) =>
+        it.type === "phase" &&
+        cx >= it.pos_x &&
+        cx <= it.pos_x + (it.width ?? PHASE_W) &&
+        cy >= it.pos_y &&
+        cy <= it.pos_y + (it.height ?? PHASE_H),
+    );
+    void createPlanItemAction(projectId, {
+      type: "task",
+      title: block.name,
+      pos_x: x,
+      pos_y: y,
+      parent_id: parent?.id ?? null,
+      meta: {
+        feature: block.key,
+        category: block.category,
+        color: block.color,
+        checklist: checklistFor(block),
+      },
+    }).then((res) => {
+      if (res.ok) {
+        addItem(res.item);
+        select(res.item.id);
+      }
+    });
+  }
+
   return (
     <div
       ref={surfaceRef}
@@ -630,6 +701,10 @@ export function Canvas({
       onPointerUp={endGesture}
       onPointerCancel={endGesture}
       onWheel={onWheel}
+      onDragOver={(e) => {
+        if (e.dataTransfer.types.includes(DRAG_MIME)) e.preventDefault();
+      }}
+      onDrop={dropBlock}
     >
       <div
         ref={layerRef}

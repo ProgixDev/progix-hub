@@ -5,6 +5,18 @@ export type ItemType = (typeof ITEM_TYPES)[number];
 export const STATUSES = ["backlog", "in_progress", "in_review", "done"] as const;
 export type Status = (typeof STATUSES)[number];
 
+/** A checklist sub-step on a feature card. */
+export type ChecklistStep = { label: string; done: boolean };
+
+/** Extra data on a card. Feature cards (seeded from the block catalog) carry brand + checklist. */
+export type ItemMeta = {
+  /** Catalog key of the feature block (e.g. "stripe") — presence marks this a feature card. */
+  feature?: string;
+  category?: string;
+  color?: string;
+  checklist?: ChecklistStep[];
+};
+
 export type PlanItem = {
   id: string;
   project_id: string;
@@ -21,6 +33,7 @@ export type PlanItem = {
   height: number | null;
   board_order: number;
   color: string | null;
+  meta: ItemMeta;
 };
 
 /** A dependency arrow: source is a prerequisite of target ("source → target"). */

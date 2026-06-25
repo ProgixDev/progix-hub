@@ -114,6 +114,45 @@ export function Inspector({ assignees }: { assignees: MemberOption[] }) {
         </>
       )}
 
+      {item.meta?.feature && item.meta.checklist && item.meta.checklist.length > 0 && (
+        <Row label="Checklist">
+          <div className="flex flex-col gap-1">
+            {item.meta.checklist.map((step, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  const checklist = item.meta.checklist!.map((s, i) =>
+                    i === idx ? { ...s, done: !s.done } : s,
+                  );
+                  patch({ meta: { ...item.meta, checklist } });
+                }}
+                className="hover:bg-bg-inset flex items-center gap-2 rounded-md px-1 py-1 text-left"
+              >
+                <span
+                  className={
+                    step.done
+                      ? "bg-blue text-bg grid size-4 flex-none place-items-center rounded-[5px] text-[10px]"
+                      : "border-line-strong grid size-4 flex-none place-items-center rounded-[5px] border"
+                  }
+                >
+                  {step.done ? "✓" : ""}
+                </span>
+                <span
+                  className={
+                    step.done
+                      ? "text-text-3 text-[12.5px] line-through"
+                      : "text-text-1 text-[12.5px]"
+                  }
+                >
+                  {step.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </Row>
+      )}
+
       {(item.type === "note" || item.type === "task") && (
         <Row label={item.type === "note" ? "Note" : "Details"}>
           <textarea
