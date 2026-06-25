@@ -33,3 +33,18 @@ export async function resolveMcpUser(token: string | undefined): Promise<string 
     .eq("id", data.id);
   return data.user_id as string;
 }
+
+/**
+ * Resolve any MCP bearer to a user id: a personal token (pgx_mcp_…) OR a Supabase-issued OAuth /
+ * session access token (validated against Supabase Auth). Lets Claude authenticate via the OAuth
+ * 2.1 flow (Supabase is the authorization server) while personal tokens keep working.
+ */
+export async function resolveBearerUser(token: string | undefined): Promise<string | null> {
+  if (!token) return null;
+  if (token.startsWith(PREFIX)) return resolveMcpUser(token);
+  const admin = createAdminClient();
+  const { data, error } = await admin.auth.getUser(token);
+  // Defense in depth: only a genuine authenticated end-user resolves (never a service/anon token).
+  if (error || !data.user || data.user.aud !== "authenticated") return null;
+  return data.user.id;
+}

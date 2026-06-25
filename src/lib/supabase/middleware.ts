@@ -44,6 +44,7 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/auth") ||
     path.startsWith("/api/health") ||
     path.startsWith("/api/mcp") ||
+    path.startsWith("/.well-known") ||
     path.startsWith("/share") ||
     path.startsWith("/setup");
 
