@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Wordmark } from "@/components/brand/logo";
-import { ShareView, getPublicPortal } from "@/features/portal";
+import { ShareView, getPublicPortal, getPublicRoadmap } from "@/features/portal";
 
 /**
  * The client-facing portal (spec 006, ADR-0010): public route, token-gated inside the
@@ -8,7 +8,7 @@ import { ShareView, getPublicPortal } from "@/features/portal";
  */
 export default async function SharePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const portal = await getPublicPortal(token);
+  const [portal, roadmap] = await Promise.all([getPublicPortal(token), getPublicRoadmap(token)]);
   const t = await getTranslations("portal");
 
   if (!portal) {
@@ -28,7 +28,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
           <Wordmark />
         </div>
       </div>
-      <ShareView portal={portal} token={token} />
+      <ShareView portal={portal} roadmap={roadmap} token={token} />
     </main>
   );
 }

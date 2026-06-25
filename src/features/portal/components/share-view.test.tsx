@@ -44,7 +44,7 @@ const portal: PublicPortal = {
 
 describe("ShareView (client side, AC-3/AC-8)", () => {
   it("renders the project, block, card, and status — and no member nav", () => {
-    renderWithIntl(<ShareView portal={portal} token={token} />);
+    renderWithIntl(<ShareView portal={portal} roadmap={[]} token={token} />);
     expect(screen.getByRole("heading", { name: "Acme site" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Website" })).toBeTruthy();
     expect(screen.getByText("Landing page")).toBeTruthy();
@@ -53,13 +53,13 @@ describe("ShareView (client side, AC-3/AC-8)", () => {
   });
 
   it("renders client-submitted text inert — never as markup (AC-8)", () => {
-    const { container } = renderWithIntl(<ShareView portal={portal} token={token} />);
+    const { container } = renderWithIntl(<ShareView portal={portal} roadmap={[]} token={token} />);
     expect(container.querySelector("script")).toBeNull();
     expect(screen.getByText(/nice work/)).toBeTruthy();
   });
 
   it("offers comment, attach, and propose affordances (view + comment role)", () => {
-    renderWithIntl(<ShareView portal={portal} token={token} />);
+    renderWithIntl(<ShareView portal={portal} roadmap={[]} token={token} />);
     expect(screen.getAllByPlaceholderText(/write a comment/i).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: /attach a file/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /propose a feature/i })).toBeTruthy();
