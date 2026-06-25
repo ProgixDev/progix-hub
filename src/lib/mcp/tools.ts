@@ -486,3 +486,135 @@ export async function mcpSyncSpecs(
   if (error) throw new Error(error.message);
   return { synced: rows.length };
 }
+
+// ---- Project lifecycle + read-backs (full two-way bridge) -------------------
+
+/** Create a hub project (the token's user becomes PM). Org members only. */
+export async function mcpCreateProject(
+  userId: string,
+  input: {
+    name: string;
+    description?: string;
+    github_url?: string;
+    notion_url?: string;
+    slack_url?: string;
+    live_url?: string;
+  },
+) {
+  const admin = createAdminClient();
+  const { data: u } = await admin.auth.admin.getUserById(userId);
+  if (!u?.user?.app_metadata?.is_member) throw new Error("Only org members can create projects");
+  const name = (input.name ?? "").trim().slice(0, 120);
+  if (!name) throw new Error("Project name is required");
+  const { data, error } = await admin
+    .from("projects")
+    .insert({
+      name,
+      status: "active",
+      description: input.description?.slice(0, 2000) ?? null,
+      github_url: input.github_url ?? null,
+      notion_url: input.notion_url ?? null,
+      slack_url: input.slack_url ?? null,
+      live_url: input.live_url ?? null,
+      created_by: userId,
+    })
+    .select("id,name")
+    .single();
+  if (error || !data) throw new Error(error?.message ?? "create failed");
+  // Seat the creator as PM (a default-role trigger may have added them as developer first).
+  await admin
+    .from("project_members")
+    .upsert(
+      { project_id: data.id, user_id: userId, role: "pm" },
+      { onConflict: "project_id,user_id" },
+    );
+  return data;
+}
+
+/** Set a project's external links (GitHub / Notion / Slack / Live). PM only. */
+export async function mcpSetProjectLinks(
+  userId: string,
+  projectId: string,
+  links: { github_url?: string; notion_url?: string; slack_url?: string; live_url?: string },
+) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId, ["pm"]))) {
+    throw new Error("No access — project links require pm");
+  }
+  const patch: Record<string, string | null> = {};
+  for (const k of ["github_url", "notion_url", "slack_url", "live_url"] as const) {
+    if (links[k] !== undefined) patch[k] = links[k] || null;
+  }
+  if (Object.keys(patch).length === 0) return { ok: true };
+  const { error } = await admin.from("projects").update(patch).eq("id", projectId);
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** The project's env var KEYS + scope — names only, never the secret values. PM/developer. */
+export async function mcpGetEnvKeys(userId: string, projectId: string) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId, ["pm", "developer"]))) {
+    throw new Error("No access — env requires pm or developer");
+  }
+  const { data } = await admin
+    .from("env_vars")
+    .select("key,scope,service")
+    .eq("project_id", projectId)
+    .order("key");
+  return data ?? [];
+}
+
+/** A project's documents (metadata + link URLs; never file contents). */
+export async function mcpListDocuments(userId: string, projectId: string) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that project");
+  const { data } = await admin
+    .from("documents")
+    .select("id,kind,title,url")
+    .eq("project_id", projectId)
+    .is("archived_at", null)
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
+/** A project's synced specs/PRDs (metadata). */
+export async function mcpListSpecs(userId: string, projectId: string) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that project");
+  const { data } = await admin
+    .from("project_specs")
+    .select("slug,number,title,status,kind")
+    .eq("project_id", projectId)
+    .order("number", { nullsFirst: false });
+  return data ?? [];
+}
+
+/** Configuration status (the project checklist) — what's set up vs missing. */
+export async function mcpGetProjectStatus(userId: string, projectId: string) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that project");
+  const head = { count: "exact" as const, head: true };
+  const [proj, env, specs, docs, reports, setup, portal] = await Promise.all([
+    admin.from("projects").select("github_url").eq("id", projectId).maybeSingle(),
+    admin.from("env_vars").select("id", head).eq("project_id", projectId),
+    admin.from("project_specs").select("id", head).eq("project_id", projectId),
+    admin.from("documents").select("id", head).eq("project_id", projectId).is("archived_at", null),
+    admin.from("project_reports").select("id", head).eq("project_id", projectId),
+    admin.from("project_setups").select("project_id", head).eq("project_id", projectId),
+    admin
+      .from("portal_share_links")
+      .select("id", head)
+      .eq("project_id", projectId)
+      .is("revoked_at", null),
+  ]);
+  return {
+    github_linked: Boolean(proj.data?.github_url),
+    env_vars: env.count ?? 0,
+    specs: specs.count ?? 0,
+    documents: docs.count ?? 0,
+    daily_reports: reports.count ?? 0,
+    client_setup: (setup.count ?? 0) > 0,
+    client_portal: (portal.count ?? 0) > 0,
+  };
+}
