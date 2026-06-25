@@ -33,8 +33,10 @@ export type PlaygroundState = {
   addLink: (link: PlanLink) => void;
   removeLink: (id: string) => void;
   replaceAll: (items: PlanItem[], links: PlanLink[]) => void;
-  /** Apply a remote refetch WITHOUT bumping localRev or disturbing the local selection/editing. */
+  /** Apply a remote full-state sync WITHOUT bumping localRev or disturbing the local selection. */
   syncPlan: (items: PlanItem[], links: PlanLink[]) => void;
+  /** Apply a remote patch to one item (e.g. live drag) WITHOUT bumping localRev (no echo). */
+  syncPatch: (id: string, patch: Partial<PlanItem>) => void;
 };
 
 /** Holds the plan items + links (seeded from the server) + canvas/board UI state. One per mount. */
@@ -107,6 +109,8 @@ export function createPlaygroundStore(initial: PlanItem[], initialLinks: PlanLin
         localRev: s.localRev + 1,
       })),
     syncPlan: (items, links) => set({ items, links }),
+    syncPatch: (id, patch) =>
+      set((s) => ({ items: s.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) })),
   }));
 }
 
