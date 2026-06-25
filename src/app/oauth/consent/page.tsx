@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { signConsent } from "@/lib/oauth-consent";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -25,9 +26,8 @@ export default async function ConsentPage({
 
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
-  if (!claims?.claims) {
-    redirect(`/sign-in?next=${encodeURIComponent(`/oauth/consent?authorization_id=${authId}`)}`);
-  }
+  const userId = claims?.claims?.sub;
+  if (!userId) redirect("/sign-in");
 
   const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(authId);
   if (error || !data) redirect("/?error=oauth");
@@ -35,6 +35,7 @@ export default async function ConsentPage({
   if (!("authorization_id" in data)) redirect(data.redirect_url);
 
   const scopes = data.scope.split(" ").filter(Boolean);
+  const csrf = signConsent(authId, userId);
 
   return (
     <main className="relative flex min-h-dvh items-center justify-center px-4 py-10">
@@ -73,6 +74,7 @@ export default async function ConsentPage({
 
         <form action="/api/oauth/decision" method="post" className="mt-5 flex items-center gap-2.5">
           <input type="hidden" name="authorization_id" value={authId} />
+          <input type="hidden" name="csrf" value={csrf} />
           <button
             type="submit"
             name="decision"

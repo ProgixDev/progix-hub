@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyConsent } from "@/lib/oauth-consent";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -11,14 +12,21 @@ export async function POST(request: Request) {
   const form = await request.formData();
   const decision = form.get("decision");
   const authorizationId = form.get("authorization_id");
-  if (typeof authorizationId !== "string") {
+  const csrf = form.get("csrf");
+  if (typeof authorizationId !== "string" || typeof csrf !== "string") {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
-  if (!claims?.claims) {
+  const userId = claims?.claims?.sub;
+  if (!userId) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+  // Explicit anti-CSRF: the token is bound to (authorization_id, this user) and was rendered on the
+  // consent page; a blind cross-site POST can't forge it.
+  if (!verifyConsent(csrf, authorizationId, userId)) {
+    return NextResponse.redirect(new URL("/?error=oauth", request.url));
   }
 
   const result =
