@@ -1,4 +1,6 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
+import { encryptSecret } from "@/lib/crypto/secrets";
 import { BLOCK_BY_KEY, checklistFor, FEATURE_BLOCKS } from "@/lib/playground/feature-catalog";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -9,13 +11,53 @@ type Status = "backlog" | "in_progress" | "in_review" | "done";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
-async function canAccess(admin: Admin, userId: string, projectId: string): Promise<boolean> {
+async function canAccess(
+  admin: Admin,
+  userId: string,
+  projectId: string,
+  roles: string[] = ROLES,
+): Promise<boolean> {
   const { data } = await admin.rpc("has_project_access_for", {
     p_user: userId,
     p_project: projectId,
-    p_roles: ROLES,
+    p_roles: roles,
   });
   return data === true;
+}
+
+/** The MCP user's email + display label (for report authorship + env audit). */
+async function userInfo(admin: Admin, userId: string): Promise<{ email: string; label: string }> {
+  const { data } = await admin.auth.admin.getUserById(userId);
+  const u = data?.user;
+  const meta = (u?.user_metadata ?? {}) as Record<string, unknown>;
+  const name = (meta.full_name || meta.name || meta.user_name) as string | undefined;
+  const email = u?.email ?? "";
+  return { email, label: name || email || "Someone" };
+}
+
+/** Parse .env text into key/value pairs (skips comments/blanks; strips quotes; validates keys). */
+function parseDotenv(text: string): { key: string; value: string }[] {
+  const out: { key: string; value: string }[] = [];
+  for (const raw of (text ?? "").split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq <= 0) continue;
+    const key = line
+      .slice(0, eq)
+      .trim()
+      .replace(/^export\s+/, "");
+    let value = line.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
+    out.push({ key, value });
+  }
+  return out;
 }
 
 /** Projects the token's owner can plan. */
@@ -306,4 +348,104 @@ export async function mcpAddFeature(
     .single();
   if (error) throw new Error(error.message);
   return data;
+}
+
+// ---- Project configuration (push from a repo into the hub) -------------------
+
+/** Post a daily report (markdown) to a project from the repo. */
+export async function mcpPostDailyReport(userId: string, projectId: string, contentMd: string) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that project");
+  const body = (contentMd ?? "").trim();
+  if (!body) throw new Error("Report is empty");
+  const { label } = await userInfo(admin, userId);
+  const { error } = await admin.from("project_reports").insert({
+    project_id: projectId,
+    content_md: body.slice(0, 20000),
+    created_by: userId,
+    author_label: label,
+  });
+  if (error) throw new Error(error.message);
+  await admin.from("activity_events").insert({
+    project_id: projectId,
+    actor_id: userId,
+    actor_label: label,
+    kind: "report",
+    summary: "posted a daily report",
+  });
+  return { ok: true };
+}
+
+/** Add a document to a project — a markdown note, or a link if `url` is given. */
+export async function mcpAddDocument(
+  userId: string,
+  projectId: string,
+  input: { title: string; body?: string; url?: string },
+) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that project");
+  const title = (input.title ?? "").trim().slice(0, 300);
+  if (!title) throw new Error("Title is required");
+  const { email } = await userInfo(admin, userId);
+  const kind = input.url ? "link" : "note";
+  const row: Record<string, unknown> = {
+    project_id: projectId,
+    kind,
+    title,
+    created_by: userId,
+    created_by_email: email,
+  };
+  if (kind === "link") row.url = input.url;
+  else row.body = (input.body ?? "").slice(0, 100000);
+  const { data, error } = await admin
+    .from("documents")
+    .insert(row)
+    .select("id,kind,title")
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+/** Upload a project's .env: each var is encrypted (AES-256-GCM) and stored; duplicates are skipped.
+ * PM/developer only. Frontend scope is auto-detected from NEXT_PUBLIC_/EXPO_PUBLIC_ prefixes. */
+export async function mcpUploadEnv(
+  userId: string,
+  projectId: string,
+  dotenv: string,
+  scope?: "backend" | "frontend",
+) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId, ["pm", "developer"]))) {
+    throw new Error("No access — env vars require pm or developer");
+  }
+  const entries = parseDotenv(dotenv).slice(0, 200);
+  if (entries.length === 0) throw new Error("No environment variables found");
+  const created: string[] = [];
+  let skipped = 0;
+  for (const { key, value } of entries) {
+    const sc = scope ?? (/^(NEXT_PUBLIC_|EXPO_PUBLIC_)/.test(key) ? "frontend" : "backend");
+    const id = randomUUID();
+    let ciphertext: string;
+    try {
+      ciphertext = encryptSecret(value, id);
+    } catch {
+      throw new Error("Secret encryption is not configured on the server");
+    }
+    const { error } = await admin.rpc("create_env_var_for", {
+      p_user: userId,
+      p_id: id,
+      p_project_id: projectId,
+      p_key: key,
+      p_service: null,
+      p_ciphertext: ciphertext,
+      p_scope: sc,
+    });
+    if (error) {
+      if (error.code === "23505") skipped++;
+      else throw new Error(error.message);
+    } else {
+      created.push(key);
+    }
+  }
+  return { created: created.length, skipped, keys: created };
 }
