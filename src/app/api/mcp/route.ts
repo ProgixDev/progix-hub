@@ -52,7 +52,12 @@ const handler = createMcpHandler(
       text(await mcpListProjects(userId(extra))),
     );
 
-    const URL_OPT = z.string().url().optional();
+    // http(s) only — block javascript:/data: schemes from reaching an href.
+    const URL_OPT = z
+      .string()
+      .url()
+      .refine((u) => /^https?:\/\//i.test(u), "http(s) only")
+      .optional();
 
     server.tool(
       "create_project",

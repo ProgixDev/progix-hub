@@ -521,13 +521,18 @@ export async function mcpCreateProject(
     .select("id,name")
     .single();
   if (error || !data) throw new Error(error?.message ?? "create failed");
-  // Seat the creator as PM (a default-role trigger may have added them as developer first).
-  await admin
+  // Seat the creator as PM (a default-role trigger may have added them as developer first). If
+  // this fails, roll back the orphan project so it can't be left with no manager.
+  const seat = await admin
     .from("project_members")
     .upsert(
       { project_id: data.id, user_id: userId, role: "pm" },
       { onConflict: "project_id,user_id" },
     );
+  if (seat.error) {
+    await admin.from("projects").delete().eq("id", data.id);
+    throw new Error(seat.error.message);
+  }
   return data;
 }
 
