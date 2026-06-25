@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { MemberOption, PlanItem, PlanLink, PlanSnapshot, PlanStroke } from "./types";
+import type { MemberOption, PlanItem, PlanLink, PlanSnapshot, PlanSpec, PlanStroke } from "./types";
 
 export const PLAN_COLS =
   "id,project_id,type,title,body,status,assignee,estimate_hours,parent_id,pos_x,pos_y,width,height,board_order,color,meta";
@@ -38,6 +38,18 @@ export async function listStrokes(projectId: string): Promise<PlanStroke[]> {
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);
   return (data ?? []) as PlanStroke[];
+}
+
+/** Specs/PRDs synced from the repo, newest spec number first (RLS-gated). */
+export async function listSpecs(projectId: string): Promise<PlanSpec[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("project_specs")
+    .select("id,slug,number,title,status,kind,body_md,updated_at")
+    .eq("project_id", projectId)
+    .order("number", { ascending: true, nullsFirst: false });
+  if (error) return [];
+  return (data ?? []) as PlanSpec[];
 }
 
 /** Snapshot list for a project (metadata only — newest first; RLS-gated). */

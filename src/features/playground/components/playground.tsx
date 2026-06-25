@@ -7,13 +7,14 @@ import { cn } from "@/lib/utils";
 import { clearStrokesAction, createPlanItemAction } from "../actions";
 import { usePlaygroundPresence } from "../presence";
 import { PlaygroundStoreProvider, usePlaygroundStore } from "../provider";
-import type { ItemType, MemberOption, PlanItem, PlanLink, PlanStroke } from "../types";
+import type { ItemType, MemberOption, PlanItem, PlanLink, PlanSpec, PlanStroke } from "../types";
 import { BlocksCommand, BlocksDrawer } from "./blocks-palette";
 import { Board } from "./board";
 import { Canvas } from "./canvas";
 import { Inspector } from "./inspector";
 import { PresenceBar } from "./presence-bar";
 import { SnapshotsPanel } from "./snapshots-panel";
+import { SpecsView } from "./specs-view";
 
 type Me = { id: string; name: string; initials: string };
 
@@ -26,6 +27,7 @@ export function Playground({
   items,
   links,
   strokes,
+  specs,
   assignees,
   me,
 }: {
@@ -35,6 +37,7 @@ export function Playground({
   items: PlanItem[];
   links: PlanLink[];
   strokes: PlanStroke[];
+  specs: PlanSpec[];
   assignees: MemberOption[];
   me: Me;
 }) {
@@ -44,6 +47,7 @@ export function Playground({
         projectId={projectId}
         projectName={projectName}
         backHref={backHref}
+        specs={specs}
         assignees={assignees}
         me={me}
       />
@@ -55,12 +59,14 @@ function Shell({
   projectId,
   projectName,
   backHref,
+  specs,
   assignees,
   me,
 }: {
   projectId: string;
   projectName: string;
   backHref: string;
+  specs: PlanSpec[];
   assignees: MemberOption[];
   me: Me;
 }) {
@@ -131,7 +137,7 @@ function Shell({
 
         {/* lens toggle */}
         <div className="border-line-1 ml-auto flex items-center gap-0.5 rounded-full border p-0.5">
-          {(["canvas", "board"] as const).map((l) => (
+          {(["canvas", "board", "specs"] as const).map((l) => (
             <button
               key={l}
               type="button"
@@ -255,8 +261,10 @@ function Shell({
               </div>
             )}
           </>
-        ) : (
+        ) : lens === "board" ? (
           <Board />
+        ) : (
+          <SpecsView specs={specs} />
         )}
         <Inspector assignees={assignees} />
 

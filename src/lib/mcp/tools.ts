@@ -449,3 +449,40 @@ export async function mcpUploadEnv(
   }
   return { created: created.length, skipped, keys: created };
 }
+
+/** Sync a project's specs/PRDs from the repo (upsert by slug) for the playground's Specs lens. */
+export async function mcpSyncSpecs(
+  userId: string,
+  projectId: string,
+  specs: {
+    slug: string;
+    number?: number;
+    title?: string;
+    status?: string;
+    kind?: string;
+    body_md?: string;
+  }[],
+) {
+  const admin = createAdminClient();
+  if (!(await canAccess(admin, userId, projectId))) throw new Error("No access to that project");
+  const rows = (specs ?? [])
+    .filter((s) => s.slug)
+    .slice(0, 100)
+    .map((s) => ({
+      project_id: projectId,
+      slug: s.slug.slice(0, 120),
+      number: typeof s.number === "number" ? s.number : null,
+      title: (s.title ?? s.slug).slice(0, 300),
+      status: (s.status ?? "draft").slice(0, 40),
+      kind: s.kind === "prd" ? "prd" : "spec",
+      body_md: (s.body_md ?? "").slice(0, 100000),
+      created_by: userId,
+      updated_at: new Date().toISOString(),
+    }));
+  if (rows.length === 0) throw new Error("No specs provided");
+  const { error } = await admin
+    .from("project_specs")
+    .upsert(rows, { onConflict: "project_id,slug" });
+  if (error) throw new Error(error.message);
+  return { synced: rows.length };
+}
