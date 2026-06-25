@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { MemberOption, PlanItem, PlanLink, PlanSnapshot } from "./types";
+import type { MemberOption, PlanItem, PlanLink, PlanSnapshot, PlanStroke } from "./types";
 
 export const PLAN_COLS =
   "id,project_id,type,title,body,status,assignee,estimate_hours,parent_id,pos_x,pos_y,width,height,board_order,color,meta";
@@ -26,6 +26,18 @@ export async function listPlanLinks(projectId: string): Promise<PlanLink[]> {
     .eq("project_id", projectId);
   if (error) throw new Error(error.message);
   return (data ?? []) as PlanLink[];
+}
+
+/** Freehand sketch strokes for a project (RLS gates to project members). */
+export async function listStrokes(projectId: string): Promise<PlanStroke[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("plan_drawings")
+    .select("id,points,color,width")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as PlanStroke[];
 }
 
 /** Snapshot list for a project (metadata only — newest first; RLS-gated). */

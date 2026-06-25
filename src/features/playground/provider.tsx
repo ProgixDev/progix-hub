@@ -3,7 +3,7 @@
 import { createContext, useContext, useState } from "react";
 import { useStore } from "zustand";
 import { createPlaygroundStore, type PlaygroundState, type PlaygroundStore } from "./store";
-import type { PlanItem, PlanLink } from "./types";
+import type { PlanItem, PlanLink, PlanStroke } from "./types";
 
 const PlaygroundStoreContext = createContext<PlaygroundStore | null>(null);
 
@@ -11,13 +11,15 @@ const PlaygroundStoreContext = createContext<PlaygroundStore | null>(null);
 export function PlaygroundStoreProvider({
   items,
   links,
+  strokes,
   children,
 }: {
   items: PlanItem[];
   links: PlanLink[];
+  strokes: PlanStroke[];
   children: React.ReactNode;
 }) {
-  const [store] = useState(() => createPlaygroundStore(items, links));
+  const [store] = useState(() => createPlaygroundStore(items, links, strokes));
   return (
     <PlaygroundStoreContext.Provider value={store}>{children}</PlaygroundStoreContext.Provider>
   );

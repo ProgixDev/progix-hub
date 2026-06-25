@@ -1,6 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 import { getProject } from "@/features/projects";
-import { listAssignees, listPlanItems, listPlanLinks, Playground } from "@/features/playground";
+import {
+  listAssignees,
+  listPlanItems,
+  listPlanLinks,
+  listStrokes,
+  Playground,
+} from "@/features/playground";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 
 /** Full-screen, per-project planning playground (spec 022). Team-only; no AppShell chrome. */
@@ -11,10 +17,11 @@ export default async function PlaygroundPage({ params }: { params: Promise<{ id:
   const role = await getProjectRole(id);
   if (!role) notFound();
 
-  const [project, items, links, assignees] = await Promise.all([
+  const [project, items, links, strokes, assignees] = await Promise.all([
     getProject(id),
     listPlanItems(id),
     listPlanLinks(id),
+    listStrokes(id),
     listAssignees(id),
   ]);
   if (!project) notFound();
@@ -26,6 +33,7 @@ export default async function PlaygroundPage({ params }: { params: Promise<{ id:
       backHref={`/projects/${id}`}
       items={items}
       links={links}
+      strokes={strokes}
       assignees={assignees}
       me={{
         id: user.id,

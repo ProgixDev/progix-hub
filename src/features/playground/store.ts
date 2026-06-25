@@ -1,5 +1,5 @@
 import { createStore } from "zustand/vanilla";
-import type { Lens, Peer, PlanItem, PlanLink, RemoteCursor } from "./types";
+import type { Lens, Peer, PlanItem, PlanLink, PlanStroke, RemoteCursor } from "./types";
 
 export type PlaygroundState = {
   items: PlanItem[];
@@ -37,13 +37,24 @@ export type PlaygroundState = {
   syncPlan: (items: PlanItem[], links: PlanLink[]) => void;
   /** Apply a remote patch to one item (e.g. live drag) WITHOUT bumping localRev (no echo). */
   syncPatch: (id: string, patch: Partial<PlanItem>) => void;
+  /** Freehand sketch strokes (draw mode). */
+  strokes: PlanStroke[];
+  /** Add a stroke (local commit or remote sync); de-dupes by id so echoes are harmless. */
+  addStroke: (stroke: PlanStroke) => void;
+  /** Wipe all strokes (local or remote clear). */
+  clearStrokes: () => void;
 };
 
 /** Holds the plan items + links (seeded from the server) + canvas/board UI state. One per mount. */
-export function createPlaygroundStore(initial: PlanItem[], initialLinks: PlanLink[]) {
+export function createPlaygroundStore(
+  initial: PlanItem[],
+  initialLinks: PlanLink[],
+  initialStrokes: PlanStroke[] = [],
+) {
   return createStore<PlaygroundState>((set) => ({
     items: initial,
     links: initialLinks,
+    strokes: initialStrokes,
     selectedId: null,
     selectedLinkId: null,
     editingId: null,
@@ -111,6 +122,11 @@ export function createPlaygroundStore(initial: PlanItem[], initialLinks: PlanLin
     syncPlan: (items, links) => set({ items, links }),
     syncPatch: (id, patch) =>
       set((s) => ({ items: s.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) })),
+    addStroke: (stroke) =>
+      set((s) =>
+        s.strokes.some((x) => x.id === stroke.id) ? s : { strokes: [...s.strokes, stroke] },
+      ),
+    clearStrokes: () => set({ strokes: [] }),
   }));
 }
 
