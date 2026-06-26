@@ -26,7 +26,9 @@ import {
 } from "@/features/projects";
 import { getProjectSetup, SetupPanel } from "@/features/setup";
 import { DigestSection, getLatestDigest } from "@/features/digests";
+import { ReleaseNotesSection, listReleaseNotes } from "@/features/release-notes";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
+import { aiConfigured } from "@/lib/ai/openai";
 import { capabilities } from "@/lib/auth/roles";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -64,6 +66,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const reports = await listProjectReports(id);
   // The project's latest AI weekly digest (spec 038) — any member reads; PMs generate.
   const digest = await getLatestDigest(id);
+  // Release notes / changelog (spec 040) — members read; PMs compose, optionally AI-drafted.
+  const releaseNotes = await listReleaseNotes(id);
   // Setup checklist counts (managers only — they configure the project).
   const configCounts = can.manageProject
     ? await getProjectConfigCounts(id)
@@ -154,6 +158,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       />
       <ReportsSection reports={reports} />
       <DigestSection projectId={id} digest={digest} canGenerate={can.manageProject} />
+      <ReleaseNotesSection
+        projectId={id}
+        notes={releaseNotes}
+        canWrite={can.manageProject}
+        aiEnabled={aiConfigured()}
+      />
     </AppShell>
   );
 }
