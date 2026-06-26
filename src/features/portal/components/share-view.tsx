@@ -3,6 +3,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 import { formatDate } from "@/lib/format";
 import { formatBytes, cardsForBlock, validateAttachment } from "../lib";
 import {
@@ -11,7 +13,7 @@ import {
   submitPortalCommentAction,
   submitPortalProposalAction,
 } from "../public-actions";
-import type { PortalPhase, PublicPortal } from "../types";
+import type { PortalPhase, PortalReleaseNote, PublicPortal } from "../types";
 import { StatusBadge } from "./status-badge";
 
 const NAME_KEY = "portal-client-name";
@@ -24,10 +26,12 @@ const btn =
 export function ShareView({
   portal,
   roadmap,
+  releaseNotes = [],
   token,
 }: {
   portal: PublicPortal;
   roadmap: PortalPhase[];
+  releaseNotes?: PortalReleaseNote[];
   token: string;
 }) {
   const t = useTranslations("portal");
@@ -126,6 +130,28 @@ export function ShareView({
               </ul>
             </div>
           )}
+        </div>
+      )}
+
+      {releaseNotes.length > 0 && (
+        <div className="glass mt-8 rounded-2xl p-5">
+          <h2 className="text-text text-[15px] font-semibold">{t("whatsNewTitle")}</h2>
+          <ul className="mt-3 flex flex-col gap-5">
+            {releaseNotes.map((n) => (
+              <li key={n.id} className="border-line border-t pt-4 first:border-t-0 first:pt-0">
+                <div className="flex items-baseline gap-2">
+                  {n.version && (
+                    <span className="text-text-3 font-mono text-[12px]">{n.version}</span>
+                  )}
+                  <h3 className="text-text text-[14px] font-semibold">{n.title}</h3>
+                </div>
+                <p className="text-text-3 mt-0.5 text-[11.5px]">{n.created_at.slice(0, 10)}</p>
+                <div className="md-body mt-2 text-[13px]">
+                  <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{n.body_md}</ReactMarkdown>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
