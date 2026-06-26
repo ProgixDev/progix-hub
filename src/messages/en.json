@@ -577,8 +577,16 @@
   },
   "commands": {
     "title": "Commands",
-    "placeholder": "Search commands…",
-    "empty": "No matching command"
+    "placeholder": "Search projects, docs, specs, people…",
+    "empty": "No matching command",
+    "searching": "Searching…",
+    "noResults": "No results",
+    "kind_project": "Project",
+    "kind_document": "Doc",
+    "kind_spec": "Spec",
+    "kind_task": "Task",
+    "kind_member": "Person",
+    "kind_tutorial": "Tutorial"
   },
   "releaseNotes": {
     "title": "Release notes",

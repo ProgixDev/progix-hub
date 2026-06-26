@@ -16,11 +16,43 @@ import { cn } from "@/lib/utils";
 /** Fire this to open the command menu (the top-bar "Commands" button + sidebar search dispatch it). */
 export const COMMANDS_EVENT = "pg:commands";
 
-type Command = { id: string; label: string; icon: React.ReactNode; run: () => void };
+type Command = {
+  id: string;
+  label: string;
+  sublabel?: string | null;
+  icon: React.ReactNode;
+  run: () => void;
+};
+
+/** A search hit from /api/search (kept local — components can't import feature types). */
+type SearchHit = {
+  kind: "project" | "document" | "spec" | "task" | "tutorial" | "member";
+  id: string;
+  title: string;
+  subtitle: string | null;
+  project_id: string | null;
+};
+
+function destFor(h: SearchHit): string {
+  switch (h.kind) {
+    case "project":
+      return `/projects/${h.id}`;
+    case "document":
+      return `/projects/${h.project_id}`;
+    case "spec":
+    case "task":
+      return `/projects/${h.project_id}/playground`;
+    case "member":
+      return `/members/${h.id}`;
+    case "tutorial":
+      return "/tutorials";
+  }
+}
 
 /**
- * The ⌘K command menu — navigate the app + quick actions from anywhere. Opened by ⌘/Ctrl-K,
- * the top-bar Commands button, or the sidebar search. Navigation only; no backend.
+ * The ⌘K command menu — navigate the app, quick actions, and global search from anywhere. Opened by
+ * ⌘/Ctrl-K, the top-bar Commands button, or the sidebar search. Typing ≥2 chars searches projects,
+ * docs, specs, tasks, members, and tutorials via /api/search (RLS-scoped server-side).
  */
 export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
   const t = useTranslations("nav");
@@ -29,13 +61,15 @@ export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const [hits, setHits] = useState<SearchHit[]>([]);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const openRef = useRef(false);
 
-  // Open/close from event handlers (not effect bodies) so resets + focus stay side-effect clean.
   function openMenu() {
     setQuery("");
     setActive(0);
+    setHits([]);
     openRef.current = true;
     setOpen(true);
     window.setTimeout(() => inputRef.current?.focus(), 0);
@@ -45,8 +79,34 @@ export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
     setOpen(false);
   }
 
+  // Debounced global search — only when open and the query is meaningful. State is set inside the
+  // deferred callback (never synchronously in the effect body) to avoid cascading renders.
+  useEffect(() => {
+    const q = query.trim();
+    if (!open || q.length < 2) return;
+    const ctrl = new AbortController();
+    const id = window.setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: ctrl.signal });
+        if (res.ok) {
+          const data = (await res.json()) as { results?: SearchHit[] };
+          setHits(data.results ?? []);
+        }
+      } catch {
+        /* aborted or offline — keep prior hits */
+      } finally {
+        setLoading(false);
+      }
+    }, 180);
+    return () => {
+      window.clearTimeout(id);
+      ctrl.abort();
+    };
+  }, [query, open]);
+
   const commands = useMemo<Command[]>(() => {
-    const all: Command[] = [
+    const nav: Command[] = [
       {
         id: "new",
         label: t("newProject"),
@@ -83,8 +143,24 @@ export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
       },
     ];
     const q = query.trim().toLowerCase();
-    return q ? all.filter((c) => c.label.toLowerCase().includes(q)) : all;
-  }, [query, showMembers, router, t]);
+    const navFiltered = q ? nav.filter((c) => c.label.toLowerCase().includes(q)) : nav;
+
+    // Only surface backend hits once the query is meaningful; ignore stale hits for short queries.
+    const showHits = q.length >= 2;
+    const hitCommands: Command[] = (showHits ? hits : []).map((h) => ({
+      id: `${h.kind}:${h.id}`,
+      label: h.title,
+      sublabel: h.subtitle,
+      icon: (
+        <span className="bg-bg-inset text-text-2 grid h-5 min-w-[36px] place-items-center rounded px-1 text-[9.5px] font-semibold tracking-wide uppercase">
+          {tc(`kind_${h.kind}` as "kind_project")}
+        </span>
+      ),
+      run: () => router.push(destFor(h)),
+    }));
+
+    return [...navFiltered, ...hitCommands];
+  }, [query, hits, showMembers, router, t, tc]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -113,6 +189,8 @@ export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
     closeMenu();
     c.run();
   }
+
+  const hasQuery = query.trim().length >= 2;
 
   return (
     <div
@@ -150,10 +228,13 @@ export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
             aria-label={tc("placeholder")}
             className="placeholder:text-text-3 text-text h-12 w-full bg-transparent text-[14px] outline-none"
           />
+          {loading && <span className="text-text-3 flex-none text-[11px]">{tc("searching")}</span>}
         </div>
         <ul className="max-h-[52vh] overflow-auto p-2">
           {commands.length === 0 ? (
-            <li className="text-text-3 px-3 py-6 text-center text-[13px]">{tc("empty")}</li>
+            <li className="text-text-3 px-3 py-6 text-center text-[13px]">
+              {hasQuery && !loading ? tc("noResults") : tc("empty")}
+            </li>
           ) : (
             commands.map((c, i) => (
               <li key={c.id}>
@@ -168,8 +249,13 @@ export function CommandMenu({ showMembers }: { showMembers?: boolean }) {
                       : "text-text-1 hover:bg-bg-2",
                   )}
                 >
-                  <span className="text-text-2">{c.icon}</span>
-                  {c.label}
+                  <span className="text-text-2 flex-none">{c.icon}</span>
+                  <span className="min-w-0 flex-1 truncate">{c.label}</span>
+                  {c.sublabel && (
+                    <span className="text-text-3 flex-none truncate text-[11.5px]">
+                      {c.sublabel}
+                    </span>
+                  )}
                 </button>
               </li>
             ))
