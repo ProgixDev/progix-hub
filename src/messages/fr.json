@@ -577,8 +577,16 @@
   },
   "commands": {
     "title": "Commandes",
-    "placeholder": "Rechercher une commande…",
-    "empty": "Aucune commande"
+    "placeholder": "Rechercher projets, docs, specs, personnes…",
+    "empty": "Aucune commande",
+    "searching": "Recherche…",
+    "noResults": "Aucun résultat",
+    "kind_project": "Projet",
+    "kind_document": "Doc",
+    "kind_spec": "Spec",
+    "kind_task": "Tâche",
+    "kind_member": "Personne",
+    "kind_tutorial": "Tutoriel"
   },
   "releaseNotes": {
     "title": "Notes de version",
