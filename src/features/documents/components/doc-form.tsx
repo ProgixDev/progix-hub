@@ -1,8 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
-import { Modal } from "@/components/ui/modal";
+import { useEffect, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 import {
   addLinkDocumentAction,
   addNoteDocumentAction,
@@ -11,6 +13,7 @@ import {
 } from "../actions";
 import { useDocumentsStore } from "../provider";
 import type { ProjectDocument } from "../types";
+import { Modal } from "@/components/ui/modal";
 
 const inputCls =
   "bg-bg-inset border-line-1 focus:border-line-blue text-text placeholder:text-text-3 w-full rounded-xl border px-3.5 py-2.5 text-[14px] outline-none focus:ring-2 focus:ring-[var(--blue-ring)]";
@@ -30,6 +33,17 @@ export function DocForm({ projectId }: { projectId: string }) {
       : modal.mode === "add-note"
         ? "note"
         : (editing!.kind as "link" | "note"); // file is excluded by the guard above
+  // Notes are written full-screen with a live preview; links stay a quick modal.
+  if (kind === "note") {
+    return (
+      <DocNoteCompose
+        key={editing?.id ?? modal.mode}
+        projectId={projectId}
+        editing={editing}
+        onClose={close}
+      />
+    );
+  }
   return (
     <DocFormModal
       key={editing?.id ?? modal.mode}
@@ -39,6 +53,98 @@ export function DocForm({ projectId }: { projectId: string }) {
       editing={editing}
       onClose={close}
     />
+  );
+}
+
+/** Full-screen markdown note editor with live preview. */
+function DocNoteCompose({
+  projectId,
+  editing,
+  onClose,
+}: {
+  projectId: string;
+  editing: ProjectDocument | null;
+  onClose: () => void;
+}) {
+  const t = useTranslations("documents");
+  const tCommon = useTranslations("common");
+  const [pending, start] = useTransition();
+  const [title, setTitle] = useState(editing?.title ?? "");
+  const [body, setBody] = useState(editing?.body ?? "");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  function save() {
+    setError(null);
+    start(async () => {
+      const input = { title, body };
+      const res: ActionResult = editing
+        ? await updateDocumentAction(editing.id, projectId, "note", input)
+        : await addNoteDocumentAction(projectId, input);
+      if (res.ok) onClose();
+      else setError(res.error ?? null);
+    });
+  }
+
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div className="bg-bg fixed inset-0 z-50 flex flex-col">
+      <div className="glow-orb" aria-hidden />
+      <header className="border-line flex flex-none flex-wrap items-center gap-3 border-b px-4 py-3 sm:px-5">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder={t("fieldTitle")}
+          autoFocus
+          className="text-text placeholder:text-text-3 h-9 min-w-0 flex-1 bg-transparent text-[15px] font-semibold outline-none"
+        />
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full px-3.5 text-[13.5px] font-medium transition-colors"
+        >
+          {tCommon("cancel")}
+        </button>
+        <button
+          type="button"
+          onClick={save}
+          disabled={pending || !title.trim() || !body.trim()}
+          className="btn-primary h-9 rounded-full px-4 text-[13.5px] font-medium transition-all disabled:opacity-60"
+        >
+          {pending ? tCommon("saving") : editing ? tCommon("save") : tCommon("add")}
+        </button>
+      </header>
+      {error && (
+        <p className="border-red/30 bg-red-tint text-red-text mx-4 mt-3 rounded-xl border px-3.5 py-2.5 text-[13px] sm:mx-5">
+          {error}
+        </p>
+      )}
+      <div className="grid min-h-0 flex-1 lg:grid-cols-2">
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder={"# Heading\n\n- bullet\n- **bold**, _italic_, [link](https://…)"}
+          className="text-text placeholder:text-text-3 min-h-0 flex-1 resize-none border-[var(--line)] bg-transparent px-4 py-4 font-mono text-[13.5px] leading-relaxed outline-none sm:px-6 lg:border-r"
+        />
+        <div className="hidden min-h-0 overflow-y-auto px-6 py-4 lg:block">
+          {body.trim() ? (
+            <div className="md-body mx-auto max-w-2xl">
+              <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{body}</ReactMarkdown>
+            </div>
+          ) : (
+            <p className="text-text-3 text-[13px]">{t("notePreviewHint")}</p>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 

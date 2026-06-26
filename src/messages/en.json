@@ -210,6 +210,7 @@
     "fieldTitle": "Title",
     "fieldUrl": "URL",
     "fieldNote": "Note",
+    "notePreviewHint": "Your note preview appears here as you type.",
     "download": "Download",
     "restore": "Restore",
     "archive": "Archive",
