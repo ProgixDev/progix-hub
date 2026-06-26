@@ -13,8 +13,8 @@ export type SetupPlatform = {
   invite_role: string | null;
   invite_email: string | null;
   key_label: string | null;
-  /** Client-visible embed videos attached to this platform, each labeled by purpose (spec 020). */
-  videos: { label: string | null; embed_url: string }[];
+  /** Client-visible tutorials: labeled video + markdown guide (spec 020/033). */
+  videos: { label: string | null; embed_url: string; body_md: string | null }[];
 };
 
 export type SetupStep = {
