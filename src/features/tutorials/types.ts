@@ -17,6 +17,8 @@ export type Tutorial = {
   storage_path: string | null;
   language: Language | null;
   visible_to_clients: boolean;
+  /** A written, markdown step-by-step guide that accompanies the video (spec 033). */
+  body_md: string | null;
   created_at: string;
   updated_at: string;
 };
