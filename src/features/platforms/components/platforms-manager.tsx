@@ -105,6 +105,11 @@ function Inner({ platforms, canManage }: { platforms: Platform[]; canManage: boo
                   {t(PATTERN_KEY[p.access_pattern])}
                 </p>
               </div>
+              {p.clientGuides > 0 ? (
+                <Badge tone="green">{t("guideReady")}</Badge>
+              ) : (
+                <Badge tone="amber">{t("guideMissing")}</Badge>
+              )}
               {p.critical && <Badge tone="amber">{t("criticalBadge")}</Badge>}
               {p.disabled && <Badge tone="neutral">{t("disabledBadge")}</Badge>}
               {canManage && (

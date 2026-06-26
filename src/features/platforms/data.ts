@@ -5,13 +5,13 @@ import type { Platform, PlatformTutorial } from "./types";
 
 const COLS =
   "id,name,service_id,access_pattern,critical,steps,invite_url,invite_role,invite_email,key_label,disabled,created_at,updated_at," +
-  "platform_tutorials(tutorial_id,label,position,tutorials(title))";
+  "platform_tutorials(tutorial_id,label,position,tutorials(title,visible_to_clients,body_md))";
 
 type PlatformLink = {
   tutorial_id: string;
   label: string | null;
   position: number;
-  tutorials: { title?: string } | null;
+  tutorials: { title?: string; visible_to_clients?: boolean; body_md?: string | null } | null;
 };
 type RawPlatformRow = Record<string, unknown> & { platform_tutorials?: PlatformLink[] };
 
@@ -25,7 +25,11 @@ export async function listPlatforms(): Promise<Platform[]> {
     const tutorials: PlatformTutorial[] = [...platform_tutorials]
       .sort((a, b) => a.position - b.position)
       .map((l) => ({ tutorial_id: l.tutorial_id, label: l.label, title: l.tutorials?.title }));
-    return { ...(rest as object), tutorials } as Platform;
+    // Coverage: how many attached tutorials are client-visible AND carry a written guide.
+    const clientGuides = platform_tutorials.filter(
+      (l) => l.tutorials?.visible_to_clients && (l.tutorials?.body_md ?? "").trim().length > 0,
+    ).length;
+    return { ...(rest as object), tutorials, clientGuides } as Platform;
   });
 }
 

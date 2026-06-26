@@ -434,6 +434,8 @@
     "fieldCritical": "Critique — ne jamais partager d’identifiants, seulement inviter",
     "criticalBadge": "Critique",
     "disabledBadge": "Désactivée",
+    "guideReady": "Guide prêt",
+    "guideMissing": "Pas de guide client",
     "disable": "Désactiver",
     "enable": "Activer",
     "deleteConfirm": "Supprimer « {name} » du registre ? Action irréversible.",

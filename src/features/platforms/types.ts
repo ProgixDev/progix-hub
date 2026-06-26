@@ -17,6 +17,8 @@ export type Platform = {
   steps: string[];
   /** Tutorials attached from the library, each labeled by purpose (spec 020). */
   tutorials: PlatformTutorial[];
+  /** How many attached tutorials are client-visible AND have a written guide (coverage, spec 033). */
+  clientGuides: number;
   // invite_collaborator pattern:
   invite_url: string | null;
   invite_role: string | null;

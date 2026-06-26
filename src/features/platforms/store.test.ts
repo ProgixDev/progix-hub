@@ -10,6 +10,7 @@ const platform: Platform = {
   critical: true,
   steps: ["Open settings"],
   tutorials: [],
+  clientGuides: 0,
   invite_url: "https://x.com",
   invite_role: "Dev",
   invite_email: "dev@progix.com",
