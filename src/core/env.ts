@@ -33,6 +33,12 @@ const serverEnvSchema = z.object({
   // names the org for the membership gate.
   GITHUB_TOKEN: z.string().min(1).optional(),
   GITHUB_ORG_ID: z.string().min(1).optional(),
+  // AI weekly digest (spec 038). The OpenAI API key drives the per-project digest generator.
+  // Optional at parse so builds/CI stay green before the secret is provisioned; the digest action
+  // fails soft ("not configured") when absent. NEVER expose client-side (no NEXT_PUBLIC_ prefix).
+  // OPENAI_DIGEST_MODEL overrides the model (defaults to gpt-4o). Mirror in .env.example.
+  OPENAI_API_KEY: z.string().min(1).optional(),
+  OPENAI_DIGEST_MODEL: z.string().min(1).optional(),
 });
 
 export const env = serverEnvSchema.parse(process.env);

@@ -24,6 +24,7 @@ import {
   type Project,
 } from "@/features/projects";
 import { getProjectSetup, SetupPanel } from "@/features/setup";
+import { DigestSection, getLatestDigest } from "@/features/digests";
 import { getCurrentUser, getProjectRole } from "@/lib/auth/session";
 import { capabilities } from "@/lib/auth/roles";
 
@@ -60,6 +61,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const dossier = await getClientDossier(id);
   // Team-only daily reports for this project (spec 021).
   const reports = await listProjectReports(id);
+  // The project's latest AI weekly digest (spec 038) — any member reads; PMs generate.
+  const digest = await getLatestDigest(id);
   // Setup checklist counts (managers only — they configure the project).
   const configCounts = can.manageProject
     ? await getProjectConfigCounts(id)
@@ -148,6 +151,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         canWrite={can.writeContent}
       />
       <ReportsSection reports={reports} />
+      <DigestSection projectId={id} digest={digest} canGenerate={can.manageProject} />
     </AppShell>
   );
 }

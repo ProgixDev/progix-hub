@@ -573,6 +573,20 @@
     "placeholder": "Search commands…",
     "empty": "No matching command"
   },
+  "digests": {
+    "title": "Weekly digest",
+    "subtitle": "An AI summary of this project’s past week — reports, activity, and progress.",
+    "generate": "Generate",
+    "regenerate": "Regenerate",
+    "generating": "Generating…",
+    "meta": "Generated {date} · {model}",
+    "empty": "No digest yet.",
+    "emptyManager": "No digest yet — generate one to summarize this week.",
+    "errorNotAuthorized": "You don’t have permission to generate a digest.",
+    "errorNotConfigured": "AI digests aren’t configured yet (missing OpenAI key).",
+    "errorNoActivity": "Not enough activity this week to summarize.",
+    "errorFailed": "Couldn’t generate the digest. Please try again."
+  },
   "reports": {
     "button": "Daily report",
     "title": "Post a daily report",

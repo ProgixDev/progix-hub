@@ -573,6 +573,20 @@
     "placeholder": "Rechercher une commande…",
     "empty": "Aucune commande"
   },
+  "digests": {
+    "title": "Résumé hebdomadaire",
+    "subtitle": "Un résumé IA de la semaine du projet — rapports, activité et progression.",
+    "generate": "Générer",
+    "regenerate": "Régénérer",
+    "generating": "Génération…",
+    "meta": "Généré le {date} · {model}",
+    "empty": "Pas encore de résumé.",
+    "emptyManager": "Pas encore de résumé — générez-en un pour résumer la semaine.",
+    "errorNotAuthorized": "Vous n’avez pas la permission de générer un résumé.",
+    "errorNotConfigured": "Les résumés IA ne sont pas encore configurés (clé OpenAI manquante).",
+    "errorNoActivity": "Pas assez d’activité cette semaine pour faire un résumé.",
+    "errorFailed": "Impossible de générer le résumé. Veuillez réessayer."
+  },
   "reports": {
     "button": "Rapport quotidien",
     "title": "Publier un rapport quotidien",
