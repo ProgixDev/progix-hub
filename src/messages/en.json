@@ -70,6 +70,12 @@
     "commands": "Commands",
     "recentActivity": "Recent activity"
   },
+  "notifications": {
+    "aria": "Notifications",
+    "title": "Notifications",
+    "empty": "You’re all caught up.",
+    "viewAll": "View all activity"
+  },
   "auth": {
     "continueWithGithub": "Continue with GitHub",
     "redirecting": "Redirecting…",

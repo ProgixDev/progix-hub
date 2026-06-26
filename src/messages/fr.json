@@ -70,6 +70,12 @@
     "commands": "Commandes",
     "recentActivity": "Activité récente"
   },
+  "notifications": {
+    "aria": "Notifications",
+    "title": "Notifications",
+    "empty": "Vous êtes à jour.",
+    "viewAll": "Voir toute l’activité"
+  },
   "auth": {
     "continueWithGithub": "Continuer avec GitHub",
     "redirecting": "Redirection…",
