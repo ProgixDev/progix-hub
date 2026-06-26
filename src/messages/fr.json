@@ -210,6 +210,7 @@
     "fieldTitle": "Titre",
     "fieldUrl": "URL",
     "fieldNote": "Note",
+    "notePreviewHint": "L’aperçu de votre note s’affiche ici au fil de la saisie.",
     "download": "Télécharger",
     "restore": "Restaurer",
     "archive": "Archiver",
