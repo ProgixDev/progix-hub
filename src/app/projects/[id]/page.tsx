@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
+import { NotificationsBell } from "@/features/activity";
 import { UserMenu } from "@/features/auth";
 import { DailyReportButton, ReportsSection, listProjectReports } from "@/features/reports";
 import { ClockWidget } from "@/features/time-tracking";
@@ -84,6 +85,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       recent={toRecent(projects)}
       showMembers={showMembers}
       clockSlot={<ClockWidget />}
+      notificationsSlot={<NotificationsBell />}
       reportSlot={<DailyReportButton />}
       userSlot={user && <UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >

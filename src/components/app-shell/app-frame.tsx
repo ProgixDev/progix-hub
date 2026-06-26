@@ -13,6 +13,7 @@ export function AppFrame({
   userSlot,
   clockSlot,
   reportSlot,
+  notificationsSlot,
   showMembers,
   children,
 }: {
@@ -21,6 +22,7 @@ export function AppFrame({
   userSlot?: React.ReactNode;
   clockSlot?: React.ReactNode;
   reportSlot?: React.ReactNode;
+  notificationsSlot?: React.ReactNode;
   showMembers?: boolean;
   children: React.ReactNode;
 }) {
@@ -41,6 +43,7 @@ export function AppFrame({
           userSlot={userSlot}
           clockSlot={clockSlot}
           reportSlot={reportSlot}
+          notificationsSlot={notificationsSlot}
           onMenu={() => setNavOpen(true)}
         />
         <main className="min-h-0 flex-1 overflow-auto">

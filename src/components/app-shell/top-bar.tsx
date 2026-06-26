@@ -9,12 +9,14 @@ export function TopBar({
   userSlot,
   clockSlot,
   reportSlot,
+  notificationsSlot,
   onMenu,
 }: {
   title: string;
   userSlot?: React.ReactNode;
   clockSlot?: React.ReactNode;
   reportSlot?: React.ReactNode;
+  notificationsSlot?: React.ReactNode;
   onMenu: () => void;
 }) {
   const t = useTranslations("topbar");
@@ -53,6 +55,7 @@ export function TopBar({
             ⌘K
           </kbd>
         </button>
+        {notificationsSlot}
         {userSlot ?? (
           <span className="bg-blue-deep border-line-blue text-blue-text flex size-9 items-center justify-center rounded-full border text-[12px] font-semibold">
             AR

@@ -12,6 +12,7 @@ export function AppShell({
   userSlot,
   clockSlot,
   reportSlot,
+  notificationsSlot,
   showMembers,
   children,
 }: {
@@ -20,6 +21,7 @@ export function AppShell({
   userSlot?: React.ReactNode;
   clockSlot?: React.ReactNode;
   reportSlot?: React.ReactNode;
+  notificationsSlot?: React.ReactNode;
   showMembers?: boolean;
   children: React.ReactNode;
 }) {
@@ -30,6 +32,7 @@ export function AppShell({
       userSlot={userSlot}
       clockSlot={clockSlot}
       reportSlot={reportSlot}
+      notificationsSlot={notificationsSlot}
       showMembers={showMembers}
     >
       {children}

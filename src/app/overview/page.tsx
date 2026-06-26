@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
+import { NotificationsBell } from "@/features/activity";
 import { UserMenu } from "@/features/auth";
 import {
   getProjectHealth,
@@ -57,6 +58,7 @@ export default async function OverviewPage() {
       recent={toRecent(projects)}
       showMembers={showMembers}
       clockSlot={<ClockWidget />}
+      notificationsSlot={<NotificationsBell />}
       reportSlot={<DailyReportButton />}
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
