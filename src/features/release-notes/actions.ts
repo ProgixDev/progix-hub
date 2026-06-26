@@ -76,7 +76,8 @@ export async function updateReleaseNoteAction(
   const { error } = await supabase
     .from("release_notes")
     .update({ ...parsed.data, updated_at: new Date().toISOString() })
-    .eq("id", id.data);
+    .eq("id", id.data)
+    .eq("project_id", pid.data);
   if (error) return { ok: false, error: t("errorFailed") };
   revalidatePath(`/projects/${pid.data}`);
   return { ok: true };
@@ -95,7 +96,11 @@ export async function deleteReleaseNoteAction(
   const supabase = await createClient();
   if (!(await isPm(supabase, user, pid.data))) return { ok: false, error: t("errorNotAuthorized") };
 
-  const { error } = await supabase.from("release_notes").delete().eq("id", id.data);
+  const { error } = await supabase
+    .from("release_notes")
+    .delete()
+    .eq("id", id.data)
+    .eq("project_id", pid.data);
   if (error) return { ok: false, error: t("errorFailed") };
   revalidatePath(`/projects/${pid.data}`);
   return { ok: true };
