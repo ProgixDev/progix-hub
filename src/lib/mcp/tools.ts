@@ -623,3 +623,111 @@ export async function mcpGetProjectStatus(userId: string, projectId: string) {
     client_portal: (portal.count ?? 0) > 0,
   };
 }
+
+// ---- Tutorials + platforms (build a client onboarding) ----------------------
+
+/** Org-config writers are superadmins / global PMs (matches tutorials + platforms RLS). */
+async function isOrgManager(admin: Admin, userId: string): Promise<boolean> {
+  const { data } = await admin.auth.admin.getUserById(userId);
+  const m = (data?.user?.app_metadata ?? {}) as Record<string, unknown>;
+  return Boolean(m.is_superadmin || m.is_global_pm);
+}
+
+/** Create a tutorial (embed video + markdown guide). Superadmin / global PM only. */
+export async function mcpCreateTutorial(
+  userId: string,
+  input: {
+    title: string;
+    embed_url: string;
+    body_md?: string;
+    platform_service_id?: string;
+    language?: string;
+    visible_to_clients?: boolean;
+  },
+) {
+  const admin = createAdminClient();
+  if (!(await isOrgManager(admin, userId)))
+    throw new Error("Only superadmins or global PMs can create tutorials");
+  const title = (input.title ?? "").trim().slice(0, 200);
+  if (!title) throw new Error("Title is required");
+  const url = (input.embed_url ?? "").trim();
+  if (!/^https?:\/\//i.test(url)) throw new Error("embed_url must be a video URL");
+  const { data, error } = await admin
+    .from("tutorials")
+    .insert({
+      title,
+      source_type: "embed",
+      embed_url: url,
+      body_md: input.body_md?.slice(0, 50000) ?? null,
+      platform_service_id: input.platform_service_id ?? null,
+      language: input.language === "en" || input.language === "fr" ? input.language : null,
+      visible_to_clients: input.visible_to_clients ?? true,
+    })
+    .select("id,title")
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+/** Attach a tutorial to a platform with a purpose label. Superadmin / global PM only. */
+export async function mcpLinkTutorial(
+  userId: string,
+  platformId: string,
+  tutorialId: string,
+  label?: string,
+) {
+  const admin = createAdminClient();
+  if (!(await isOrgManager(admin, userId)))
+    throw new Error("Only superadmins or global PMs can link tutorials");
+  const [pl, tu] = await Promise.all([
+    admin.from("platforms").select("id").eq("id", platformId).maybeSingle(),
+    admin.from("tutorials").select("id").eq("id", tutorialId).maybeSingle(),
+  ]);
+  if (!pl.data) throw new Error("Platform not found");
+  if (!tu.data) throw new Error("Tutorial not found");
+  const existing = await admin
+    .from("platform_tutorials")
+    .select("id")
+    .eq("platform_id", platformId)
+    .eq("tutorial_id", tutorialId)
+    .maybeSingle();
+  if (existing.data) return { ok: true, already: true };
+  const { count } = await admin
+    .from("platform_tutorials")
+    .select("id", { count: "exact", head: true })
+    .eq("platform_id", platformId);
+  const { error } = await admin.from("platform_tutorials").insert({
+    platform_id: platformId,
+    tutorial_id: tutorialId,
+    label: label ?? null,
+    position: count ?? 0,
+  });
+  if (error) throw new Error(error.message);
+  return { ok: true };
+}
+
+/** The tutorial library (metadata only; has_guide instead of the full body). */
+export async function mcpListTutorials() {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("tutorials")
+    .select("id,title,platform_service_id,visible_to_clients,body_md")
+    .order("created_at", { ascending: false });
+  return (data ?? []).map((t) => ({
+    id: t.id,
+    title: t.title,
+    platform: t.platform_service_id,
+    visible_to_clients: t.visible_to_clients,
+    has_guide: Boolean((t.body_md ?? "").trim()),
+  }));
+}
+
+/** The platform registry (id, name, access pattern) — for linking tutorials. */
+export async function mcpListPlatforms() {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("platforms")
+    .select("id,name,service_id,access_pattern,disabled")
+    .order("name");
+  return data ?? [];
+}

@@ -7,15 +7,19 @@ import {
   mcpBulkCreatePlan,
   mcpCreateItem,
   mcpCreateProject,
+  mcpCreateTutorial,
   mcpDeleteItem,
   mcpGetEnvKeys,
   mcpGetPlan,
   mcpGetProjectStatus,
   mcpLink,
+  mcpLinkTutorial,
   mcpListDocuments,
   mcpListFeatures,
+  mcpListPlatforms,
   mcpListProjects,
   mcpListSpecs,
+  mcpListTutorials,
   mcpPostDailyReport,
   mcpSetProjectLinks,
   mcpSetStatus,
@@ -120,6 +124,52 @@ const handler = createMcpHandler(
       "List a project's synced specs/PRDs (metadata).",
       { projectId: z.string().uuid() },
       async (a, extra) => text(await mcpListSpecs(userId(extra), a.projectId)),
+    );
+
+    server.tool(
+      "list_tutorials",
+      "List the tutorial library (id, title, platform, whether it has a written guide).",
+      {},
+      async (_a, extra) => {
+        userId(extra);
+        return text(await mcpListTutorials());
+      },
+    );
+
+    server.tool(
+      "list_platforms",
+      "List the platform registry (id, name) — for linking tutorials.",
+      {},
+      async (_a, extra) => {
+        userId(extra);
+        return text(await mcpListPlatforms());
+      },
+    );
+
+    server.tool(
+      "create_tutorial",
+      "Create a tutorial: an embed video URL + a markdown step-by-step guide (body_md). Superadmin/global-PM only. Visible to clients by default.",
+      {
+        title: z.string(),
+        embed_url: z.string().url(),
+        body_md: z.string().optional(),
+        platform_service_id: z.string().optional(),
+        language: z.enum(["en", "fr"]).optional(),
+        visible_to_clients: z.boolean().optional(),
+      },
+      async (a, extra) => text(await mcpCreateTutorial(userId(extra), a)),
+    );
+
+    server.tool(
+      "link_tutorial_to_platform",
+      "Attach a tutorial to a platform with a purpose label (e.g. 'Create account', 'Invite us'). Superadmin/global-PM only.",
+      {
+        platformId: z.string().uuid(),
+        tutorialId: z.string().uuid(),
+        label: z.string().optional(),
+      },
+      async (a, extra) =>
+        text(await mcpLinkTutorial(userId(extra), a.platformId, a.tutorialId, a.label)),
     );
 
     server.tool(
