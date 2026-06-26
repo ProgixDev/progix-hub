@@ -434,6 +434,8 @@
     "fieldCritical": "Critical — never share credentials, only invite",
     "criticalBadge": "Critical",
     "disabledBadge": "Disabled",
+    "guideReady": "Guide ready",
+    "guideMissing": "No client guide",
     "disable": "Disable",
     "enable": "Enable",
     "deleteConfirm": "Delete “{name}” from the registry? This can’t be undone.",
