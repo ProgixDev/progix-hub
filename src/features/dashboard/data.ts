@@ -10,6 +10,18 @@ export async function getProjectHealth(): Promise<ProjectHealth[]> {
   return (data ?? []) as ProjectHealth[];
 }
 
+/** Open task count per assignee across the caller's projects (RLS-scoped via the RPC). */
+export async function getTeamWorkload(): Promise<Record<string, number>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("team_workload");
+  if (error) return {};
+  const out: Record<string, number> = {};
+  for (const r of (data ?? []) as { user_id: string; open_tasks: number }[]) {
+    out[r.user_id] = Number(r.open_tasks);
+  }
+  return out;
+}
+
 type TaskRow = {
   id: string;
   title: string;
