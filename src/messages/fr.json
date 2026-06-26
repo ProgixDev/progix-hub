@@ -52,7 +52,13 @@
     "colSpecs": "Specs",
     "colReports": "Dernier rapport",
     "colClient": "Client",
-    "colTeam": "Équipe"
+    "colTeam": "Équipe",
+    "workloadTitle": "Charge de l’équipe",
+    "workloadSubtitle": "Qui est en activité et combien de tâches l’occupent.",
+    "openTasks": "{n} ouvertes",
+    "state_working": "En activité",
+    "state_paused": "En pause",
+    "state_off": "Hors ligne"
   },
   "activity": {
     "eyebrow": "Activité",

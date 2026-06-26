@@ -1,11 +1,17 @@
 import { redirect } from "next/navigation";
 import { AppShell, type RecentProject } from "@/components/app-shell/app-shell";
 import { UserMenu } from "@/features/auth";
-import { getProjectHealth, HealthBoard } from "@/features/dashboard";
-import { canViewOrgMembers } from "@/features/members";
+import {
+  getProjectHealth,
+  getTeamWorkload,
+  HealthBoard,
+  WorkloadPanel,
+  type WorkloadRow,
+} from "@/features/dashboard";
+import { canViewOrgMembers, listOrgMembers } from "@/features/members";
 import { listProjects, type Project } from "@/features/projects";
 import { DailyReportButton } from "@/features/reports";
-import { ClockWidget } from "@/features/time-tracking";
+import { ClockWidget, listWorkStatus } from "@/features/time-tracking";
 import { getCurrentUser } from "@/lib/auth/session";
 
 function toRecent(projects: Project[]): RecentProject[] {
@@ -26,6 +32,25 @@ export default async function OverviewPage() {
     listProjects(),
     canViewOrgMembers(),
   ]);
+
+  // Team workload is an oversight view — only for those who can see the org directory.
+  let workload: WorkloadRow[] = [];
+  if (showMembers) {
+    const [members, status, load] = await Promise.all([
+      listOrgMembers(),
+      listWorkStatus(),
+      getTeamWorkload(),
+    ]);
+    const statusBy = new Map(status.map((s) => [s.user_id, s]));
+    workload = members.map((m) => ({
+      userId: m.user_id,
+      name: m.display_name || m.email || "Member",
+      state: statusBy.get(m.user_id)?.state ?? "off",
+      secondsToday: statusBy.get(m.user_id)?.seconds_today ?? 0,
+      openTasks: load[m.user_id] ?? 0,
+    }));
+  }
+
   return (
     <AppShell
       title="Overview"
@@ -36,6 +61,7 @@ export default async function OverviewPage() {
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <HealthBoard rows={rows} />
+      {showMembers && <WorkloadPanel rows={workload} />}
     </AppShell>
   );
 }

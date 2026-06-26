@@ -52,7 +52,13 @@
     "colSpecs": "Specs",
     "colReports": "Last report",
     "colClient": "Client",
-    "colTeam": "Team"
+    "colTeam": "Team",
+    "workloadTitle": "Team workload",
+    "workloadSubtitle": "Who’s on the clock and how much is on their plate.",
+    "openTasks": "{n} open",
+    "state_working": "Working",
+    "state_paused": "Paused",
+    "state_off": "Off"
   },
   "activity": {
     "eyebrow": "Activity",

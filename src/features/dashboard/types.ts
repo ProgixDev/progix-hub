@@ -22,6 +22,15 @@ export type ProjectHealth = {
   members: number;
 };
 
+/** A team member's load: clock state + open assigned tasks (workload view). */
+export type WorkloadRow = {
+  userId: string;
+  name: string;
+  state: "working" | "paused" | "off";
+  secondsToday: number;
+  openTasks: number;
+};
+
 /** A recent daily report across the user's projects. */
 export type RecentReport = {
   id: string;
