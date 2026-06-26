@@ -3,6 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 import { Badge } from "@/components/ui/badge";
 import { markStepAction } from "../public-actions";
 import { videoEmbedSrc } from "../lib";
@@ -34,8 +36,10 @@ function StepCard({ token, step, index }: { token: string; step: SetupStep; inde
   const p = step.platform;
   const done = step.status !== "pending";
   const videos = p.videos
-    .map((v) => ({ label: v.label, src: videoEmbedSrc(v.embed_url) }))
-    .filter((v): v is { label: string | null; src: string } => v.src !== null);
+    .map((v) => ({ label: v.label, src: videoEmbedSrc(v.embed_url), body_md: v.body_md }))
+    .filter(
+      (v): v is { label: string | null; src: string; body_md: string | null } => v.src !== null,
+    );
 
   function toggle() {
     start(async () => {
@@ -84,6 +88,11 @@ function StepCard({ token, step, index }: { token: string; step: SetupStep; inde
               referrerPolicy="strict-origin-when-cross-origin"
             />
           </div>
+          {v.body_md && (
+            <div className="md-body border-line-1 mt-2 rounded-lg border px-3.5 py-3 text-[13px]">
+              <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{v.body_md}</ReactMarkdown>
+            </div>
+          )}
         </div>
       ))}
 
