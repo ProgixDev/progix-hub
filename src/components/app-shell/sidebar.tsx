@@ -9,6 +9,7 @@ import {
   BellIcon,
   GridIcon,
   PlusIcon,
+  PulseIcon,
   SearchIcon,
   SettingsIcon,
   UsersIcon,
@@ -152,6 +153,13 @@ function SidebarNav({
       icon: <UsersIcon className="size-[18px] flex-none" />,
       active: pathname.startsWith("/members"),
       show: !!showMembers,
+    },
+    {
+      href: "/overview",
+      label: t("overview"),
+      icon: <PulseIcon className="size-[18px] flex-none" />,
+      active: pathname.startsWith("/overview"),
+      show: true,
     },
     {
       href: "/activity",

@@ -38,8 +38,21 @@
     "profile": "Profil",
     "tutorials": "Tutoriels",
     "activity": "Activité",
+    "overview": "Vue d’ensemble",
     "collapse": "Réduire le menu",
     "expand": "Agrandir le menu"
+  },
+  "overview": {
+    "eyebrow": "Vue d’ensemble",
+    "title": "Santé des projets",
+    "subtitle": "La progression, la configuration et l’activité de chaque projet en un coup d’œil.",
+    "empty": "Aucun projet pour l’instant.",
+    "colProject": "Projet",
+    "colRoadmap": "Feuille de route",
+    "colSpecs": "Specs",
+    "colReports": "Dernier rapport",
+    "colClient": "Client",
+    "colTeam": "Équipe"
   },
   "activity": {
     "eyebrow": "Activité",
