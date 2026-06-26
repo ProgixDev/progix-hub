@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tutorial } from "./types";
 
 const COLS =
-  "id,title,description,platform_service_id,source_type,embed_url,storage_path,language,visible_to_clients,created_at,updated_at";
+  "id,title,description,platform_service_id,source_type,embed_url,storage_path,language,visible_to_clients,body_md,created_at,updated_at";
 
 const VIDEO_URL_TTL = 60 * 60; // 1h signed URL for inline playback
 

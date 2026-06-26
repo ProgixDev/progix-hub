@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 import { Badge } from "@/components/ui/badge";
 import { PlusIcon } from "@/components/ui/icons";
 import { deleteTutorialAction } from "../actions";
@@ -115,6 +117,17 @@ function Inner({
                   {item.language && <Badge tone="neutral">{item.language.toUpperCase()}</Badge>}
                 </div>
               </div>
+              {item.body_md && (
+                <details className="group">
+                  <summary className="text-text-2 hover:text-text cursor-pointer list-none text-[12px] font-medium">
+                    {t("viewGuide")} <span className="group-open:hidden">▸</span>
+                    <span className="hidden group-open:inline">▾</span>
+                  </summary>
+                  <div className="md-body border-line mt-2 border-t pt-2 text-[13px]">
+                    <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{item.body_md}</ReactMarkdown>
+                  </div>
+                </details>
+              )}
               {canManage && (
                 <div className="flex items-center gap-1.5">
                   <button

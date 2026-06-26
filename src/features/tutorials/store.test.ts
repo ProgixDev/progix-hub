@@ -12,6 +12,7 @@ const tutorial: Tutorial = {
   storage_path: null,
   language: null,
   visible_to_clients: true,
+  body_md: null,
   created_at: "2026-06-24T00:00:00Z",
   updated_at: "2026-06-24T00:00:00Z",
 };

@@ -70,6 +70,10 @@ export const tutorialInputSchema = z
       .optional()
       .transform((v) => (v === "en" || v === "fr" ? v : null)),
     visible_to_clients: z.boolean().default(false),
+    body_md: z.preprocess(
+      (v) => (typeof v === "string" && v.trim().length > 0 ? v : undefined),
+      z.string().max(50000).optional(),
+    ),
   })
   .superRefine((val, ctx) => {
     // Exactly one source: an embed needs a recognized link; an upload needs a stored file.

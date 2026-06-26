@@ -44,6 +44,7 @@ function rowFrom(d: z.infer<typeof tutorialInputSchema>) {
     storage_path: isUpload ? d.storage_path : null,
     language: d.language,
     visible_to_clients: d.visible_to_clients,
+    body_md: d.body_md ?? null,
   };
 }
 
