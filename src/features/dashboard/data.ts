@@ -1,6 +1,14 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { MyTask, RecentReport } from "./types";
+import type { MyTask, ProjectHealth, RecentReport } from "./types";
+
+/** Per-project health aggregates across the user's projects (RLS-scoped via the RPC). */
+export async function getProjectHealth(): Promise<ProjectHealth[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("project_health");
+  if (error) return [];
+  return (data ?? []) as ProjectHealth[];
+}
 
 type TaskRow = {
   id: string;

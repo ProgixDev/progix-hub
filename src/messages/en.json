@@ -38,8 +38,21 @@
     "profile": "Profile",
     "tutorials": "Tutorials",
     "activity": "Activity",
+    "overview": "Overview",
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar"
+  },
+  "overview": {
+    "eyebrow": "Overview",
+    "title": "Project health",
+    "subtitle": "Every project's progress, setup, and activity at a glance.",
+    "empty": "No projects yet.",
+    "colProject": "Project",
+    "colRoadmap": "Roadmap",
+    "colSpecs": "Specs",
+    "colReports": "Last report",
+    "colClient": "Client",
+    "colTeam": "Team"
   },
   "activity": {
     "eyebrow": "Activity",

@@ -66,6 +66,14 @@ export function VideoIcon(props: IconProps) {
   );
 }
 
+export function PulseIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M3 12h4l2-6 4 12 2-6h6" />
+    </svg>
+  );
+}
+
 export function BellIcon(props: IconProps) {
   return (
     <svg {...base(props)}>
