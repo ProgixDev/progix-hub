@@ -69,26 +69,32 @@ type TaskRow = {
   title: string;
   status: string;
   project_id: string;
+  due_date: string | null;
   projects: { name: string } | null;
 };
 
-/** The current user's open (not done) plan items across all their projects (RLS-gated). */
+/** The current user's open (not done) plan items across all their projects (RLS-gated).
+ *  Due/overdue items sort first (nulls last) so deadlines lead the Today panel. */
 export async function getMyOpenTasks(userId: string): Promise<MyTask[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("plan_items")
-    .select("id,title,status,project_id,projects(name)")
+    .select("id,title,status,project_id,due_date,projects(name)")
     .eq("assignee", userId)
     .eq("type", "task")
     .neq("status", "done")
+    .order("due_date", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true })
     .limit(12);
   if (error) return [];
+  const today = new Date().toISOString().slice(0, 10);
   return ((data ?? []) as unknown as TaskRow[]).map((r) => ({
     id: r.id,
     title: r.title || "Untitled",
     status: r.status,
     project_id: r.project_id,
+    due_date: r.due_date,
+    overdue: r.due_date != null && r.due_date < today,
     project_name: r.projects?.name ?? "Project",
   }));
 }

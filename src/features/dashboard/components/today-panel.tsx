@@ -52,6 +52,18 @@ export function TodayPanel({
                     <span className="text-text min-w-0 flex-1 truncate text-[13px]">
                       {task.title}
                     </span>
+                    {task.due_date && (
+                      <span
+                        className={
+                          task.overdue
+                            ? "bg-red-tint text-red-text flex-none rounded-full px-1.5 py-0.5 text-[10.5px] font-medium"
+                            : "border-line-1 text-text-3 flex-none rounded-full border px-1.5 py-0.5 text-[10.5px]"
+                        }
+                        title={task.due_date}
+                      >
+                        {task.overdue ? t("overdue") : t("due", { date: task.due_date.slice(5) })}
+                      </span>
+                    )}
                     <span className="text-text-3 flex-none text-[11.5px]">{task.project_name}</span>
                   </Link>
                 </li>

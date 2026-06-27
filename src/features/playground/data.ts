@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { MemberOption, PlanItem, PlanLink, PlanSnapshot, PlanSpec, PlanStroke } from "./types";
 
 export const PLAN_COLS =
-  "id,project_id,type,title,body,status,assignee,estimate_hours,parent_id,pos_x,pos_y,width,height,board_order,color,meta";
+  "id,project_id,type,title,body,status,assignee,estimate_hours,due_date,parent_id,pos_x,pos_y,width,height,board_order,color,meta";
 
 /** All plan items for a project (RLS gates to project members). */
 export async function listPlanItems(projectId: string): Promise<PlanItem[]> {

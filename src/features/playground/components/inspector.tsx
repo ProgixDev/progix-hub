@@ -111,6 +111,14 @@ export function Inspector({ assignees }: { assignees: MemberOption[] }) {
               className={fieldCls}
             />
           </Row>
+          <Row label="Due date">
+            <input
+              type="date"
+              value={item.due_date ?? ""}
+              onChange={(e) => patch({ due_date: e.target.value || null })}
+              className={fieldCls}
+            />
+          </Row>
         </>
       )}
 

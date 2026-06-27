@@ -49,6 +49,10 @@ const patchSchema = z
     status: z.enum(STATUSES),
     assignee: z.uuid().nullable(),
     estimate_hours: z.number().nonnegative().nullable(),
+    due_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .nullable(),
     parent_id: z.uuid().nullable(),
     pos_x: z.number(),
     pos_y: z.number(),
@@ -276,6 +280,10 @@ const restoreItemSchema = z
     status: z.enum(STATUSES),
     assignee: z.uuid().nullable(),
     estimate_hours: z.number().nullable(),
+    due_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .nullish(),
     parent_id: z.uuid().nullable(),
     pos_x: z.number(),
     pos_y: z.number(),
