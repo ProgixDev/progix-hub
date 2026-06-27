@@ -9,8 +9,11 @@ export type ProjectType = {
   active: boolean;
 };
 
-/** A priced building block in the catalog (spec 044). base_price + effort_days are the "standard"
- *  baseline; the Scoping & Pricing wizard later applies complexity/quantity multipliers. */
+/** essential = free baseline · screen · feature · option (nested under a feature) · crosscutting. */
+export type BlockType = "essential" | "screen" | "feature" | "option" | "crosscutting";
+
+/** A priced building block in the catalog (spec 044/045). Options hang under a feature via parent_id;
+ *  essentials are documented but free; platforms scopes it to ecosystems (empty = all). */
 export type PricingItem = {
   id: string;
   key: string | null;
@@ -21,4 +24,8 @@ export type PricingItem = {
   effort_days: number;
   is_custom: boolean;
   active: boolean;
+  block_type: BlockType;
+  parent_id: string | null;
+  is_free: boolean;
+  platforms: string[];
 };

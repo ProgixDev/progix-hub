@@ -35,6 +35,9 @@ export async function syncFeatureBlocksAction(): Promise<PricingResult> {
   return { ok: true };
 }
 
+const BLOCK_TYPES = ["essential", "screen", "feature", "option", "crosscutting"] as const;
+const PLATFORMS = ["web", "mobile", "desktop"] as const;
+
 const updateSchema = z
   .object({
     base_price: z.number().min(0).max(10_000_000),
@@ -42,6 +45,9 @@ const updateSchema = z
     name: z.string().trim().min(1).max(120),
     category: z.string().trim().min(1).max(60),
     active: z.boolean(),
+    is_free: z.boolean(),
+    block_type: z.enum(BLOCK_TYPES),
+    platforms: z.array(z.enum(PLATFORMS)).max(3),
   })
   .partial();
 
@@ -69,6 +75,10 @@ const createSchema = z.object({
   name: z.string().trim().min(1).max(120),
   base_price: z.number().min(0).max(10_000_000).default(0),
   effort_days: z.number().min(0).max(100_000).default(0),
+  block_type: z.enum(BLOCK_TYPES).default("feature"),
+  parent_id: z.string().uuid().nullable().default(null),
+  is_free: z.boolean().default(false),
+  platforms: z.array(z.enum(PLATFORMS)).max(3).default([]),
 });
 
 export async function createPricingItemAction(input: unknown): Promise<PricingResult> {
