@@ -6,12 +6,14 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { FEATURE_BLOCKS } from "@/lib/playground/feature-catalog";
 import { createClient } from "@/lib/supabase/server";
+import { computeTotals } from "./calc";
 import { parseCsv } from "./csv";
 
 export type PricingResult = { ok: true } | { ok: false; error: string };
 export type ImportResult =
   | { ok: true; inserted: number; updated: number; skipped: number }
   | { ok: false; error: string };
+export type SaveEstimateResult = { ok: true; id: string } | { ok: false; error: string };
 type SessionUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
 
 async function leadership(): Promise<SessionUser | null> {
@@ -361,5 +363,80 @@ export async function deleteProjectTypeAction(id: string): Promise<PricingResult
   const { error } = await supabase.from("project_types").delete().eq("id", pid.data);
   if (error) return { ok: false, error: t("errorFailed") };
   revalidatePath("/pricing/types");
+  return { ok: true };
+}
+
+// ---- Estimates (the wizard's output) ----------------------------------------
+
+const selectionSchema = z.object({
+  item_id: z.string().uuid(),
+  name: z.string().trim().min(1).max(160),
+  category: z.string().trim().max(80),
+  block_type: z.enum(BLOCK_TYPES),
+  unit_price: z.number().min(0).max(10_000_000),
+  unit_days: z.number().min(0).max(100_000),
+  qty: z.number().int().min(1).max(1000),
+  is_free: z.boolean(),
+});
+
+const saveEstimateSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().trim().min(1).max(160),
+  client_name: z.string().trim().max(160).default(""),
+  ecosystems: z.array(z.enum(PLATFORMS)).max(3),
+  project_type: z.string().trim().max(120).default(""),
+  selections: z.array(selectionSchema).max(5000),
+  buffer_pct: z.number().min(0).max(100),
+  velocity: z.number().min(0.1).max(1000),
+});
+
+/** Create or update an estimate. Totals are recomputed server-side (the authoritative store). */
+export async function saveEstimateAction(input: unknown): Promise<SaveEstimateResult> {
+  const t = await getTranslations("pricing");
+  const user = await leadership();
+  if (!user) return { ok: false, error: t("errorNotAuthorized") };
+  const parsed = saveEstimateSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: t("errorInvalid") };
+  const v = parsed.data;
+  const totals = computeTotals(v.selections, v.ecosystems, v.buffer_pct, v.velocity);
+  const supabase = await createClient();
+  const row = {
+    name: v.name,
+    client_name: v.client_name || null,
+    ecosystems: v.ecosystems,
+    project_type: v.project_type || null,
+    selections: v.selections,
+    buffer_pct: v.buffer_pct,
+    velocity: v.velocity,
+    total_price: totals.totalPrice,
+    total_days: totals.totalDays,
+    updated_at: new Date().toISOString(),
+  };
+  if (v.id) {
+    const { error } = await supabase.from("estimates").update(row).eq("id", v.id);
+    if (error) return { ok: false, error: t("errorFailed") };
+    revalidatePath("/pricing/estimates");
+    return { ok: true, id: v.id };
+  }
+  const { data, error } = await supabase
+    .from("estimates")
+    .insert({ ...row, created_by: user.id })
+    .select("id")
+    .single();
+  if (error || !data) return { ok: false, error: t("errorFailed") };
+  revalidatePath("/pricing/estimates");
+  return { ok: true, id: (data as { id: string }).id };
+}
+
+export async function deleteEstimateAction(id: string): Promise<PricingResult> {
+  const t = await getTranslations("pricing");
+  const user = await leadership();
+  if (!user) return { ok: false, error: t("errorNotAuthorized") };
+  const pid = z.string().uuid().safeParse(id);
+  if (!pid.success) return { ok: false, error: t("errorInvalid") };
+  const supabase = await createClient();
+  const { error } = await supabase.from("estimates").delete().eq("id", pid.data);
+  if (error) return { ok: false, error: t("errorFailed") };
+  revalidatePath("/pricing/estimates");
   return { ok: true };
 }
