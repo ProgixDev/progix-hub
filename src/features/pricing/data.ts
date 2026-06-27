@@ -16,7 +16,8 @@ export async function listProjectTypes(): Promise<ProjectType[]> {
   return (data ?? []) as ProjectType[];
 }
 
-const COLS = "id,key,category,name,description,base_price,effort_days,is_custom,active";
+const COLS =
+  "id,key,category,name,description,base_price,effort_days,is_custom,active,block_type,parent_id,is_free,platforms";
 
 /** Leadership (superadmin / global-PM / lead) manage the catalog and run the wizard. */
 export async function canManagePricing(): Promise<boolean> {

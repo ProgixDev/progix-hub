@@ -7,3 +7,11 @@
 - [x] ProjectTypesManager (grouped chips, toggle active, add/delete custom) + PricingTabs; /pricing/types page
 - [ ] NEXT: catalog v2 (block_type, options nested under features, essentials-free, screens, platform tags)
 - [ ] NEXT: the wizard UI (ecosystem → type → screens → features → review), exports (quote + cahier des charges)
+
+## Catalog v2 (shipped — spec 045)
+
+- [x] Migration 0053: block_type, parent_id (options), is_free, platforms[]
+- [x] types/data/actions: v2 fields + create/update accept them
+- [x] PricingCatalog rebuilt for scale: collapsed categories + search + nested options + free toggle + block-type select
+- [x] Verified: collapse, expand, nested option, search filter
+- [ ] NEXT: CSV import/export (bulk-load 2000+ blocks) → then the wizard UI
