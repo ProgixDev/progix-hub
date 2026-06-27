@@ -31,6 +31,16 @@ export type WorkloadRow = {
   openTasks: number;
 };
 
+/** A team member's worked-hours summary (time insights). */
+export type TimeMember = {
+  userId: string;
+  name: string;
+  weekSeconds: number;
+  monthSeconds: number;
+  /** Last 7 days, oldest → newest, seconds per day (for the bar sparkline). */
+  weekDaily: number[];
+};
+
 /** A recent daily report across the user's projects. */
 export type RecentReport = {
   id: string;
