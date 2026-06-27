@@ -27,6 +27,7 @@ export type PlanItem = {
   status: Status;
   assignee: string | null;
   estimate_hours: number | null;
+  due_date: string | null;
   parent_id: string | null;
   pos_x: number;
   pos_y: number;

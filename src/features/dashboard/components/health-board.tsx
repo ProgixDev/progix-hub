@@ -53,6 +53,11 @@ export function HealthBoard({ rows }: { rows: ProjectHealth[] }) {
                       <span className="text-text min-w-0 truncate text-[13.5px] font-medium">
                         {r.name}
                       </span>
+                      {r.overdue > 0 && (
+                        <span className="bg-red-tint text-red-text flex-none rounded-full px-1.5 py-0.5 text-[10.5px] font-medium">
+                          {t("overdue", { n: r.overdue })}
+                        </span>
+                      )}
                     </div>
                     {/* roadmap */}
                     <div className="flex items-center gap-2">

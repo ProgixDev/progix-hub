@@ -4,6 +4,8 @@ export type MyTask = {
   title: string;
   status: string;
   project_id: string;
+  due_date: string | null;
+  overdue: boolean;
   project_name: string;
 };
 
@@ -14,6 +16,7 @@ export type ProjectHealth = {
   status: string;
   task_total: number;
   task_done: number;
+  overdue: number;
   specs: number;
   reports: number;
   last_report: string | null;
