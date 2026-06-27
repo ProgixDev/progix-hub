@@ -237,7 +237,8 @@ export async function importPricingCsvAction(csvText: string): Promise<ImportRes
   let updated = 0;
   for (const p of parsed) existingKeys.has(p.computedKey) ? updated++ : inserted++;
 
-  const uid = user.id;
+  // created_by is intentionally omitted: on an upsert it would reassign authorship of existing/seeded
+  // rows to the importer on every re-import. Inserts default it to null; updates keep the original.
   function payload(p: Parsed, parentId: string | null) {
     return {
       key: p.computedKey,
@@ -250,7 +251,6 @@ export async function importPricingCsvAction(csvText: string): Promise<ImportRes
       platforms: p.platforms,
       parent_id: parentId,
       is_custom: p.computedKey.startsWith("csv:"),
-      created_by: uid,
       updated_at: new Date().toISOString(),
     };
   }

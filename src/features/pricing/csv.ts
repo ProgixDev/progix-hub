@@ -35,7 +35,9 @@ export function parseCsv(text: string): string[][] {
 }
 
 function csvCell(v: string | number | boolean): string {
-  const s = String(v ?? "");
+  let s = String(v ?? "");
+  // Neutralize spreadsheet formula injection: a leading =,+,-,@,tab,CR can execute in Excel/Sheets.
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
