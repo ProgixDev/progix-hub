@@ -41,6 +41,7 @@
     "tutorials": "Tutoriels",
     "activity": "Activité",
     "overview": "Vue d’ensemble",
+    "pricing": "Tarification",
     "collapse": "Réduire le menu",
     "expand": "Agrandir le menu"
   },
@@ -66,6 +67,28 @@
     "state_working": "En activité",
     "state_paused": "En pause",
     "state_off": "Hors ligne"
+  },
+  "pricing": {
+    "eyebrow": "Cadrage & tarification",
+    "title": "Catalogue de tarification",
+    "subtitle": "Tarifez chaque brique — prix de base + charge en jours. L’assistant additionne vos choix en un devis et un cahier des charges.",
+    "import": "Importer les briques",
+    "addItem": "Ajouter",
+    "add": "Ajouter",
+    "delete": "Supprimer",
+    "itemsCount": "{n} éléments",
+    "totalPrice": "Total catalogue {v}",
+    "totalDays": "{d} jours",
+    "groupSummary": "{v} · {d}j",
+    "colFeature": "Fonctionnalité",
+    "colPrice": "Prix",
+    "colEffort": "Charge (jours)",
+    "emptyTitle": "Votre catalogue est vide. Importez les briques pour commencer à tarifer.",
+    "phCategory": "Catégorie",
+    "phName": "Nom de la fonctionnalité",
+    "errorNotAuthorized": "Seule la direction peut gérer la tarification.",
+    "errorInvalid": "Veuillez vérifier les valeurs.",
+    "errorFailed": "Une erreur s’est produite. Veuillez réessayer."
   },
   "activity": {
     "eyebrow": "Activité",

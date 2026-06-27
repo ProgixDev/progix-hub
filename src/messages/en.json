@@ -41,6 +41,7 @@
     "tutorials": "Tutorials",
     "activity": "Activity",
     "overview": "Overview",
+    "pricing": "Pricing",
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar"
   },
@@ -66,6 +67,28 @@
     "state_working": "Working",
     "state_paused": "Paused",
     "state_off": "Off"
+  },
+  "pricing": {
+    "eyebrow": "Scoping & pricing",
+    "title": "Pricing catalog",
+    "subtitle": "Price each building block — base price + effort in days. The wizard sums your selections into a quote and a spec.",
+    "import": "Import feature blocks",
+    "addItem": "Add item",
+    "add": "Add",
+    "delete": "Delete",
+    "itemsCount": "{n} items",
+    "totalPrice": "Catalog total {v}",
+    "totalDays": "{d} days",
+    "groupSummary": "{v} · {d}d",
+    "colFeature": "Feature",
+    "colPrice": "Price",
+    "colEffort": "Effort (days)",
+    "emptyTitle": "Your catalog is empty. Import the feature blocks to start pricing.",
+    "phCategory": "Category",
+    "phName": "Feature name",
+    "errorNotAuthorized": "Only leadership can manage pricing.",
+    "errorInvalid": "Please check the values.",
+    "errorFailed": "Something went wrong. Please try again."
   },
   "activity": {
     "eyebrow": "Activity",
