@@ -34,3 +34,12 @@
 - [x] EstimatesList + Estimates tab; /pricing/estimates, /new, /[id] pages
 - [x] Verified: select 3 blocks + mobile → $5,704 (×1.6 platform, 15% buffer), save → list
 - [ ] NEXT: exports (quote + cahier des charges w/ scope-control clauses) + accepted estimate → seed project phases/tasks
+
+## Exports — quote + cahier des charges (shipped — spec 045)
+
+- [x] document.ts (pure): estimateDocModel (group by category, essentials/screens, price range low–high) + DOC_TERMS
+- [x] EstimateDocument (quote | spec variants) on a white print sheet; DocBar (Print/Save as PDF, print:hidden)
+- [x] Standalone pages /pricing/estimates/[id]/quote + /spec (leadership-gated); Quote/Spec links on list rows
+- [x] estimateDoc i18n namespace (en+fr) incl. scope-control clauses: revisions, CHANGE-ORDER (highlighted), client responsibilities, assumptions, out-of-scope
+- [x] Verified both docs render (range, scope, essentials, terms) + print-friendly
+- [ ] NEXT (final): accepted estimate → seed real project phases/tasks + change requests

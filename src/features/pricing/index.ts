@@ -13,4 +13,6 @@ export { ProjectTypesManager } from "./components/project-types-manager";
 export { PricingTabs } from "./components/pricing-tabs";
 export { EstimateWizard } from "./components/estimate-wizard";
 export { EstimatesList } from "./components/estimates-list";
+export { EstimateDocument } from "./components/estimate-document";
+export { DocBar } from "./components/doc-bar";
 export type { PricingItem, ProjectType, Estimate } from "./types";

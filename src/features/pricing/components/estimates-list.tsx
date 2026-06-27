@@ -84,6 +84,20 @@ export function EstimatesList({ estimates: initial }: { estimates: Estimate[] })
                   {t("daysShort", { d: e.total_days })}
                 </p>
               </div>
+              <div className="flex items-center gap-1">
+                <Link
+                  href={`/pricing/estimates/${e.id}/quote`}
+                  className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition-colors"
+                >
+                  {t("quoteLink")}
+                </Link>
+                <Link
+                  href={`/pricing/estimates/${e.id}/spec`}
+                  className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition-colors"
+                >
+                  {t("specLink")}
+                </Link>
+              </div>
               <button
                 type="button"
                 onClick={() => remove(e.id)}
