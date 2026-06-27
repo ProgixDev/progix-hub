@@ -2,12 +2,13 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { PlusIcon, SearchIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import {
   createPricingItemAction,
   deletePricingItemAction,
+  importPricingCsvAction,
   syncFeatureBlocksAction,
   updatePricingItemAction,
 } from "../actions";
@@ -31,11 +32,42 @@ export function PricingCatalog({ items: initial }: { items: PricingItem[] }) {
   const t = useTranslations("pricing");
   const router = useRouter();
   const [items, setItems] = useState<PricingItem[]>(initial);
+  // Re-sync local state when the server data changes (after import / add / delete refresh). Inline
+  // edits don't touch `initial`, so they aren't clobbered. (React's reset-state-on-prop-change pattern.)
+  const sig = useMemo(
+    () => initial.map((i) => `${i.id}:${i.base_price}:${i.effort_days}:${i.is_free}`).join("|"),
+    [initial],
+  );
+  const prevSig = useRef(sig);
+  if (sig !== prevSig.current) {
+    prevSig.current = sig;
+    setItems(initial);
+  }
   const [open, setOpen] = useState<Set<string>>(new Set());
   const [q, setQ] = useState("");
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setError(null);
+    setNotice(null);
+    start(async () => {
+      const text = await file.text();
+      const res = await importPricingCsvAction(text);
+      if (res.ok) {
+        setNotice(
+          t("importDone", { inserted: res.inserted, updated: res.updated, skipped: res.skipped }),
+        );
+        router.refresh();
+      } else setError(res.error);
+    });
+  }
 
   const query = q.trim().toLowerCase();
 
@@ -214,7 +246,28 @@ export function PricingCatalog({ items: initial }: { items: PricingItem[] }) {
           <h1 className="text-text text-[26px] font-semibold tracking-tight">{t("title")}</h1>
           <p className="text-text-3 mt-1 text-[13px]">{t("subtitle")}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/api/pricing/export"
+            className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text flex h-9 items-center rounded-full border px-3.5 text-[13px] font-medium transition-colors"
+          >
+            {t("exportCsv")}
+          </a>
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={pending}
+            className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text h-9 rounded-full border px-3.5 text-[13px] font-medium transition-colors disabled:opacity-60"
+          >
+            {t("importCsv")}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".csv,text/csv"
+            onChange={onImportFile}
+            className="hidden"
+          />
           <button
             type="button"
             onClick={importBlocks}
@@ -254,6 +307,11 @@ export function PricingCatalog({ items: initial }: { items: PricingItem[] }) {
       {error && (
         <p className="border-red/30 bg-red-tint text-red-text mt-3 rounded-xl border px-3.5 py-2.5 text-[13px]">
           {error}
+        </p>
+      )}
+      {notice && (
+        <p className="border-line-blue bg-blue-tint text-text mt-3 rounded-xl border px-3.5 py-2.5 text-[13px]">
+          {notice}
         </p>
       )}
 
