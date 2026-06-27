@@ -5,9 +5,9 @@ import { UserMenu } from "@/features/auth";
 import { canViewOrgMembers } from "@/features/members";
 import {
   canManagePricing,
-  listPricingItems,
-  PricingCatalog,
+  listProjectTypes,
   PricingTabs,
+  ProjectTypesManager,
 } from "@/features/pricing";
 import { listProjects, type Project } from "@/features/projects";
 import { DailyReportButton } from "@/features/reports";
@@ -23,13 +23,13 @@ function toRecent(projects: Project[]): RecentProject[] {
   }));
 }
 
-/** Pricing catalog — leadership prices the building blocks for the Scoping & Pricing wizard (spec 044). */
-export default async function PricingPage() {
+/** Project types the Scoping & Pricing wizard offers (spec 045) — leadership managed. */
+export default async function ProjectTypesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
   if (!(await canManagePricing())) redirect("/");
-  const [items, projects, showMembers] = await Promise.all([
-    listPricingItems(),
+  const [types, projects, showMembers] = await Promise.all([
+    listProjectTypes(),
     listProjects(),
     canViewOrgMembers(),
   ]);
@@ -44,7 +44,7 @@ export default async function PricingPage() {
       userSlot={<UserMenu initials={user.initials} name={user.name} email={user.email} />}
     >
       <PricingTabs />
-      <PricingCatalog items={items} />
+      <ProjectTypesManager types={types} />
     </AppShell>
   );
 }
