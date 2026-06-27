@@ -2,7 +2,33 @@ import "server-only";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { toCsv } from "./csv";
-import type { PricingItem, ProjectType } from "./types";
+import type { Estimate, PricingItem, ProjectType } from "./types";
+
+const ESTIMATE_COLS =
+  "id,name,client_name,ecosystems,project_type,selections,buffer_pct,velocity,total_price,total_days,status,project_id,created_at";
+
+/** Saved estimates, newest first (leadership only, via RLS). */
+export async function listEstimates(): Promise<Estimate[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("estimates")
+    .select(ESTIMATE_COLS)
+    .order("created_at", { ascending: false });
+  if (error) return [];
+  return (data ?? []) as Estimate[];
+}
+
+/** One estimate by id (leadership only, via RLS) — for the wizard's edit mode. */
+export async function getEstimate(id: string): Promise<Estimate | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("estimates")
+    .select(ESTIMATE_COLS)
+    .eq("id", id)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data as Estimate;
+}
 
 /** All project types, grouped by vertical (the wizard's project-type step). */
 export async function listProjectTypes(): Promise<ProjectType[]> {

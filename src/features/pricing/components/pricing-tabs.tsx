@@ -12,12 +12,13 @@ export function PricingTabs() {
   const tabs = [
     { href: "/pricing", label: t("tabFeatures") },
     { href: "/pricing/types", label: t("tabTypes") },
+    { href: "/pricing/estimates", label: t("tabEstimates") },
   ];
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pt-6 sm:px-6">
       <div className="border-line-1 inline-flex items-center gap-0.5 rounded-full border p-0.5">
         {tabs.map((tb) => {
-          const active = path === tb.href;
+          const active = tb.href === "/pricing" ? path === "/pricing" : path.startsWith(tb.href);
           return (
             <Link
               key={tb.href}

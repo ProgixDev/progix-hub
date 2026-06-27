@@ -24,3 +24,13 @@
 - [x] Export/Import CSV buttons + result notice; fixed stale-local-state on refresh (PricingCatalog + ProjectTypesManager)
 - [x] Verified round-trip: export 140 rows; import "3 added, 1 updated", nested option resolved, rows display
 - [ ] NEXT: the wizard UI (ecosystem → type → screens → features → review → quote + cahier des charges)
+
+## The wizard UI — core (shipped — spec 045)
+
+- [x] Migration 0054: estimates table (selections jsonb snapshot, totals, status; leadership RLS)
+- [x] calc.ts (pure shared math: platform factor, buffer, target band $10-20k, effort→weeks)
+- [x] data: listEstimates, getEstimate; actions: saveEstimateAction (server-recomputes totals), deleteEstimateAction
+- [x] EstimateWizard: basics + ecosystem toggles + project-type select + feature picker (collapse/search/nested) + sticky live summary (price, band, timeline, buffer/velocity inputs)
+- [x] EstimatesList + Estimates tab; /pricing/estimates, /new, /[id] pages
+- [x] Verified: select 3 blocks + mobile → $5,704 (×1.6 platform, 15% buffer), save → list
+- [ ] NEXT: exports (quote + cahier des charges w/ scope-control clauses) + accepted estimate → seed project phases/tasks
