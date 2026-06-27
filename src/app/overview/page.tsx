@@ -5,7 +5,10 @@ import { UserMenu } from "@/features/auth";
 import {
   getProjectHealth,
   getTeamWorkload,
+  getTimeInsights,
   HealthBoard,
+  type TimeMember,
+  TimePanel,
   WorkloadPanel,
   type WorkloadRow,
 } from "@/features/dashboard";
@@ -34,8 +37,9 @@ export default async function OverviewPage() {
     canViewOrgMembers(),
   ]);
 
-  // Team workload is an oversight view — only for those who can see the org directory.
+  // Team workload + time insights are oversight views — only for those who can see the org directory.
   let workload: WorkloadRow[] = [];
+  let timeRows: TimeMember[] = [];
   if (showMembers) {
     const [members, status, load] = await Promise.all([
       listOrgMembers(),
@@ -50,6 +54,7 @@ export default async function OverviewPage() {
       secondsToday: statusBy.get(m.user_id)?.seconds_today ?? 0,
       openTasks: load[m.user_id] ?? 0,
     }));
+    timeRows = await getTimeInsights(members);
   }
 
   return (
@@ -64,6 +69,7 @@ export default async function OverviewPage() {
     >
       <HealthBoard rows={rows} />
       {showMembers && <WorkloadPanel rows={workload} />}
+      {showMembers && <TimePanel rows={timeRows} />}
     </AppShell>
   );
 }
