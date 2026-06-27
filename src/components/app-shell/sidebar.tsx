@@ -7,6 +7,7 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { LogoMark, Wordmark } from "@/components/brand/logo";
 import {
   BellIcon,
+  CalculatorIcon,
   GridIcon,
   PlusIcon,
   PulseIcon,
@@ -160,6 +161,13 @@ function SidebarNav({
       icon: <PulseIcon className="size-[18px] flex-none" />,
       active: pathname.startsWith("/overview"),
       show: true,
+    },
+    {
+      href: "/pricing",
+      label: t("pricing"),
+      icon: <CalculatorIcon className="size-[18px] flex-none" />,
+      active: pathname.startsWith("/pricing"),
+      show: !!showMembers,
     },
     {
       href: "/activity",
