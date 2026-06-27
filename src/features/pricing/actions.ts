@@ -98,3 +98,78 @@ export async function deletePricingItemAction(id: string): Promise<PricingResult
   revalidatePath("/pricing");
   return { ok: true };
 }
+
+// ---- Project types (the wizard's project-type step) -------------------------
+
+function slugify(s: string): string {
+  return (
+    s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 50) || "type"
+  );
+}
+
+const typeCreateSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  group_name: z.string().trim().min(1).max(60),
+});
+
+export async function createProjectTypeAction(input: unknown): Promise<PricingResult> {
+  const t = await getTranslations("pricing");
+  const user = await leadership();
+  if (!user) return { ok: false, error: t("errorNotAuthorized") };
+  const parsed = typeCreateSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: t("errorInvalid") };
+  const supabase = await createClient();
+  const slug = `${slugify(parsed.data.name)}-${Math.random().toString(36).slice(2, 6)}`;
+  const { error } = await supabase
+    .from("project_types")
+    .insert({ ...parsed.data, slug, is_custom: true, sort: 999, created_by: user.id });
+  if (error) return { ok: false, error: t("errorFailed") };
+  revalidatePath("/pricing/types");
+  return { ok: true };
+}
+
+const typeUpdateSchema = z
+  .object({
+    name: z.string().trim().min(1).max(80),
+    group_name: z.string().trim().min(1).max(60),
+    active: z.boolean(),
+  })
+  .partial();
+
+export async function updateProjectTypeAction(id: string, input: unknown): Promise<PricingResult> {
+  const t = await getTranslations("pricing");
+  const user = await leadership();
+  if (!user) return { ok: false, error: t("errorNotAuthorized") };
+  const pid = z.string().uuid().safeParse(id);
+  const parsed = typeUpdateSchema.safeParse(input);
+  if (!pid.success || !parsed.success || Object.keys(parsed.data).length === 0) {
+    return { ok: false, error: t("errorInvalid") };
+  }
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("project_types")
+    .update({ ...parsed.data, updated_at: new Date().toISOString() })
+    .eq("id", pid.data);
+  if (error) return { ok: false, error: t("errorFailed") };
+  revalidatePath("/pricing/types");
+  return { ok: true };
+}
+
+export async function deleteProjectTypeAction(id: string): Promise<PricingResult> {
+  const t = await getTranslations("pricing");
+  const user = await leadership();
+  if (!user) return { ok: false, error: t("errorNotAuthorized") };
+  const pid = z.string().uuid().safeParse(id);
+  if (!pid.success) return { ok: false, error: t("errorInvalid") };
+  const supabase = await createClient();
+  const { error } = await supabase.from("project_types").delete().eq("id", pid.data);
+  if (error) return { ok: false, error: t("errorFailed") };
+  revalidatePath("/pricing/types");
+  return { ok: true };
+}

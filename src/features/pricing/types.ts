@@ -1,3 +1,14 @@
+/** A project type the wizard offers (spec 045), grouped into a vertical. */
+export type ProjectType = {
+  id: string;
+  slug: string;
+  name: string;
+  group_name: string;
+  description: string | null;
+  is_custom: boolean;
+  active: boolean;
+};
+
 /** A priced building block in the catalog (spec 044). base_price + effort_days are the "standard"
  *  baseline; the Scoping & Pricing wizard later applies complexity/quantity multipliers. */
 export type PricingItem = {

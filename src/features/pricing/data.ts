@@ -1,7 +1,20 @@
 import "server-only";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import type { PricingItem } from "./types";
+import type { PricingItem, ProjectType } from "./types";
+
+/** All project types, grouped by vertical (the wizard's project-type step). */
+export async function listProjectTypes(): Promise<ProjectType[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("project_types")
+    .select("id,slug,name,group_name,description,is_custom,active")
+    .order("group_name", { ascending: true })
+    .order("sort", { ascending: true })
+    .order("name", { ascending: true });
+  if (error) return [];
+  return (data ?? []) as ProjectType[];
+}
 
 const COLS = "id,key,category,name,description,base_price,effort_days,is_custom,active";
 
