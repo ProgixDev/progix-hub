@@ -540,11 +540,24 @@ export async function seedProjectFromEstimateAction(
     if (tErr) return { ok: false, error: t("errorFailed") };
   }
 
-  // 3. mark the estimate accepted + linked
-  await supabase
+  // 3. mark the estimate accepted + linked — claim atomically (only if still unlinked) so two
+  //    concurrent clicks can't each create a project. The loser discards its orphan and opens the winner's.
+  const { data: linked } = await supabase
     .from("estimates")
     .update({ status: "accepted", project_id: projectId, updated_at: new Date().toISOString() })
-    .eq("id", eid.data);
+    .eq("id", eid.data)
+    .is("project_id", null)
+    .select("id");
+  if (!linked || linked.length === 0) {
+    await supabase.from("projects").delete().eq("id", projectId); // rollback (cascades plan_items)
+    const { data: cur } = await supabase
+      .from("estimates")
+      .select("project_id")
+      .eq("id", eid.data)
+      .maybeSingle();
+    const won = (cur as { project_id: string | null } | null)?.project_id;
+    return won ? { ok: true, projectId: won } : { ok: false, error: t("errorFailed") };
+  }
   revalidatePath("/pricing/estimates");
   revalidatePath("/");
   return { ok: true, projectId };
