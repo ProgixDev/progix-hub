@@ -8,12 +8,14 @@ import { FEATURE_BLOCKS } from "@/lib/playground/feature-catalog";
 import { createClient } from "@/lib/supabase/server";
 import { computeTotals } from "./calc";
 import { parseCsv } from "./csv";
+import type { EstimateSelection } from "./types";
 
 export type PricingResult = { ok: true } | { ok: false; error: string };
 export type ImportResult =
   | { ok: true; inserted: number; updated: number; skipped: number }
   | { ok: false; error: string };
 export type SaveEstimateResult = { ok: true; id: string } | { ok: false; error: string };
+export type SeedProjectResult = { ok: true; projectId: string } | { ok: false; error: string };
 type SessionUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
 
 async function leadership(): Promise<SessionUser | null> {
@@ -439,4 +441,124 @@ export async function deleteEstimateAction(id: string): Promise<PricingResult> {
   if (error) return { ok: false, error: t("errorFailed") };
   revalidatePath("/pricing/estimates");
   return { ok: true };
+}
+
+// ---- Close the loop: accepted estimate -> seed a real project ---------------
+
+/** Turn an estimate into a real hub project: create it (creator seated as PM), seed a phase frame
+ *  per category with a task per selected block, and link/accept the estimate. Idempotent. */
+export async function seedProjectFromEstimateAction(
+  estimateId: string,
+): Promise<SeedProjectResult> {
+  const t = await getTranslations("pricing");
+  const user = await leadership();
+  if (!user) return { ok: false, error: t("errorNotAuthorized") };
+  const eid = z.string().uuid().safeParse(estimateId);
+  if (!eid.success) return { ok: false, error: t("errorInvalid") };
+
+  const supabase = await createClient();
+  const { data: est } = await supabase
+    .from("estimates")
+    .select("id,name,selections,project_id")
+    .eq("id", eid.data)
+    .maybeSingle();
+  if (!est) return { ok: false, error: t("errorFailed") };
+  const e = est as {
+    id: string;
+    name: string;
+    selections: EstimateSelection[];
+    project_id: string | null;
+  };
+  if (e.project_id) return { ok: true, projectId: e.project_id }; // already created — just open it
+
+  // 1. create the project (RPC seats the creator as PM atomically)
+  const { data: proj, error: pErr } = await supabase.rpc("create_project", {
+    p_name: e.name.slice(0, 120),
+    p_status: "active",
+    p_description: t("seededFrom"),
+  });
+  if (pErr || !proj) return { ok: false, error: t("errorFailed") };
+  const projectId = (proj as { id: string }).id;
+
+  // 2. group selections by category -> phase frames + tasks
+  const byCat = new Map<string, EstimateSelection[]>();
+  for (const s of e.selections ?? []) {
+    const g = byCat.get(s.category) ?? [];
+    g.push(s);
+    byCat.set(s.category, g);
+  }
+  const cats = [...byCat.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+
+  const FRAME_W = 320;
+  const COL_GAP = 48;
+  const HEAD = 72;
+  const ROW = 84;
+  const PAD = 20;
+  const phaseRows = cats.map(([category, blocks], i) => ({
+    project_id: projectId,
+    type: "phase",
+    title: category.slice(0, 120),
+    pos_x: i * (FRAME_W + COL_GAP) + 40,
+    pos_y: 40,
+    width: FRAME_W,
+    height: HEAD + blocks.length * ROW + PAD,
+    created_by: user.id,
+  }));
+  const { data: phases, error: phErr } = await supabase
+    .from("plan_items")
+    .insert(phaseRows)
+    .select("id,title,pos_x,pos_y");
+  if (phErr || !phases) return { ok: false, error: t("errorFailed") };
+  const phaseByTitle = new Map(
+    (phases as { id: string; title: string; pos_x: number; pos_y: number }[]).map((p) => [
+      p.title,
+      p,
+    ]),
+  );
+
+  let order = 0;
+  const taskRows = cats.flatMap(([category, blocks]) => {
+    const ph = phaseByTitle.get(category.slice(0, 120));
+    return blocks.map((b, j) => ({
+      project_id: projectId,
+      type: "task",
+      title: (b.qty > 1 ? `${b.name} ×${b.qty}` : b.name).slice(0, 500),
+      parent_id: ph?.id ?? null,
+      status: "backlog",
+      estimate_hours: Math.round(b.unit_days * b.qty * 8 * 10) / 10 || null,
+      pos_x: (ph?.pos_x ?? 40) + PAD,
+      pos_y: (ph?.pos_y ?? 40) + HEAD + j * ROW,
+      width: FRAME_W - PAD * 2,
+      height: 48,
+      board_order: order++,
+      meta: { category },
+      created_by: user.id,
+    }));
+  });
+  if (taskRows.length > 0) {
+    const { error: tErr } = await supabase.from("plan_items").insert(taskRows);
+    if (tErr) return { ok: false, error: t("errorFailed") };
+  }
+
+  // 3. mark the estimate accepted + linked — claim atomically (only if still unlinked) so two
+  //    concurrent clicks can't each create a project. The loser discards its orphan and opens the winner's.
+  const { data: linked } = await supabase
+    .from("estimates")
+    .update({ status: "accepted", project_id: projectId, updated_at: new Date().toISOString() })
+    .eq("id", eid.data)
+    .is("project_id", null)
+    .select("id");
+  if (!linked || linked.length === 0) {
+    await supabase.from("projects").delete().eq("id", projectId); // rollback (cascades plan_items)
+    const { data: cur } = await supabase
+      .from("estimates")
+      .select("project_id")
+      .eq("id", eid.data)
+      .maybeSingle();
+    const won = (cur as { project_id: string | null } | null)?.project_id;
+    return won ? { ok: true, projectId: won } : { ok: false, error: t("errorFailed") };
+  }
+  revalidatePath("/pricing/estimates");
+  revalidatePath("/");
+  return { ok: true, projectId };
 }

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { PlusIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
-import { deleteEstimateAction } from "../actions";
+import { deleteEstimateAction, seedProjectFromEstimateAction } from "../actions";
 import type { Estimate } from "../types";
 
 const STATUS_CLS: Record<string, string> = {
@@ -20,12 +20,21 @@ export function EstimatesList({ estimates: initial }: { estimates: Estimate[] })
   const t = useTranslations("pricing");
   const router = useRouter();
   const [estimates, setEstimates] = useState(initial);
-  const [, start] = useTransition();
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   function remove(id: string) {
     setEstimates((arr) => arr.filter((e) => e.id !== id));
     start(async () => {
       await deleteEstimateAction(id);
+    });
+  }
+  function createProject(id: string) {
+    setError(null);
+    start(async () => {
+      const res = await seedProjectFromEstimateAction(id);
+      if (res.ok) router.push(`/projects/${res.projectId}/playground`);
+      else setError(res.error);
     });
   }
 
@@ -47,6 +56,12 @@ export function EstimatesList({ estimates: initial }: { estimates: Estimate[] })
           {t("newEstimate")}
         </Link>
       </div>
+
+      {error && (
+        <p className="border-red/30 bg-red-tint text-red-text mt-4 rounded-xl border px-3.5 py-2.5 text-[13px]">
+          {error}
+        </p>
+      )}
 
       {estimates.length === 0 ? (
         <div className="border-line-1 mt-6 rounded-2xl border border-dashed p-10 text-center">
@@ -85,6 +100,23 @@ export function EstimatesList({ estimates: initial }: { estimates: Estimate[] })
                 </p>
               </div>
               <div className="flex items-center gap-1">
+                {e.project_id ? (
+                  <Link
+                    href={`/projects/${e.project_id}/playground`}
+                    className="border-line-blue text-blue-text bg-blue-tint rounded-full border px-2.5 py-1 text-[11.5px] font-medium"
+                  >
+                    {t("openProject")}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => createProject(e.id)}
+                    disabled={pending}
+                    className="btn-primary rounded-full px-2.5 py-1 text-[11.5px] font-medium disabled:opacity-50"
+                  >
+                    {t("createProject")}
+                  </button>
+                )}
                 <Link
                   href={`/pricing/estimates/${e.id}/quote`}
                   className="border-line-1 text-text-1 hover:bg-bg-3 hover:text-text rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition-colors"

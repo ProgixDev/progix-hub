@@ -43,3 +43,9 @@
 - [x] estimateDoc i18n namespace (en+fr) incl. scope-control clauses: revisions, CHANGE-ORDER (highlighted), client responsibilities, assumptions, out-of-scope
 - [x] Verified both docs render (range, scope, essentials, terms) + print-friendly
 - [ ] NEXT (final): accepted estimate → seed real project phases/tasks + change requests
+
+## Close the loop — accepted estimate → real project (shipped — spec 045) ✅ EPIC COMPLETE
+
+- [x] seedProjectFromEstimateAction: create_project RPC (creator=PM) → phase frame per category + task per block (estimate_hours = days×qty×8, canvas-positioned, board_order) → estimate status=accepted + project_id linked; idempotent
+- [x] EstimatesList: Create project / Open project per row + error banner
+- [x] Verified: Create project → seeds Auth/Screens/Essentials phases + block tasks → redirects to playground; estimate flips Accepted + Open project
