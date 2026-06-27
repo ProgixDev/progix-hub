@@ -1,6 +1,7 @@
 import "server-only";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { toCsv } from "./csv";
 import type { PricingItem, ProjectType } from "./types";
 
 /** All project types, grouped by vertical (the wizard's project-type step). */
@@ -45,4 +46,34 @@ export async function listPricingItems(): Promise<PricingItem[]> {
     base_price: Number(r.base_price),
     effort_days: Number(r.effort_days),
   }));
+}
+
+const CSV_HEADER = [
+  "key",
+  "category",
+  "name",
+  "block_type",
+  "base_price",
+  "effort_days",
+  "is_free",
+  "platforms",
+  "parent",
+];
+
+/** The whole catalog as a CSV string (for the export download). Options carry their parent's name. */
+export async function pricingCatalogCsv(): Promise<string> {
+  const items = await listPricingItems();
+  const nameById = new Map(items.map((i) => [i.id, i.name]));
+  const rows = items.map((i) => [
+    i.key ?? "",
+    i.category,
+    i.name,
+    i.block_type,
+    i.base_price,
+    i.effort_days,
+    i.is_free,
+    i.platforms.join(";"),
+    i.parent_id ? (nameById.get(i.parent_id) ?? "") : "",
+  ]);
+  return toCsv(CSV_HEADER, rows);
 }

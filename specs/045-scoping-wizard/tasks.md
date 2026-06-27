@@ -15,3 +15,12 @@
 - [x] PricingCatalog rebuilt for scale: collapsed categories + search + nested options + free toggle + block-type select
 - [x] Verified: collapse, expand, nested option, search filter
 - [ ] NEXT: CSV import/export (bulk-load 2000+ blocks) → then the wizard UI
+
+## CSV import/export (shipped — spec 045)
+
+- [x] csv.ts: parseCsv (RFC4180-ish) + toCsv
+- [x] pricingCatalogCsv data fn + /api/pricing/export route (leadership 403-gated)
+- [x] importPricingCsvAction: parse, validate (zod, caps 5MB/5000 rows), 2-pass upsert by key (synthetic keys for keyless → idempotent), options resolve parent by name
+- [x] Export/Import CSV buttons + result notice; fixed stale-local-state on refresh (PricingCatalog + ProjectTypesManager)
+- [x] Verified round-trip: export 140 rows; import "3 added, 1 updated", nested option resolved, rows display
+- [ ] NEXT: the wizard UI (ecosystem → type → screens → features → review → quote + cahier des charges)

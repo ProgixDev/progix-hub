@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { PlusIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 import {
@@ -20,6 +20,13 @@ export function ProjectTypesManager({ types: initial }: { types: ProjectType[] }
   const t = useTranslations("pricing");
   const router = useRouter();
   const [types, setTypes] = useState<ProjectType[]>(initial);
+  // Re-sync when the server data changes (after add/delete refresh); local toggles aren't clobbered.
+  const sig = useMemo(() => initial.map((i) => `${i.id}:${i.active}`).join("|"), [initial]);
+  const prevSig = useRef(sig);
+  if (sig !== prevSig.current) {
+    prevSig.current = sig;
+    setTypes(initial);
+  }
   const [, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
